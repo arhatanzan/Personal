@@ -61,6 +61,7 @@
   .card-footer { margin-top:auto; display:flex; align-items:center; gap:8px; }
   .card-footer .primary-wrap { flex:1 1 auto; }
   .card-footer .actions { flex:0 0 auto; display:flex; gap:8px; align-items:center; }
+  .card-footer .actions { margin-left: auto; }
   .download-btn { background:var(--accent); color:var(--navy); border-radius:8px; padding:8px 12px; text-decoration:none; font-weight:700; font-size:14px; display:inline-flex; align-items:center; justify-content:center; }
   /* unify action buttons (Details / Back) so they're visually identical and align perfectly */
   .details-btn, .back-btn { background:transparent; border:1px solid rgba(0,0,0,0.1); border-radius:8px; padding:6px 12px; font-size:14px; cursor:pointer; color:var(--navy); display:inline-flex; align-items:center; justify-content:center; min-width:86px; box-sizing:border-box; }
@@ -91,10 +92,11 @@
   .card-front, .card-back { grid-area: 1/1; display:flex; flex-direction:column; gap:12px; padding:16px; box-sizing:border-box; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
   .card-front { background:transparent; }
   .card-back { background:var(--card-bg); color:var(--navy); transform: rotateY(180deg); border-radius: calc(var(--radius) - 2px); align-items:flex-start; }
+  /* Ensure the footer on the back face stretches full width so actions can be pushed right */
+  .card-back .card-footer { width: 100%; }
   .card.is-flipped .card-inner { transform: rotateY(180deg); }
   /* Ensure long content on back side scrolls within the card without moving layout */
   .card-back { overflow:auto; }
-  .back-btn { background:transparent; border:1px solid rgba(0,0,0,0.1); border-radius:8px; padding:6px 10px; font-size:14px; cursor:pointer; color:var(--navy); }
 
   /* Price display */
   .price-row { display:flex; gap:8px; align-items:center; margin-top:8px; }
