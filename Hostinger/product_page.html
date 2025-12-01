@@ -188,9 +188,10 @@ function setTheme(vars){
 const PRODUCTS = [
   {
     id: "p1",
+    summary: "Hands-on workbook to structure and tell data-driven stories.",
     buttonLabel: "",
     category: "Guides",
-    description: "A practical workbook for crafting narratives using data.",
+    description: "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line in section 1.10.32",
     discountPercent: null,
     fileName: "data-storytelling-workbook.pdf",
     imageUrl: "",
@@ -204,6 +205,7 @@ const PRODUCTS = [
   },
   {
     id: "p2",
+    summary: "Quick reference cheat sheet for setting up monitors.",
     buttonLabel: "",
     category: "Cheatsheets",
     description: "Quick access reference for creating effective monitors.",
@@ -220,6 +222,7 @@ const PRODUCTS = [
   },
   {
     id: "p3",
+    summary: "A practical leadership book in hardcover format.",
     buttonLabel: "Buy on Amazon",
     category: "Books",
     description: "A hardcover book available on Amazon.",
@@ -236,6 +239,7 @@ const PRODUCTS = [
   },
   {
     id: "p4",
+    summary: "Slide deck covering digital democracy and media.",
     buttonLabel: "",
     category: "Slides",
     description: "Download slide deck on digital democracy & media.",
@@ -252,6 +256,7 @@ const PRODUCTS = [
   },
   {
     id: "p5",
+    summary: "A premium aesthetic portfolio template for creators.",
     buttonLabel: "Get Template",
     category: "Templates",
     description: "A premium digital template on Gumroad.",
@@ -298,6 +303,18 @@ let toastTimer = null;
 /* Helpers */
 function escapeHtml(s){ return (s||"").toString().replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 function cap(s){ return (s||'').charAt(0).toUpperCase() + (s||'').slice(1); }
+// Return a short summary for the front of the card. Prefer explicit `summary`, else derive.
+function getSummary(p){
+  if(!p) return '';
+  if(p.summary && String(p.summary).trim()) return String(p.summary).trim();
+  const s = (p.description || '').toString().trim();
+  if(!s) return '';
+  // Try first sentence
+  const first = s.split(/[\.?!]\s/)[0];
+  if(first && first.length <= 160) return first + (/[\.?!]$/.test(first) ? '' : '...');
+  // Fallback to a short truncate
+  return s.length > 140 ? s.slice(0,140).trim() + '...' : s;
+}
 
 /* SEO elements: dynamic title/meta/og/twitter and JSON-LD injection */
 function ensureMetaTag(nameOrProp, value, isProperty=false){
@@ -619,16 +636,13 @@ function renderProductsPage(list, page, pageSize){
             ${renderPriceLabel(p)}
           </div>
           ${renderPriceBlock(p)}
-          <p class="desc">${escapeHtml(p.description)}</p>
+          <p class="desc">${escapeHtml(getSummary(p))}</p>
           <div class="card-footer">
             <div class="primary-wrap">${renderPrimaryButton(p)}</div>
             <div class="actions"><button class="details-btn" data-id="${p.id}" aria-label="Details for ${escapeHtml(p.title)}">Details</button></div>
           </div>
         </div>
         <div class="card-back" aria-hidden="true">
-          <h3 class="title">${escapeHtml(p.title)}</h3>
-          <div style="font-weight:700; color:var(--navy)">${escapeHtml(p.category)}${priceLabel ? ' • ' + escapeHtml(priceLabel) : ''}</div>
-          ${renderPriceBlock(p)}
           <p class="desc">${escapeHtml(p.description)}</p>
           <div class="card-footer" style="margin-top:auto;">
             <div class="primary-wrap">${renderPrimaryButton(p)}</div>
