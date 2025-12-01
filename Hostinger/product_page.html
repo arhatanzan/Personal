@@ -82,12 +82,16 @@
   #toast.show { opacity:1; pointer-events:all; transform:translateX(-50%) translateY(0); }
 
   /* Modal */
-  /* Modal: center in the viewport and prevent background scroll when open; allow internal scrolling for tall content */
-  .modal-backdrop { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:99999; padding:20px; overflow:auto; }
-  .modal { width:100%; max-width:760px; background:var(--white); border-radius:10px; padding:18px; border:4px solid var(--accent); margin:0 auto; max-height: calc(100vh - 56px); overflow:auto; z-index:2147483648; }
-  .modal h2 { margin:0 0 8px 0; color:var(--navy); }
-  .modal p { margin:0 0 12px 0; color:var(--muted); }
-  .modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+  /* Card flip: use grid-based overlap (avoids absolute/fixed positioning) */
+  .card { background:var(--card-bg); border-radius:var(--radius); padding:0; border:4px solid var(--accent); display:flex; flex-direction:column; gap:0; min-height:240px; overflow:hidden; perspective:1000px; }
+  .card-inner { transition: transform .5s ease; transform-style: preserve-3d; display:grid; width:100%; height:100%; }
+  .card-front, .card-back { grid-area: 1/1; display:flex; flex-direction:column; gap:12px; padding:16px; box-sizing:border-box; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .card-front { background:transparent; }
+  .card-back { background:var(--card-bg); color:var(--navy); transform: rotateY(180deg); border-radius: calc(var(--radius) - 2px); align-items:flex-start; }
+  .card.is-flipped .card-inner { transform: rotateY(180deg); }
+  /* Ensure long content on back side scrolls within the card without moving layout */
+  .card-back { overflow:auto; }
+  .back-btn { background:transparent; border:1px solid rgba(0,0,0,0.1); border-radius:8px; padding:6px 10px; font-size:14px; cursor:pointer; color:var(--navy); }
 
   /* Price display */
   .price-row { display:flex; gap:8px; align-items:center; margin-top:8px; }
@@ -101,26 +105,8 @@
     .controls-row { width:100%; justify-content:flex-start; margin-top:6px; }
     .search input { width:130px; }
     .prod-title h1 { font-size:22px; }
-    /* Make modal responsive on small screens: use centered flow instead of fixed popover
-       but allow JS to opt-in to a popover/fixed mode by adding the `popover-mode` class. */
-    .modal:not(.popover-mode) {
-      position: static !important;
-      left: auto !important;
-      top: auto !important;
-      transform: none !important;
-      margin: 12px auto !important;
-      max-width: calc(100% - 24px) !important;
-      width: auto !important;
-      box-sizing: border-box;
-    }
-    /* When JS needs to position the modal as a popover, add `popover-mode` to force fixed positioning. */
-    .modal.popover-mode {
-      position: fixed !important;
-      transform: none !important;
-      max-width: calc(100% - 24px) !important;
-      box-sizing: border-box;
-    }
-    .modal-backdrop { align-items: flex-start; padding-top:20px; }
+    .card { min-height:200px; }
+    .card-back { max-height: none; }
   }
 </style>
 
@@ -168,18 +154,6 @@
   <div id="empty" class="empty" style="display:none">No products found.</div>
 
   <div id="pagination" class="pagination-wrap" style="display:none"></div>
-</div>
-
-<div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-  <div class="modal" role="document">
-    <h2 id="modalTitle"></h2>
-    <p id="modalDesc"></p>
-    <div id="modalMeta" style="font-weight:700; color:var(--navy)"></div>
-    <div class="modal-actions">
-      <a id="modalDownload" class="download-btn" href="#">Download</a>
-      <button id="modalClose" class="details-btn">Close</button>
-    </div>
-  </div>
 </div>
 
 <button id="goTopBtn" aria-label="Go to top">↑ Top</button>
@@ -302,54 +276,12 @@ const refs = {
   resetBtn: document.getElementById('resetBtn'),
   goTopBtn: document.getElementById('goTopBtn'),
   toastEl: document.getElementById('toast'),
-  modalBackdrop: document.getElementById('modalBackdrop'),
-  modal: document.querySelector('.modal'),
-  modalTitle: document.getElementById('modalTitle'),
-  modalDesc: document.getElementById('modalDesc'),
-  modalMeta: document.getElementById('modalMeta'),
-  modalDownload: document.getElementById('modalDownload'),
-  modalClose: document.getElementById('modalClose'),
   pageH1: document.getElementById('pageH1'),
   pageDescEl: document.getElementById('pageDesc')
+  
 };
 
-// Ensure modal backdrop is a child of document.body to avoid stacking issues.
-(function ensureModalAtBody(){
-  try{
-    // If we're embedded in an iframe but same-origin, move the modal/backdrop
-    // into the top window so it can cover the full viewport instead of the
-    // embed frame. Fall back to appending into the current document when
-    // cross-origin or on error.
-    if(window.top && window.top !== window){
-      try{
-        const topDoc = window.top.document;
-        // copy the page's first <style> block (contains modal styles) so the
-        // moved modal keeps its appearance in the top document.
-        if(!topDoc.getElementById('__copied_modal_style')){
-          const firstStyle = document.querySelector('style');
-          if(firstStyle){
-            const styleClone = topDoc.createElement('style');
-            styleClone.id = '__copied_modal_style';
-            styleClone.textContent = firstStyle.textContent;
-            topDoc.head.appendChild(styleClone);
-          }
-        }
-
-        // adopt the modalBackdrop node into the top document and append to body
-        const adopted = topDoc.adoptNode(refs.modalBackdrop);
-        topDoc.body.appendChild(adopted);
-        refs._movedToTop = true;
-        return;
-      }catch(err){
-        // likely cross-origin or adoptNode failed — fall back below
-      }
-    }
-
-    if(refs && refs.modalBackdrop && refs.modalBackdrop.parentNode !== document.body){
-      document.body.appendChild(refs.modalBackdrop);
-    }
-  }catch(e){ /* noop */ }
-})();
+// Modal removed — using card flip interaction instead.
 
 // Note: use `refs.*` for DOM access throughout the file.
 
@@ -661,28 +593,43 @@ function renderProductsPage(list, page, pageSize){
     // image fallback: prefer imageUrl; fallback to thumbText
     let thumbHtml = `<div class="thumb" aria-hidden="true">${escapeHtml(p.thumbText)}</div>`;
     if(p.imageUrl){
-      // add loading="lazy" and onerror fallback
-          const imgSrc = escapeHtml(p.imageUrl);
-          thumbHtml = `<div class="thumb" data-thumb-text="${escapeHtml(p.thumbText)}"><img src="${imgSrc}" alt="${escapeHtml(p.title)} thumbnail" loading="lazy" onerror="this.dataset.failed='1'; this.style.display='none'; this.parentNode.classList.add('thumb-failed');"></div>`;
+      const imgSrc = escapeHtml(p.imageUrl);
+      thumbHtml = `<div class="thumb" data-thumb-text="${escapeHtml(p.thumbText)}"><img src="${imgSrc}" alt="${escapeHtml(p.title)} thumbnail" loading="lazy" onerror="this.dataset.failed='1'; this.style.display='none'; this.parentNode.classList.add('thumb-failed');"></div>`;
     }
 
-    // Link title to SEO-friendly URL when available; otherwise fall back to productUrl if present
     const titleHref = p.seoUrl || p.productUrl || '';
     const titleLink = titleHref ? `<a href="${escapeHtml(titleHref)}">${escapeHtml(p.title)}</a>` : `<span>${escapeHtml(p.title)}</span>`;
 
+    const priceLabel = getPriceLabelText(p);
+
+    // card inner contains front + back faces; use grid to overlay them (avoids absolute positioning)
     card.innerHTML = `
-      ${thumbHtml}
-      <h3 class="title">${titleLink}</h3>
-      <div class="tags">
-        <span class="tag">${escapeHtml(p.category)}</span>
-        <span class="tag">${escapeHtml(getFileType(p))}</span>
-        ${renderPriceLabel(p)}
-      </div>
-      ${renderPriceBlock(p)}
-      <p class="desc">${escapeHtml(p.description)}</p>
-      <div class="card-footer">
-        ${renderPrimaryButton(p)}
-        <button class="details-btn" data-id="${p.id}" aria-label="Details for ${escapeHtml(p.title)}">Details</button>
+      <div class="card-inner">
+        <div class="card-front">
+          ${thumbHtml}
+          <h3 class="title">${titleLink}</h3>
+          <div class="tags">
+            <span class="tag">${escapeHtml(p.category)}</span>
+            <span class="tag">${escapeHtml(getFileType(p))}</span>
+            ${renderPriceLabel(p)}
+          </div>
+          ${renderPriceBlock(p)}
+          <p class="desc">${escapeHtml(p.description)}</p>
+          <div class="card-footer">
+            ${renderPrimaryButton(p)}
+            <button class="details-btn" data-id="${p.id}" aria-label="Details for ${escapeHtml(p.title)}">Details</button>
+          </div>
+        </div>
+        <div class="card-back" aria-hidden="true">
+          <h3 class="title">${escapeHtml(p.title)}</h3>
+          <div style="font-weight:700; color:var(--navy)">${escapeHtml(p.category)}${priceLabel ? ' • ' + escapeHtml(priceLabel) : ''}</div>
+          ${renderPriceBlock(p)}
+          <p class="desc">${escapeHtml(p.description)}</p>
+          <div class="card-footer" style="margin-top:auto;">
+            ${renderPrimaryButton(p)}
+            <button class="back-btn" data-id="${p.id}" aria-label="Back to product">Back</button>
+          </div>
+        </div>
       </div>
     `;
     refs.grid.appendChild(card);
@@ -810,73 +757,45 @@ refs.sortSelect.addEventListener('change', applyFilters);
 refs.pageSizeSelect.addEventListener('change', ()=>{ currentPage=1; refreshPage(); });
 refs.resetBtn.addEventListener('click', ()=>{ refs.searchInput.value=''; refs.categorySelect.value=''; refs.priceSelect.value=''; refs.sortSelect.value='new'; refs.pageSizeSelect.value='all'; currentPage=1; applyFilters(); });
 
-/* Modal helpers */
-function closeModal(){
-  refs.modalBackdrop.style.display='none';
-  refs.modalBackdrop.setAttribute('aria-hidden','true');
-  document.body.style.overflow = '';
-  // clear any inline positioning applied for popover mode
-  refs.modal.style.position = '';
-  refs.modal.style.left = '';
-  refs.modal.style.top = '';
-  refs.modal.style.transform = '';
-  refs.modal.style.visibility = '';
-  refs.modal.classList.remove('popover-mode');
-}
-
-/* Robust openDetails implementation */
-function openDetails(id, anchorEl){
-  const p = PRODUCTS.find(x => x.id === id);
-  if(!p) return;
-
-  // populate modal content
-  refs.modalTitle.textContent = p.title;
-  refs.modalDesc.textContent = p.description;
-  const priceLabel = getPriceLabelText(p);
-  refs.modalMeta.textContent = `${p.category}${priceLabel ? ' • ' + priceLabel : ''}`;
-
-  if(p.type === 'download'){
-    refs.modalDownload.textContent = 'Download';
-    refs.modalDownload.onclick = (e)=>{ e.preventDefault(); startDownloadById(id); };
-    refs.modalDownload.href = '#';
-  } else if(p.type === 'external'){
-    refs.modalDownload.textContent = p.buttonLabel || 'Buy Now';
-    refs.modalDownload.onclick = ()=> window.open(p.productUrl || '#', '_blank');
-    refs.modalDownload.href = p.productUrl || '#';
-    refs.modalDownload.target = '_blank';
-    refs.modalDownload.rel = 'noopener';
-  }
-
-  // ensure backdrop appended to body to avoid builder wrappers
-  try { if(refs.modalBackdrop.parentNode !== document.body) document.body.appendChild(refs.modalBackdrop); } catch(e){}
-
-  // show centered modal (simple approach)
-  // On narrow viewports force popover-mode so modal sits above other stacking contexts
-  if(window.innerWidth <= 600){
-    refs.modal.classList.add('popover-mode');
-  } else {
-    refs.modal.classList.remove('popover-mode');
-    refs.modal.style.position = '';
-    refs.modal.style.left = '';
-    refs.modal.style.top = '';
-    refs.modal.style.transform = '';
-    refs.modal.style.visibility = '';
-  }
-  refs.modalBackdrop.style.display = 'flex';
-  refs.modalBackdrop.setAttribute('aria-hidden','false');
-  document.body.style.overflow = 'hidden';
-}
-
-refs.modalClose.addEventListener('click', closeModal);
-refs.modalBackdrop.addEventListener('click', (e)=>{ if(e.target === refs.modalBackdrop) closeModal(); });
-document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+// Modal removed — card flip replaces modal interactions.
 
 /* Downloads & toast */
 function showToast(msg, duration=2500){ if(toastTimer){ clearTimeout(toastTimer); toastTimer=null; } refs.toastEl.textContent = msg; refs.toastEl.classList.add('show'); toastTimer = setTimeout(()=>{ refs.toastEl.classList.remove('show'); toastTimer=null; }, duration); }
 function startDownloadById(id){ const p = PRODUCTS.find(x=>x.id === id); if(!p) return; if(p.productUrl){ const a = document.createElement('a'); a.href = p.productUrl; a.download = p.fileName || ''; a.click(); showToast('Download started'); return; } const blob = createDemoFileBlob(p); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = p.fileName || p.title + '.txt'; a.click(); showToast('Download prepared — check your downloads'); setTimeout(()=> URL.revokeObjectURL(url), 4000); }
 
-/* Delegated grid click */
-refs.grid.addEventListener('click', (e)=>{ const dl = e.target.closest('.download-btn'); const det = e.target.closest('.details-btn'); if(dl && dl.dataset.id){ e.preventDefault(); startDownloadById(dl.dataset.id); return; } if(det){ openDetails(det.dataset.id, det); return; } });
+/* Card flip helpers and delegated grid click */
+function flipCard(cardEl){
+  if(!cardEl) return;
+  // close other flipped cards
+  document.querySelectorAll('.card.is-flipped').forEach(c => { if(c !== cardEl) c.classList.remove('is-flipped'); });
+  // toggle this card
+  const willFlip = !cardEl.classList.contains('is-flipped');
+  if(willFlip) cardEl.classList.add('is-flipped'); else cardEl.classList.remove('is-flipped');
+}
+
+refs.grid.addEventListener('click', (e)=>{
+  const dl = e.target.closest('.download-btn');
+  const det = e.target.closest('.details-btn');
+  const back = e.target.closest('.back-btn');
+
+  if(dl && dl.dataset.id){
+    e.preventDefault();
+    startDownloadById(dl.dataset.id);
+    return;
+  }
+
+  if(back){
+    const card = back.closest('.card');
+    if(card) card.classList.remove('is-flipped');
+    return;
+  }
+
+  if(det){
+    const card = det.closest('.card');
+    if(card) flipCard(card);
+    return;
+  }
+});
 
 /* Go to top */
 window.addEventListener('scroll', ()=>{ if(window.scrollY > 300) refs.goTopBtn.classList.add('show'); else refs.goTopBtn.classList.remove('show'); });
