@@ -1,45 +1,70 @@
-<!-- PRODUCT LISTING PAGE – SEO-ENHANCED SINGLE FILE (copy-paste into Hostinger) -->
 <style>
+  /* Theme variables — change these to update site colors quickly */
   :root {
     --page-bg: #f8f6f2;
     --card-bg: #ffffff;
+    --white: #ffffff;
     --accent: #d4a017;
     --navy: #0a2342;
+    --navy-rgb: 10,34,66; /* use with rgba(var(--navy-rgb),a) */
     --muted: #5a6673;
+    --paid-bg: #7a2e2e;
+    --label-free-bg: var(--navy);
+    --label-free-text: var(--page-bg);
+    --label-paid-bg: var(--paid-bg);
+    --label-paid-text: var(--page-bg);
+    --border: rgba(0,0,0,0.06);
     --radius: 10px;
     --gap: 18px;
     --container: 1200px;
+    --thumb-grad-1: #ececec;
   }
+
   * { box-sizing: border-box; }
   body, html { margin:0; padding:0; font-family: Calibri, Arial, sans-serif; background: var(--page-bg); color: var(--navy); }
   .prod-wrap { max-width: var(--container); margin: 28px auto; padding: 20px; }
-  .prod-header { display:flex; gap:16px; align-items:center; justify-content:space-between; margin-bottom:16px; }
-  .prod-title h1 { margin:0; font-size:28px; color:var(--navy); }
+  /* Stack header vertically and left-align contents for a precise layout */
+  .prod-header { display:flex; flex-direction:column; gap:12px; align-items:flex-start; margin-bottom:12px; }
+  .prod-title h1 { margin:0; font-size:32px; line-height:1.05; color:var(--navy); font-weight:700; letter-spacing:-0.2px; }
   .prod-sub { color:var(--muted); font-size:14px; margin:0; }
-  .prod-controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-  .search { display:flex; align-items:center; gap:8px; background:#fff; border-radius:8px; padding:8px 10px; }
-  .search input { border:0; outline:0; width:220px; font-size:14px; color:var(--navy); background:transparent; }
-  .select, .btn { background:#fff; border-radius:8px; padding:8px 12px; font-size:14px; border:1px solid rgba(0,0,0,0.06); }
+  /* Stack search above filters; keep controls right-aligned */
+  .prod-controls { display:flex; flex-direction:column; gap:8px; align-items:flex-end; width:100%; }
+
+  /* Controls */
+  /* Search sits on its own row and is left-most */
+  .search { display:flex; align-items:center; gap:8px; background:var(--white); border-radius:8px; padding:8px 10px; flex:0 0 auto; max-width:480px; min-width:200px; }
+  .search input { border:0; outline:0; width:100%; font-size:14px; color:var(--navy); background:transparent; }
+
+  /* Grouped row for filters + reset button (placed under search) */
+  .controls-row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; width:auto; margin-top:0; justify-content:flex-end; }
+  .select, .btn { background:var(--white); border-radius:8px; padding:8px 12px; font-size:14px; border:1px solid var(--border); }
   .btn { cursor:pointer; }
   .btn.primary { background:var(--accent); color:var(--navy); font-weight:600; }
+
+  /* Make reset button stand out: navy background, white text, and add tactile click effect */
+  #resetBtn { background: var(--navy); color: var(--white); border:1px solid var(--navy); font-weight:600; transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease; box-shadow: 0 6px 12px rgba(10,34,66,0.08); }
+  #resetBtn:hover { opacity:0.95; }
+  #resetBtn:active { transform: translateY(1px) scale(0.996); box-shadow: 0 3px 8px rgba(10,34,66,0.06); }
+
+  /* Grid & Cards */
   .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:var(--gap); margin-top:18px; }
-  .card { background:var(--card-bg); border-radius:var(--radius); padding:16px; border:6px solid var(--accent); display:flex; flex-direction:column; gap:12px; min-height:240px; overflow:hidden; }
-  .thumb { height:110px; border-radius:6px; background:linear-gradient(180deg,#ececec,#fff); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--muted); position:relative; overflow:hidden; }
+  .card { background:var(--card-bg); border-radius:var(--radius); padding:16px; border:4px solid var(--accent); display:flex; flex-direction:column; gap:12px; min-height:240px; overflow:hidden; }
+  .thumb { height:110px; border-radius:6px; background:linear-gradient(180deg,var(--thumb-grad-1),var(--white)); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--muted); position:relative; overflow:hidden; }
   .thumb img { width:100%; height:100%; object-fit:cover; display:block; border-radius:6px; }
   .title { font-size:16px; font-weight:700; margin:0; color:var(--navy); }
   .title a { color:inherit; text-decoration:none; }
   .desc { font-size:14px; color:var(--muted); margin:0; line-height:1.4; }
   .tags { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
   .tag { border:1px solid rgba(0,0,0,0.1); padding:3px 8px; border-radius:999px; font-size:12px; }
-  .label-free { background:#0a2342; color:#f8f6f2; border-radius:999px; padding:3px 8px; font-size:12px; }
-  .label-paid { background:#7a2e2e; color:#f8f6f2; border-radius:999px; padding:3px 8px; font-size:12px; }
+  .label-free { background:var(--label-free-bg); color:var(--label-free-text); border-radius:999px; padding:3px 8px; font-size:12px; }
+  .label-paid { background:var(--label-paid-bg); color:var(--label-paid-text); border-radius:999px; padding:3px 8px; font-size:12px; }
   .card-footer { margin-top:auto; display:flex; justify-content:space-between; align-items:center; gap:8px; }
   .download-btn { background:var(--accent); color:var(--navy); border-radius:8px; padding:8px 12px; text-decoration:none; font-weight:700; font-size:14px; }
   .details-btn { background:transparent; border:1px solid rgba(0,0,0,0.1); border-radius:8px; padding:6px 10px; font-size:14px; cursor:pointer; color:var(--navy); }
   .empty { text-align:center; color:var(--muted); padding:40px 0; }
 
   /* SEO helper button (sitemap) */
-  #sitemapBtn { background:#fff; border-radius:8px; border:1px solid rgba(0,0,0,0.06); padding:8px 10px; cursor:pointer; }
+  #sitemapBtn { background:var(--white); border-radius:8px; border:1px solid var(--border); padding:8px 10px; cursor:pointer; }
 
   /* Go To Top Button */
   #goTopBtn { position:fixed; bottom:24px; right:24px; background:var(--accent); color:var(--navy); border:none; padding:12px 16px; font-size:14px; font-weight:700; border-radius:10px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.15); opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:9999; }
@@ -47,18 +72,19 @@
 
   /* Pagination */
   .pagination-wrap { display:flex; justify-content:center; align-items:center; gap:8px; margin-top:18px; flex-wrap:wrap; }
-  .page-btn { background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:6px; padding:6px 10px; cursor:pointer; }
-  .page-btn.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+  .page-btn { background:var(--white); border:1px solid var(--border); border-radius:6px; padding:6px 10px; cursor:pointer; }
+  .page-btn.active { background:var(--navy); color:var(--white); border-color:var(--navy); }
   .go-page { display:flex; gap:6px; align-items:center; margin-left:8px; }
-  .go-page input { width:64px; padding:6px 8px; border-radius:6px; border:1px solid rgba(0,0,0,0.06); }
+  .go-page input { width:64px; padding:6px 8px; border-radius:6px; border:1px solid var(--border); }
 
   /* Toast */
-  #toast { position:fixed; left:50%; transform:translateX(-50%); bottom:36px; background:rgba(10,35,66,0.95); color:#fff; padding:10px 14px; border-radius:8px; font-weight:600; box-shadow:0 6px 18px rgba(10,35,66,0.25); opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; z-index:10000; }
+  #toast { position:fixed; left:50%; transform:translateX(-50%); bottom:36px; background:rgba(var(--navy-rgb),0.95); color:var(--white); padding:10px 14px; border-radius:8px; font-weight:600; box-shadow:0 6px 18px rgba(var(--navy-rgb),0.25); opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; z-index:10000; }
   #toast.show { opacity:1; pointer-events:all; transform:translateX(-50%) translateY(0); }
 
   /* Modal */
-  .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:9999; padding:18px; }
-  .modal { width:100%; max-width:760px; background:#fff; border-radius:10px; padding:18px; border:6px solid var(--accent); }
+  /* Modal: center in the viewport and prevent background scroll when open; allow internal scrolling for tall content */
+  .modal-backdrop { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:99999; padding:20px; overflow:auto; }
+  .modal { width:100%; max-width:760px; background:var(--white); border-radius:10px; padding:18px; border:4px solid var(--accent); margin:0 auto; max-height: calc(100vh - 56px); overflow:auto; z-index:2147483648; }
   .modal h2 { margin:0 0 8px 0; color:var(--navy); }
   .modal p { margin:0 0 12px 0; color:var(--muted); }
   .modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
@@ -67,9 +93,35 @@
   .price-row { display:flex; gap:8px; align-items:center; margin-top:8px; }
   .price-old { text-decoration:line-through; color:var(--muted); font-size:13px; }
   .price-now { font-weight:800; color:var(--navy); font-size:15px; }
-  .discount-badge { background:#7a2e2e; color:#fff; border-radius:8px; padding:4px 6px; font-size:12px; font-weight:700; }
+  .discount-badge { background:var(--accent); color:var(--navy); border-radius:8px; padding:4px 6px; font-size:12px; font-weight:700; }
 
-  @media (max-width:800px) { .search input { width:130px; } .prod-title h1 { font-size:22px; } }
+  @media (max-width:1000px) { .search { max-width:420px; } .prod-title h1 { font-size:28px; } }
+  @media (max-width:600px) { 
+    .search { max-width:100%; flex:1 1 100%; min-width:0; }
+    .controls-row { width:100%; justify-content:flex-start; margin-top:6px; }
+    .search input { width:130px; }
+    .prod-title h1 { font-size:22px; }
+    /* Make modal responsive on small screens: use centered flow instead of fixed popover
+       but allow JS to opt-in to a popover/fixed mode by adding the `popover-mode` class. */
+    .modal:not(.popover-mode) {
+      position: static !important;
+      left: auto !important;
+      top: auto !important;
+      transform: none !important;
+      margin: 12px auto !important;
+      max-width: calc(100% - 24px) !important;
+      width: auto !important;
+      box-sizing: border-box;
+    }
+    /* When JS needs to position the modal as a popover, add `popover-mode` to force fixed positioning. */
+    .modal.popover-mode {
+      position: fixed !important;
+      transform: none !important;
+      max-width: calc(100% - 24px) !important;
+      box-sizing: border-box;
+    }
+    .modal-backdrop { align-items: flex-start; padding-top:20px; }
+  }
 </style>
 
 <div class="prod-wrap" aria-live="polite">
@@ -84,43 +136,40 @@
         <input id="searchInput" placeholder="Search products…" aria-label="Search products" />
       </div>
 
-      <select id="categorySelect" class="select" aria-label="Filter by category">
-        <option value="">All categories</option>
-      </select>
+      <div class="controls-row">
+        <select id="categorySelect" class="select" aria-label="Filter by category">
+          <option value="">All categories</option>
+        </select>
 
-      <select id="priceSelect" class="select" aria-label="Filter by price">
-        <option value="">All prices</option>
-      </select>
+        <select id="priceSelect" class="select" aria-label="Filter by price">
+          <option value="">All prices</option>
+        </select>
 
-      <select id="pageSizeSelect" class="select" title="Items per page" aria-label="Items per page">
-        <option value="all">All (default)</option>
-        <option value="10">10 / page</option>
-        <option value="30">30 / page</option>
-        <option value="50">50 / page</option>
-        <option value="100">100 / page</option>
-      </select>
+        <select id="pageSizeSelect" class="select" title="Items per page" aria-label="Items per page">
+          <option value="all">All (default)</option>
+          <option value="10">10 / page</option>
+          <option value="30">30 / page</option>
+          <option value="50">50 / page</option>
+          <option value="100">100 / page</option>
+        </select>
 
-      <select id="sortSelect" class="select" aria-label="Sort products">
-        <option value="new">Newest</option>
-        <option value="az">A → Z</option>
-        <option value="za">Z → A</option>
-      </select>
+        <select id="sortSelect" class="select" aria-label="Sort products">
+          <option value="new">Newest</option>
+          <option value="az">A → Z</option>
+          <option value="za">Z → A</option>
+        </select>
 
-      <button id="resetBtn" class="btn" aria-label="Reset filters">Reset</button>
-
-      <!-- Sitemap download for static hosting -->
-      <button id="sitemapBtn" title="Download sitemap.xml for your host" aria-label="Download sitemap">Download sitemap</button>
+        <button id="resetBtn" class="btn" aria-label="Reset filters">Reset</button>
+        </div>
     </div>
   </div>
 
   <div id="grid" class="grid"></div>
   <div id="empty" class="empty" style="display:none">No products found.</div>
 
-  <!-- Pagination controls -->
   <div id="pagination" class="pagination-wrap" style="display:none"></div>
 </div>
 
-<!-- MODAL -->
 <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal" role="document">
     <h2 id="modalTitle"></h2>
@@ -137,122 +186,172 @@
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
-/* ============================
-   CONFIG: change only if needed
-   SITE_BASE: used to build absolute URLs for canonical, JSON-LD, and sitemap.
-   If left blank, location.origin is used.
-============================ */
+(function(){
+  'use strict';
 const SITE_BASE = (window.SITE_BASE_URL && window.SITE_BASE_URL.replace(/\/$/, "")) || location.origin.replace(/\/$/, "");
 const LISTING_PATH = '/products'; // relative path for listing pages in sitemap/canonical (change if needed)
 
-/* ============================
-   PRODUCT DATA – EDIT HERE
-   Add optional fields:
-   - imageUrl (string) for thumbnail images
-   - productUrl (string) absolute or root-relative canonical product page
-   - priceValue (string, e.g. "499.00")
-   - priceCurrency (string, e.g. "INR", "USD")
-============================ */
+/*
+  THEME HELPER
+  If you want to change colors at runtime without editing the CSS, call
+    setTheme({ '--accent': '#ff6600', '--navy': '#002244' });
+  It updates CSS custom properties on :root and keeps the file self-contained.
+*/
+function setTheme(vars){
+  if(!vars || typeof vars !== 'object') return;
+  const root = document.documentElement;
+  Object.keys(vars).forEach(k => {
+    try{ root.style.setProperty(k, vars[k]); }catch(e){}
+  });
+}
+
+/* PRODUCT DATA - edit entries below as needed */
 const PRODUCTS = [
   {
     id: "p1",
-    title: "Data Storytelling Workbook",
-    description: "A practical workbook for crafting narratives using data.",
+    buttonLabel: "",
     category: "Guides",
-    type: "download",
-    price: "free",
-    fileUrl: "",
+    description: "A practical workbook for crafting narratives using data.",
+    discountPercent: null,
     fileName: "data-storytelling-workbook.pdf",
-    thumbText: "Workbook",
     imageUrl: "",
+    originalPrice: "",
+    priceCurrency: "",
     productUrl: "/product/data-storytelling-workbook",
-    // priceValue and priceCurrency optional for paid items
+    seoUrl: "/product/data-storytelling-workbook",
+    thumbText: "Workbook",
+    title: "Data Storytelling Workbook",
+    type: "download"
   },
   {
     id: "p2",
-    title: "Datadog Monitors Cheat Sheet",
-    description: "Quick access reference for creating effective monitors.",
+    buttonLabel: "",
     category: "Cheatsheets",
-    type: "download",
-    price: "free",
-    fileUrl: "",
+    description: "Quick access reference for creating effective monitors.",
+    discountPercent: null,
     fileName: "datadog-monitors-cheatsheet.pdf",
-    thumbText: "Cheatsheet",
     imageUrl: "",
-    productUrl: "/product/datadog-monitors-cheatsheet"
+    originalPrice: "",
+    priceCurrency: "",
+    productUrl: "/product/datadog-monitors-cheatsheet",
+    seoUrl: "/product/datadog-monitors-cheatsheet",
+    thumbText: "Cheatsheet",
+    title: "Datadog Monitors Cheat Sheet",
+    type: "download"
   },
   {
     id: "p3",
-    title: "Modern Leadership (Hardcover)",
-    description: "A hardcover book available on Amazon.",
-    category: "Books",
-    type: "external",
-    price: "paid",
-    externalUrl: "https://amazon.in/your-product",
     buttonLabel: "Buy on Amazon",
-    thumbText: "Hardcover",
+    category: "Books",
+    description: "A hardcover book available on Amazon.",
+    discountPercent: null,
+    fileName: "",
     imageUrl: "",
-    productUrl: "https://your-site.com/product/modern-leadership",
-    priceValue: "499.00",
-    priceCurrency: "INR"
+    originalPrice: "",
+    priceCurrency: "INR",
+    productUrl: "https://amazon.in/your-product",
+    seoUrl: "/product/modern-leadership",
+    thumbText: "Hardcover",
+    title: "Modern Leadership (Hardcover)",
+    type: "external"
   },
   {
     id: "p4",
-    title: "Digital Democracy Course (Slides)",
-    description: "Download slide deck on digital democracy & media.",
+    buttonLabel: "",
     category: "Slides",
-    type: "download",
-    price: "free",
-    fileUrl: "",
+    description: "Download slide deck on digital democracy & media.",
+    discountPercent: null,
     fileName: "digital-democracy-slides.zip",
-    thumbText: "Slides",
     imageUrl: "",
-    productUrl: "/product/digital-democracy-slides"
+    originalPrice: "",
+    priceCurrency: "",
+    productUrl: "/product/digital-democracy-slides",
+    seoUrl: "/product/digital-democracy-slides",
+    thumbText: "Slides",
+    title: "Digital Democracy Course (Slides)",
+    type: "download"
   },
   {
     id: "p5",
-    title: "Aesthetic Portfolio Template",
-    description: "A premium digital template on Gumroad.",
-    category: "Templates",
-    type: "external",
-    price: "paid",
-    externalUrl: "https://gumroad.com/your-product",
     buttonLabel: "Get Template",
-    thumbText: "Template",
+    category: "Templates",
+    description: "A premium digital template on Gumroad.",
+    discountPercent: null,
+    fileName: "",
     imageUrl: "",
-    productUrl: "https://your-site.com/product/aesthetic-portfolio-template",
-    priceValue: "799.00",
-    priceCurrency: "INR"
+    originalPrice: "",
+    priceCurrency: "INR",
+    productUrl: "https://gumroad.com/your-product",
+    seoUrl: "/product/aesthetic-portfolio-template",
+    thumbText: "Template",
+    title: "Aesthetic Portfolio Template",
+    type: "external"
   }
 ];
 
-/* ============================
-    DOM refs
-============================ */
-const grid = document.getElementById('grid');
-const empty = document.getElementById('empty');
-const paginationWrap = document.getElementById('pagination');
+/* DOM refs (cached) */
+const refs = {
+  grid: document.getElementById('grid'),
+  empty: document.getElementById('empty'),
+  paginationWrap: document.getElementById('pagination'),
+  categorySelect: document.getElementById('categorySelect'),
+  priceSelect: document.getElementById('priceSelect'),
+  pageSizeSelect: document.getElementById('pageSizeSelect'),
+  searchInput: document.getElementById('searchInput'),
+  sortSelect: document.getElementById('sortSelect'),
+  resetBtn: document.getElementById('resetBtn'),
+  goTopBtn: document.getElementById('goTopBtn'),
+  toastEl: document.getElementById('toast'),
+  modalBackdrop: document.getElementById('modalBackdrop'),
+  modal: document.querySelector('.modal'),
+  modalTitle: document.getElementById('modalTitle'),
+  modalDesc: document.getElementById('modalDesc'),
+  modalMeta: document.getElementById('modalMeta'),
+  modalDownload: document.getElementById('modalDownload'),
+  modalClose: document.getElementById('modalClose'),
+  pageH1: document.getElementById('pageH1'),
+  pageDescEl: document.getElementById('pageDesc')
+};
 
-const categorySelect = document.getElementById('categorySelect');
-const priceSelect = document.getElementById('priceSelect');
-const pageSizeSelect = document.getElementById('pageSizeSelect');
-const searchInput = document.getElementById('searchInput');
-const sortSelect = document.getElementById('sortSelect');
-const resetBtn = document.getElementById('resetBtn');
-const sitemapBtn = document.getElementById('sitemapBtn');
+// Ensure modal backdrop is a child of document.body to avoid stacking issues.
+(function ensureModalAtBody(){
+  try{
+    // If we're embedded in an iframe but same-origin, move the modal/backdrop
+    // into the top window so it can cover the full viewport instead of the
+    // embed frame. Fall back to appending into the current document when
+    // cross-origin or on error.
+    if(window.top && window.top !== window){
+      try{
+        const topDoc = window.top.document;
+        // copy the page's first <style> block (contains modal styles) so the
+        // moved modal keeps its appearance in the top document.
+        if(!topDoc.getElementById('__copied_modal_style')){
+          const firstStyle = document.querySelector('style');
+          if(firstStyle){
+            const styleClone = topDoc.createElement('style');
+            styleClone.id = '__copied_modal_style';
+            styleClone.textContent = firstStyle.textContent;
+            topDoc.head.appendChild(styleClone);
+          }
+        }
 
-const goTopBtn = document.getElementById('goTopBtn');
-const toastEl = document.getElementById('toast');
+        // adopt the modalBackdrop node into the top document and append to body
+        const adopted = topDoc.adoptNode(refs.modalBackdrop);
+        topDoc.body.appendChild(adopted);
+        refs._movedToTop = true;
+        return;
+      }catch(err){
+        // likely cross-origin or adoptNode failed — fall back below
+      }
+    }
 
-const modalBackdrop = document.getElementById('modalBackdrop');
-const modalTitle = document.getElementById('modalTitle');
-const modalDesc = document.getElementById('modalDesc');
-const modalMeta = document.getElementById('modalMeta');
-const modalDownload = document.getElementById('modalDownload');
-const modalClose = document.getElementById('modalClose');
+    if(refs && refs.modalBackdrop && refs.modalBackdrop.parentNode !== document.body){
+      document.body.appendChild(refs.modalBackdrop);
+    }
+  }catch(e){ /* noop */ }
+})();
 
-const pageH1 = document.getElementById('pageH1');
-const pageDescEl = document.getElementById('pageDesc');
+// Note: use `refs.*` for DOM access throughout the file.
 
 let filteredProducts = []; // unpaged
 let currentPage = 1;
@@ -263,13 +362,7 @@ let toastTimer = null;
 function escapeHtml(s){ return (s||"").toString().replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 function cap(s){ return (s||'').charAt(0).toUpperCase() + (s||'').slice(1); }
 
-/* ===========
-   SEO ELEMENTS (dynamic injection)
-   - title, meta description, og tags, twitter tags
-   - canonical and rel prev/next
-   - robots meta
-   - JSON-LD (Products)
-   =========== */
+/* SEO elements: dynamic title/meta/og/twitter and JSON-LD injection */
 function ensureMetaTag(nameOrProp, value, isProperty=false){
   // nameOrProp: meta name or property (og:)
   let selector = isProperty ? `meta[property="${nameOrProp}"]` : `meta[name="${nameOrProp}"]`;
@@ -296,9 +389,9 @@ function ensureLinkRel(rel, href){
 function updateTitleAndMeta(){
   // Create a context-aware title & description (dynamic)
   const parts = [];
-  const cat = categorySelect.value;
-  const price = priceSelect.value;
-  const q = searchInput.value.trim();
+  const cat = refs.categorySelect.value;
+  const price = refs.priceSelect.value;
+  const q = refs.searchInput.value.trim();
 
   if(q) parts.push(`${q} —`);
   if(cat) parts.push(`${cap(cat)}`);
@@ -366,8 +459,7 @@ function updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize){
   }
 }
 
-/* JSON-LD injection: richer offers if priceValue + priceCurrency present */
-/* --------- Replace injectStructuredData() with richer price logic ---------- */
+/* JSON-LD injection (builds product Offers when price data provided) */
 function injectStructuredData(){
   const items = PRODUCTS.map(p => {
     const node = {
@@ -376,56 +468,49 @@ function injectStructuredData(){
       "description": p.description
     };
 
-    if(p.productUrl){
-      node.url = p.productUrl.startsWith('http') ? p.productUrl : SITE_BASE + (p.productUrl.startsWith('/') ? p.productUrl : '/' + p.productUrl);
+    // Prefer SEO-friendly URL for canonical product page in structured data
+    const urlSource = p.seoUrl || p.productUrl;
+    if(urlSource){
+      node.url = urlSource.startsWith('http') ? urlSource : SITE_BASE + (urlSource.startsWith('/') ? urlSource : '/' + urlSource);
     }
     if(p.imageUrl) node.image = p.imageUrl.startsWith('http') ? p.imageUrl : SITE_BASE + (p.imageUrl.startsWith('/') ? p.imageUrl : '/' + p.imageUrl);
 
-    // Compute priceNow if originalPrice + discountPercent present
-    function toNumber(s){
-      if(s === undefined || s === null || s === '') return NaN;
-      const n = Number(String(s).replace(/,/g,''));
-      return isNaN(n) ? NaN : n;
-    }
+    // Compute price and offers using only originalPrice + discountPercent
+    function toNumber(s){ if(s === undefined || s === null || s === '') return NaN; const n = Number(String(s).replace(/,/g,'')); return isNaN(n) ? NaN : n; }
     const origNum = toNumber(p.originalPrice);
     const disc = (typeof p.discountPercent === 'number') ? p.discountPercent : (p.discountPercent ? Number(p.discountPercent) : NaN);
-    if(!isNaN(origNum) && !isNaN(disc)){
-      const safeDisc = Math.max(0, Math.min(100, disc));
-      const priceNowNum = +(origNum * (1 - safeDisc / 100)).toFixed(2);
-      node.offers = {
-        "@type": "Offer",
-        "price": priceNowNum.toFixed(2),
-        "priceCurrency": (p.priceCurrency || "INR"),
-        "availability": "https://schema.org/InStock"
-      };
-      // include original price as priceSpecification so rich results know the discount context
-      node.priceSpecification = {
-        "@type": "PriceSpecification",
-        "priceCurrency": (p.priceCurrency || "INR"),
-        "price": origNum.toFixed(2)
-      };
-    } else if(p.priceValue && p.priceCurrency){
-      node.offers = {
-        "@type": "Offer",
-        "price": Number(p.priceValue).toFixed(2),
-        "priceCurrency": p.priceCurrency,
-        "availability": "https://schema.org/InStock"
-      };
-    } else if(p.price === 'free'){
-      node.offers = {
-        "@type": "Offer",
-        "price": "0.00",
-        "priceCurrency": "INR",
-        "availability": "https://schema.org/InStock"
-      };
-      if(!isNaN(origNum)){
+
+    if(!isNaN(origNum)){
+      const curr = p.priceCurrency || 'INR';
+      if(!isNaN(disc)){
+        const safeDisc = Math.max(0, Math.min(100, disc));
+        const priceNowNum = +(origNum * (1 - safeDisc / 100)).toFixed(2);
+        node.offers = {
+          "@type": "Offer",
+          "price": priceNowNum.toFixed(2),
+          "priceCurrency": (p.priceCurrency || "INR"),
+          "availability": "https://schema.org/InStock"
+        };
         node.priceSpecification = {
           "@type": "PriceSpecification",
-          "priceCurrency": "INR",
+          "priceCurrency": (p.priceCurrency || "INR"),
+          "price": origNum.toFixed(2)
+        };
+      } else {
+        node.offers = {
+          "@type": "Offer",
+          "price": origNum.toFixed(2),
+          "priceCurrency": (p.priceCurrency || "INR"),
+          "availability": "https://schema.org/InStock"
+        };
+        node.priceSpecification = {
+          "@type": "PriceSpecification",
+          "priceCurrency": (p.priceCurrency || "INR"),
           "price": origNum.toFixed(2)
         };
       }
     } else {
+      // No reliable numeric price — include an Offer without a price (keeps item discoverable)
       node.offers = { "@type": "Offer", "availability": "https://schema.org/InStock" };
     }
 
@@ -444,27 +529,73 @@ function injectStructuredData(){
   }
 }
 
-/* ===========
-   Rendering, filters, pagination (same as before) with small hooks to update SEO elements
-   =========== */
+/* Rendering, filters and pagination (updates SEO hooks after render) */
 function getFileType(prod){ if(prod.type === "external") return "LINK"; if(prod.fileName) return prod.fileName.split('.').pop().toUpperCase(); return "FILE"; }
 function createDemoFileBlob(p){ const txt = `${p.title}\n---\n${p.description}\nGenerated: ${new Date().toLocaleString()}`; return new Blob([txt], {type:'text/plain'}); }
-function renderPrimaryButton(prod){ if(prod.type === "download"){ return `<a class="download-btn" data-id="${prod.id}" href="#" aria-label="Download ${escapeHtml(prod.title)}">Download</a>`; } if(prod.type === "external"){ const label = prod.buttonLabel || "Buy Now"; return `<a class="download-btn" href="${prod.externalUrl}" target="_blank" rel="noopener" aria-label="${escapeHtml(label)}">${escapeHtml(label)}</a>`; } return ''; }
-function renderPriceLabel(prod){ if(prod.price === "free") return `<span class="label-free">FREE</span>`; if(prod.price === "paid") return `<span class="label-paid">PAID</span>`; if(prod.price) return `<span class="tag">${escapeHtml(prod.price)}</span>`; return ''; }
+function renderPrimaryButton(prod){
+  if(prod.type === "download"){
+    return `<a class="download-btn" data-id="${prod.id}" href="#" aria-label="Download ${escapeHtml(prod.title)}">Download</a>`;
+  }
+  if(prod.type === "external"){
+    const label = prod.buttonLabel || "Buy Now";
+    const href = prod.productUrl || '#';
+    return `<a class="download-btn" href="${escapeHtml(href)}" target="_blank" rel="noopener" aria-label="${escapeHtml(label)}">${escapeHtml(label)}</a>`;
+  }
+  return '';
+}
+// Return a short text label (FREE / PAID) based solely on originalPrice + discountPercent
+function getPriceLabelText(prod){
+  function toNumber(s){ if(s === undefined || s === null || s === '') return NaN; const n = Number(String(s).replace(/,/g,'')); return isNaN(n) ? NaN : n; }
+  const orig = toNumber(prod.originalPrice);
+  const disc = (typeof prod.discountPercent === 'number') ? prod.discountPercent : (prod.discountPercent ? Number(prod.discountPercent) : NaN);
+
+  if(!isNaN(orig)){
+    if(!isNaN(disc)){
+      const safeDisc = Math.max(0, Math.min(100, disc));
+      const priceNow = +(orig * (1 - safeDisc / 100)).toFixed(2);
+      if(priceNow === 0 || safeDisc === 100) return 'FREE';
+      return 'PAID';
+    }
+    return orig === 0 ? 'FREE' : 'PAID';
+  }
+
+  // Unknown/not provided
+  return '';
+}
+
+// Render HTML badge based on inferred price label or explicit token
+function renderPriceLabel(prod){
+  const txt = getPriceLabelText(prod);
+  if(txt === 'FREE') return `<span class="label-free">FREE</span>`;
+  if(txt === 'PAID') return `<span class="label-paid">PAID</span>`;
+  if(txt) return `<span class="tag">${escapeHtml(txt)}</span>`;
+  return '';
+}
 
 /* Format number as INR currency string (₹ with grouping) */
-function formatINR(v){
+function formatCurrency(v, currency){
+  const curr = (currency && String(currency).trim()) || 'INR';
   const n = Number(String(v).replace(/,/g,''));
-  if(isNaN(n)) return '₹0.00';
+  if(isNaN(n)){
+    try{
+      // show zero in requested currency
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: curr, minimumFractionDigits:2, maximumFractionDigits:2 }).format(0);
+    }catch(e){
+      return curr === 'INR' ? '₹0.00' : `${curr}0.00`;
+    }
+  }
   try{
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits:2, maximumFractionDigits:2 }).format(n);
+    // Use a locale that commonly maps to the currency for nicer formatting
+    const locale = curr === 'INR' ? 'en-IN' : (curr === 'USD' ? 'en-US' : 'en-US');
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: curr, minimumFractionDigits:2, maximumFractionDigits:2 }).format(n);
   }catch(e){
     // fallback
-    return '₹' + n.toFixed(2);
+    if(curr === 'INR') return '₹' + n.toFixed(2);
+    return curr + ' ' + n.toFixed(2);
   }
 }
 
-/* --------- renderPriceBlock(p) ---------- */
+/* renderPriceBlock(p) */
 function renderPriceBlock(p){
   // Helper to parse price string to number safely
   function toNumber(s){
@@ -476,8 +607,8 @@ function renderPriceBlock(p){
 
   // If product has explicit discountPercent + originalPrice
   const origNum = toNumber(p.originalPrice);
-  const disc = (typeof p.discountPercent === 'number') ? p.discountPercent : (p.discountPercent ? Number(p.discountPercent) : NaN);
-
+    const disc = (typeof p.discountPercent === 'number') ? p.discountPercent : (p.discountPercent ? Number(p.discountPercent) : NaN); 
+    const curr = p.priceCurrency || 'INR';
   // Case: discount provided and original price valid
   if(!isNaN(origNum) && !isNaN(disc)){
     // clamp discount between 0 and 100
@@ -485,44 +616,35 @@ function renderPriceBlock(p){
     const priceNowNum = +(origNum * (1 - safeDisc / 100)).toFixed(2);
     // For 100% off show FREE
     if(safeDisc === 100){
-      const origHtml = `<span class="price-old">${escapeHtml(formatINR(origNum))}</span>`;
+        const origHtml = `<span class="price-old">${escapeHtml(formatCurrency(origNum, curr))}</span>`;
       return `<div class="price-row">${origHtml}<span class="price-now">FREE</span><span class="discount-badge">${safeDisc}% OFF</span></div>`;
     }
     // Normal discounted price
-    const origHtml = `<span class="price-old">${escapeHtml(formatINR(origNum))}</span>`;
-    const nowHtml = `<span class="price-now">${escapeHtml(formatINR(priceNowNum))}</span>`;
+      const origHtml = `<span class="price-old">${escapeHtml(formatCurrency(origNum, curr))}</span>`;
+      const nowHtml = `<span class="price-now">${escapeHtml(formatCurrency(priceNowNum, curr))}</span>`;
     return `<div class="price-row">${origHtml}${nowHtml}<span class="discount-badge">${safeDisc}% OFF</span></div>`;
   }
 
-  // If product already has explicit priceValue (current price)
-  if(p.priceValue){
-    return `<div class="price-row"><span class="price-now">${escapeHtml(formatINR(p.priceValue))}</span></div>`;
+  // If originalPrice present but no discount specified, treat originalPrice as current price
+  if(!isNaN(origNum) && (isNaN(disc) || disc === 0)){
+      return `<div class="price-row"><span class="price-now">${escapeHtml(formatCurrency(origNum, curr))}</span></div>`;
   }
 
-  // Fallback: free label or nothing
-  if(p.price === 'free'){
-    // attempt to show original price if available
-    if(!isNaN(origNum)){
-      const origHtml = `<span class="price-old">${escapeHtml(formatINR(origNum))}</span>`;
-      return `<div class="price-row">${origHtml}<span class="price-now">FREE</span><span class="discount-badge">100% OFF</span></div>`;
-    }
-    return `<div class="price-row"><span class="price-now">FREE</span></div>`;
-  }
-
+  // No reliable pricing info (originalPrice not provided) — render nothing
   return '';
 }
 function renderProductsPage(list, page, pageSize){
-  grid.innerHTML = '';
+  refs.grid.innerHTML = '';
 
   if(!list.length){
-    empty.style.display = 'block';
-    paginationWrap.style.display = 'none';
+    refs.empty.style.display = 'block';
+    refs.paginationWrap.style.display = 'none';
     updateTitleAndMeta();
     injectStructuredData();
     updateCanonicalAndPaginationLinks(1,1,'all');
     return;
   }
-  empty.style.display = 'none';
+  refs.empty.style.display = 'none';
 
   let pageNum = parseInt(page,10) || 1;
   let size = pageSize === 'all' ? list.length : parseInt(pageSize,10);
@@ -540,11 +662,13 @@ function renderProductsPage(list, page, pageSize){
     let thumbHtml = `<div class="thumb" aria-hidden="true">${escapeHtml(p.thumbText)}</div>`;
     if(p.imageUrl){
       // add loading="lazy" and onerror fallback
-      const imgSrc = escapeHtml(p.imageUrl);
-      thumbHtml = `<div class="thumb" data-thumb-text="${escapeHtml(p.thumbText)}"><img src="${imgSrc}" alt="${escapeHtml(p.title)} thumbnail" loading="lazy" onerror="this.dataset.failed='1'; this.style.display='none'; this.parentNode.classList.add('thumb-failed');"></div>`;
+          const imgSrc = escapeHtml(p.imageUrl);
+          thumbHtml = `<div class="thumb" data-thumb-text="${escapeHtml(p.thumbText)}"><img src="${imgSrc}" alt="${escapeHtml(p.title)} thumbnail" loading="lazy" onerror="this.dataset.failed='1'; this.style.display='none'; this.parentNode.classList.add('thumb-failed');"></div>`;
     }
 
-    const titleLink = p.productUrl ? `<a href="${escapeHtml(p.productUrl)}">${escapeHtml(p.title)}</a>` : `<span>${escapeHtml(p.title)}</span>`;
+    // Link title to SEO-friendly URL when available; otherwise fall back to productUrl if present
+    const titleHref = p.seoUrl || p.productUrl || '';
+    const titleLink = titleHref ? `<a href="${escapeHtml(titleHref)}">${escapeHtml(p.title)}</a>` : `<span>${escapeHtml(p.title)}</span>`;
 
     card.innerHTML = `
       ${thumbHtml}
@@ -561,7 +685,7 @@ function renderProductsPage(list, page, pageSize){
         <button class="details-btn" data-id="${p.id}" aria-label="Details for ${escapeHtml(p.title)}">Details</button>
       </div>
     `;
-    grid.appendChild(card);
+    refs.grid.appendChild(card);
 
     const img = card.querySelector('.thumb img');
     if(img){
@@ -586,60 +710,59 @@ function renderProductsPage(list, page, pageSize){
 
   // update visible H1/description to reflect context
   let h = 'Digital & Physical Products';
-  if(categorySelect.value) h = `${cap(categorySelect.value)} — ${h}`;
-  if(searchInput.value) h = `Results for "${searchInput.value}" — ${h}`;
-  pageH1.textContent = h;
-  pageDescEl.textContent = document.title; // quick summary
+  if(refs.categorySelect.value) h = `${cap(refs.categorySelect.value)} — ${h}`;
+  if(refs.searchInput.value) h = `Results for "${refs.searchInput.value}" — ${h}`;
+  refs.pageH1.textContent = h;
+  refs.pageDescEl.textContent = document.title; // quick summary
 }
 
 function renderPagination(totalItems, current, totalPages, pageSize){
   if(pageSize === 'all' || totalPages <= 1){
-    paginationWrap.style.display = 'none';
+    refs.paginationWrap.style.display = 'none';
     return;
   }
-  paginationWrap.style.display = 'flex';
-  paginationWrap.innerHTML = '';
+  refs.paginationWrap.style.display = 'flex';
+  refs.paginationWrap.innerHTML = '';
 
   const prev = document.createElement('button'); prev.className='page-btn'; prev.textContent='Prev';
   prev.disabled = current <= 1;
   prev.addEventListener('click', ()=> { if(current > 1){ currentPage--; refreshPage(); } });
-  paginationWrap.appendChild(prev);
+  refs.paginationWrap.appendChild(prev);
 
   if(totalPages <= 10){
-    for(let i=1;i<=totalPages;i++){
+      for(let i=1;i<=totalPages;i++){
       const b = document.createElement('button');
       b.className = 'page-btn' + (i===current ? ' active' : '');
       b.textContent = i;
       b.addEventListener('click', ()=> { currentPage = i; refreshPage(); });
-      paginationWrap.appendChild(b);
+      refs.paginationWrap.appendChild(b);
     }
   } else {
     const first = document.createElement('button'); first.className='page-btn'; first.textContent='1';
     first.addEventListener('click', ()=> { currentPage=1; refreshPage(); });
-    paginationWrap.appendChild(first);
+    refs.paginationWrap.appendChild(first);
 
-    if(current > 4){ const dots = document.createElement('span'); dots.textContent='...'; paginationWrap.appendChild(dots); }
+    if(current > 4){ const dots = document.createElement('span'); dots.textContent='...'; refs.paginationWrap.appendChild(dots); }
 
     const start = Math.max(2, current - 2);
     const end = Math.min(totalPages - 1, current + 2);
-    for(let i=start;i<=end;i++){
+      for(let i=start;i<=end;i++){
       const b = document.createElement('button'); b.className = 'page-btn' + (i===current ? ' active' : '');
       b.textContent = i;
       b.addEventListener('click', ()=> { currentPage = i; refreshPage(); });
-      paginationWrap.appendChild(b);
+      refs.paginationWrap.appendChild(b);
     }
 
-    if(current < totalPages - 3){ const dots2 = document.createElement('span'); dots2.textContent='...'; paginationWrap.appendChild(dots2); }
+    if(current < totalPages - 3){ const dots2 = document.createElement('span'); dots2.textContent='...'; refs.paginationWrap.appendChild(dots2); }
 
     const last = document.createElement('button'); last.className='page-btn'; last.textContent=totalPages;
     last.addEventListener('click', ()=>{ currentPage = totalPages; refreshPage(); });
-    paginationWrap.appendChild(last);
+    refs.paginationWrap.appendChild(last);
   }
-
   const next = document.createElement('button'); next.className='page-btn'; next.textContent='Next';
   next.disabled = current >= totalPages;
   next.addEventListener('click', ()=> { if(current < totalPages){ currentPage++; refreshPage(); } });
-  paginationWrap.appendChild(next);
+  refs.paginationWrap.appendChild(next);
 
   // Go to page quick-jump
   const goWrap = document.createElement('div'); goWrap.className = 'go-page';
@@ -650,24 +773,24 @@ function renderPagination(totalItems, current, totalPages, pageSize){
   goBtn.addEventListener('click', ()=> { let v=parseInt(goInput.value,10); if(isNaN(v)) return; if(v<1) v=1; if(v>totalPages) v=totalPages; currentPage=v; refreshPage(); goBtn.blur(); });
   goInput.addEventListener('keydown', (ev)=>{ if(ev.key === 'Enter') goBtn.click(); });
   goWrap.appendChild(goLabel); goWrap.appendChild(goInput); goWrap.appendChild(goBtn);
-  paginationWrap.appendChild(goWrap);
+  refs.paginationWrap.appendChild(goWrap);
 
   const info = document.createElement('div'); info.style.marginLeft='8px'; info.style.color='var(--muted)';
   info.textContent = `Page ${current} of ${totalPages} • ${totalItems} items`;
-  paginationWrap.appendChild(info);
+  refs.paginationWrap.appendChild(info);
 }
 
 /* Apply filters & sorting */
 function applyFilters(){
-  const q = searchInput.value.toLowerCase().trim();
-  const cat = categorySelect.value;
-  const price = priceSelect.value;
-  const sort = sortSelect.value;
+  const q = refs.searchInput.value.toLowerCase().trim();
+  const cat = refs.categorySelect.value;
+  const price = refs.priceSelect.value;
+  const sort = refs.sortSelect.value;
 
   filteredProducts = PRODUCTS.filter(p => {
     const m1 = !cat || p.category === cat;
-    const m2 = !price || p.price === price;
-    const m3 = !q || (p.title + p.description + p.category + (p.price||'')).toLowerCase().includes(q);
+    const m2 = !price || (getPriceLabelText(p) || '').toLowerCase() === price;
+    const m3 = !q || (p.title + p.description + p.category + (p.seoUrl||'')).toLowerCase().includes(q);
     return m1 && m2 && m3;
   });
 
@@ -677,79 +800,169 @@ function applyFilters(){
   currentPage = 1;
   refreshPage();
 }
-function refreshPage(){ currentPageSize = pageSizeSelect.value || 'all'; renderProductsPage(filteredProducts, currentPage, currentPageSize); }
+function refreshPage(){ currentPageSize = refs.pageSizeSelect.value || 'all'; renderProductsPage(filteredProducts, currentPage, currentPageSize); }
 
 /* Event wiring */
-searchInput.addEventListener('input', applyFilters);
-categorySelect.addEventListener('change', applyFilters);
-priceSelect.addEventListener('change', applyFilters);
-sortSelect.addEventListener('change', applyFilters);
-pageSizeSelect.addEventListener('change', ()=>{ currentPage=1; refreshPage(); });
-resetBtn.addEventListener('click', ()=>{ searchInput.value=''; categorySelect.value=''; priceSelect.value=''; sortSelect.value='new'; pageSizeSelect.value='all'; currentPage=1; applyFilters(); });
+refs.searchInput.addEventListener('input', applyFilters);
+refs.categorySelect.addEventListener('change', applyFilters);
+refs.priceSelect.addEventListener('change', applyFilters);
+refs.sortSelect.addEventListener('change', applyFilters);
+refs.pageSizeSelect.addEventListener('change', ()=>{ currentPage=1; refreshPage(); });
+refs.resetBtn.addEventListener('click', ()=>{ refs.searchInput.value=''; refs.categorySelect.value=''; refs.priceSelect.value=''; refs.sortSelect.value='new'; refs.pageSizeSelect.value='all'; currentPage=1; applyFilters(); });
 
-/* Modal */
-function closeModal(){ modalBackdrop.style.display='none'; modalBackdrop.setAttribute('aria-hidden','true'); }
-function openDetails(id){ const p = PRODUCTS.find(x=>x.id===id); if(!p) return; modalTitle.textContent = p.title; modalDesc.textContent = p.description; modalMeta.textContent = `${p.category} • ${p.price ? p.price.toUpperCase() : ''}`; if(p.type === 'download'){ modalDownload.textContent='Download'; modalDownload.onclick=(e)=>{ e.preventDefault(); startDownloadById(id); }; modalDownload.href='#'; } else if(p.type === 'external'){ modalDownload.textContent=p.buttonLabel||'Buy Now'; modalDownload.onclick = ()=> window.open(p.externalUrl,'_blank'); modalDownload.href = p.externalUrl; modalDownload.target='_blank'; modalDownload.rel='noopener'; } modalBackdrop.style.display='flex'; modalBackdrop.setAttribute('aria-hidden','false'); }
-modalClose.addEventListener('click', closeModal);
-modalBackdrop.addEventListener('click', (e)=>{ if(e.target === modalBackdrop) closeModal(); });
-document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
-
-/* Downloads + toast */
-function showToast(msg, duration=2500){ if(toastTimer){ clearTimeout(toastTimer); toastTimer=null; } toastEl.textContent = msg; toastEl.classList.add('show'); toastTimer = setTimeout(()=>{ toastEl.classList.remove('show'); toastTimer=null; }, duration); }
-function startDownloadById(id){ const p = PRODUCTS.find(x=>x.id === id); if(!p) return; if(p.fileUrl){ const a = document.createElement('a'); a.href = p.fileUrl; a.download = p.fileName || ''; a.click(); showToast('Download started'); return; } const blob = createDemoFileBlob(p); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = p.fileName || p.title + '.txt'; a.click(); showToast('Download prepared — check your downloads'); setTimeout(()=> URL.revokeObjectURL(url), 4000); }
-
-/* Delegated grid click */
-grid.addEventListener('click', (e)=>{ const dl = e.target.closest('.download-btn'); const det = e.target.closest('.details-btn'); if(dl && dl.dataset.id){ e.preventDefault(); startDownloadById(dl.dataset.id); return; } if(det){ openDetails(det.dataset.id); return; } });
-
-/* Go to top */
-window.addEventListener('scroll', ()=>{ if(window.scrollY > 300) goTopBtn.classList.add('show'); else goTopBtn.classList.remove('show'); });
-goTopBtn.addEventListener('click', ()=> window.scrollTo({ top:0, behavior:'smooth' }));
-
-/* Sitemap generator (downloadable) */
-function buildSitemapXml(){
-  // include listing root + products productUrl if present
-  const urls = [];
-  // listing root (allow pagination detection)
-  urls.push({ loc: SITE_BASE + (LISTING_PATH.startsWith('/') ? LISTING_PATH : '/' + LISTING_PATH), priority: 0.8 });
-
-  // individual products
-  PRODUCTS.forEach(p => {
-    if(p.productUrl){
-      const loc = p.productUrl.startsWith('http') ? p.productUrl : (SITE_BASE + (p.productUrl.startsWith('/') ? p.productUrl : '/' + p.productUrl));
-      urls.push({ loc, priority: p.price === 'paid' ? 0.7 : 0.6 });
-    } else {
-      // fallback: create a listing fragment URL with anchor
-      urls.push({ loc: SITE_BASE + (LISTING_PATH.startsWith('/') ? LISTING_PATH : '/' + LISTING_PATH) + `#${encodeURIComponent(p.id)}`, priority: 0.4 });
-    }
-  });
-
-  const now = new Date().toISOString();
-  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
-  urls.forEach(u => {
-    xml += `  <url>\n    <loc>${u.loc}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${u.priority}</priority>\n  </url>\n`;
-  });
-  xml += `</urlset>`;
-  return xml;
+/* Modal helpers */
+function closeModal(){
+  refs.modalBackdrop.style.display='none';
+  refs.modalBackdrop.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+  // clear any inline positioning applied for popover mode
+  refs.modal.style.position = '';
+  refs.modal.style.left = '';
+  refs.modal.style.top = '';
+  refs.modal.style.transform = '';
+  refs.modal.style.visibility = '';
+  refs.modal.classList.remove('popover-mode');
 }
 
-sitemapBtn.addEventListener('click', ()=>{
-  const xml = buildSitemapXml();
-  const blob = new Blob([xml], {type:'application/xml'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'sitemap.xml';
-  a.click();
-  setTimeout(()=> URL.revokeObjectURL(url), 4000);
-  showToast('sitemap.xml prepared for download');
+/* Robust openDetails implementation */
+function openDetails(id, anchorEl){
+  const p = PRODUCTS.find(x => x.id === id);
+  if(!p) return;
+
+  // populate modal content
+  refs.modalTitle.textContent = p.title;
+  refs.modalDesc.textContent = p.description;
+  const priceLabel = getPriceLabelText(p);
+  refs.modalMeta.textContent = `${p.category}${priceLabel ? ' • ' + priceLabel : ''}`;
+
+  if(p.type === 'download'){
+    refs.modalDownload.textContent = 'Download';
+    refs.modalDownload.onclick = (e)=>{ e.preventDefault(); startDownloadById(id); };
+    refs.modalDownload.href = '#';
+  } else if(p.type === 'external'){
+    refs.modalDownload.textContent = p.buttonLabel || 'Buy Now';
+    refs.modalDownload.onclick = ()=> window.open(p.productUrl || '#', '_blank');
+    refs.modalDownload.href = p.productUrl || '#';
+    refs.modalDownload.target = '_blank';
+    refs.modalDownload.rel = 'noopener';
+  }
+
+  // ensure backdrop appended to body to avoid builder wrappers
+  try { if(refs.modalBackdrop.parentNode !== document.body) document.body.appendChild(refs.modalBackdrop); } catch(e){}
+
+  // show centered modal (simple approach)
+  // On narrow viewports force popover-mode so modal sits above other stacking contexts
+  if(window.innerWidth <= 600){
+    refs.modal.classList.add('popover-mode');
+  } else {
+    refs.modal.classList.remove('popover-mode');
+    refs.modal.style.position = '';
+    refs.modal.style.left = '';
+    refs.modal.style.top = '';
+    refs.modal.style.transform = '';
+    refs.modal.style.visibility = '';
+  }
+  refs.modalBackdrop.style.display = 'flex';
+  refs.modalBackdrop.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+}
+
+refs.modalClose.addEventListener('click', closeModal);
+refs.modalBackdrop.addEventListener('click', (e)=>{ if(e.target === refs.modalBackdrop) closeModal(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+
+/* Downloads & toast */
+function showToast(msg, duration=2500){ if(toastTimer){ clearTimeout(toastTimer); toastTimer=null; } refs.toastEl.textContent = msg; refs.toastEl.classList.add('show'); toastTimer = setTimeout(()=>{ refs.toastEl.classList.remove('show'); toastTimer=null; }, duration); }
+function startDownloadById(id){ const p = PRODUCTS.find(x=>x.id === id); if(!p) return; if(p.productUrl){ const a = document.createElement('a'); a.href = p.productUrl; a.download = p.fileName || ''; a.click(); showToast('Download started'); return; } const blob = createDemoFileBlob(p); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = p.fileName || p.title + '.txt'; a.click(); showToast('Download prepared — check your downloads'); setTimeout(()=> URL.revokeObjectURL(url), 4000); }
+
+/* Delegated grid click */
+refs.grid.addEventListener('click', (e)=>{ const dl = e.target.closest('.download-btn'); const det = e.target.closest('.details-btn'); if(dl && dl.dataset.id){ e.preventDefault(); startDownloadById(dl.dataset.id); return; } if(det){ openDetails(det.dataset.id, det); return; } });
+
+/* Go to top */
+window.addEventListener('scroll', ()=>{ if(window.scrollY > 300) refs.goTopBtn.classList.add('show'); else refs.goTopBtn.classList.remove('show'); });
+refs.goTopBtn.addEventListener('click', ()=> window.scrollTo({ top:0, behavior:'smooth' }));
+
+/* Hidden sitemap generator (Ctrl+Shift+S) */
+function buildSitemapXml() {
+  const domain = window.location.origin;
+
+  const urls = PRODUCTS.map(p => {
+    const loc = p.seoUrl || p.productUrl || `${domain}/product/${p.id}`;
+    return `
+      <url>
+        <loc>${loc}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+      </url>
+    `;
+  }).join("");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+  <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+      <loc>${domain}</loc>
+      <changefreq>daily</changefreq>
+      <priority>1.0</priority>
+    </url>
+    ${urls}
+  </urlset>`;
+}
+
+/* Keyboard shortcut: CTRL + SHIFT + S */
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
+
+    const xml = buildSitemapXml();
+    const blob = new Blob([xml], { type: "application/xml" });
+    const url = URL.createObjectURL(blob);
+
+    const win = window.open();
+    win.document.write(`
+      <pre>${xml.replace(/</g,"&lt;")}</pre>
+      <a href="${url}" download="sitemap.xml">Download sitemap.xml</a>
+      <p>Upload this file to your site root (/sitemap.xml)</p>
+    `);
+    win.document.close();
+
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
 });
 
 /* Populate filters from PRODUCTS */
 (function setupFilters(){
+  // Ensure each product has an SEO-friendly URL (`seoUrl`).
+  // Auto-generate from `title` when not provided and ensure uniqueness.
+  function slugify(s){
+    return (s||'').toString().trim().toLowerCase()
+      .replace(/["'`]/g,'')
+      .replace(/[^a-z0-9\s-]/g,'')
+      .replace(/\s+/g,'-')
+      .replace(/-+/g,'-')
+      .replace(/^[-]+|[-]+$/g,'');
+  }
+  function ensureSeoUrls(){
+    const seen = new Set();
+    // pre-seed with provided seoUrls
+    PRODUCTS.forEach(p => { if(p.seoUrl) seen.add(p.seoUrl); });
+    PRODUCTS.forEach(p => {
+      if(!p.seoUrl || !String(p.seoUrl).trim()){
+        const base = '/product/' + slugify(p.title || p.id || '') || ('product-' + p.id);
+        let candidate = base;
+        let i = 1;
+        while(seen.has(candidate)){
+          candidate = base + '-' + i; i++;
+        }
+        p.seoUrl = candidate;
+        seen.add(candidate);
+      }
+    });
+  }
+  ensureSeoUrls();
   const cats = [...new Set(PRODUCTS.map(p => p.category))].sort();
-  cats.forEach(c => { const op = document.createElement('option'); op.value = c; op.textContent = c; categorySelect.appendChild(op); });
+  cats.forEach(c => { const op = document.createElement('option'); op.value = c; op.textContent = c; refs.categorySelect.appendChild(op); });
 
-  const prices = [...new Set(PRODUCTS.map(p => p.price || 'unknown'))].filter(Boolean).sort();
-  prices.forEach(pv => { const op = document.createElement('option'); op.value = pv; op.textContent = cap(pv); priceSelect.appendChild(op); });
+  const prices = [...new Set(PRODUCTS.map(p => (getPriceLabelText(p) || 'unknown').toLowerCase()))].filter(Boolean).sort();
+  prices.forEach(pv => { const op = document.createElement('option'); op.value = pv; op.textContent = cap(pv); refs.priceSelect.appendChild(op); });
 
   // initial SEO injection
   updateTitleAndMeta();
@@ -758,4 +971,8 @@ sitemapBtn.addEventListener('click', ()=>{
 
 /* INITIAL LOAD */
 applyFilters();
+// expose minimal API
+window.setTheme = setTheme;
+
+})();
 </script>
