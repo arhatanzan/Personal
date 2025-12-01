@@ -1,0 +1,378 @@
+<!-- Product listing & download page (no sign-in required) -->
+<style>
+  :root{
+    --page-bg: #f8f6f2;       /* light page */
+    --card-bg: #ffffff;       /* card surface */
+    --accent: #d4a017;        /* gold */
+    --navy: #0a2342;          /* main text color */
+    --muted: #5a6673;
+    --radius: 10px;
+    --gap: 18px;
+    --container: 1200px;
+  }
+
+  * { box-sizing: border-box; }
+  body, html { margin:0; padding:0; font-family: Calibri, Arial, sans-serif; background: var(--page-bg); color: var(--navy); }
+
+  .prod-wrap { max-width: var(--container); margin: 28px auto; padding: 20px; }
+
+  /* Header */
+  .prod-header { display:flex; gap:16px; align-items:center; justify-content:space-between; margin-bottom: 16px; }
+  .prod-title { display:flex; gap:12px; align-items:center; }
+  .prod-title h1 { margin:0; font-size:28px; letter-spacing:0.2px; color:var(--navy); }
+  .prod-sub { color:var(--muted); font-size:14px; margin:0; }
+
+  /* Controls */
+  .prod-controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .search {
+    display:flex; align-items:center; gap:8px;
+    background: #fff; border-radius:8px; padding:8px 10px; box-shadow:0 1px 0 rgba(0,0,0,0.04);
+  }
+  .search input { border:0; outline:0; width:220px; font-size:14px; color:var(--navy); background:transparent; }
+  .select, .btn {
+    background:#fff; border-radius:8px; padding:8px 12px; font-size:14px; border:1px solid rgba(0,0,0,0.06);
+  }
+  .btn { cursor:pointer; display:inline-flex; gap:8px; align-items:center; color:var(--navy); }
+  .btn.primary { background:linear-gradient(180deg,var(--accent), #b88b11); color:#0a2342; font-weight:600; }
+
+  /* Grid */
+  .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:var(--gap); margin-top:18px; }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 6px solid var(--accent); /* gold frame like your cards */
+    display:flex; flex-direction:column; gap:12px;
+    min-height:220px;
+  }
+
+  .thumb {
+    height:110px; border-radius:6px; background: linear-gradient(180deg,#ececec,#fff); display:flex; align-items:center; justify-content:center;
+    font-weight:700; color:var(--muted);
+  }
+
+  /* Thumbnail image wrapper */
+    .thumb-img {
+        height: 110px;
+        border-radius: 6px;
+        overflow: hidden;
+        background: #eaeaea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .thumb-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+  .meta { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .title { font-size:16px; font-weight:700; color:var(--navy); margin:0; }
+  .desc { font-size:14px; color:var(--muted); margin:0; line-height:1.4; }
+
+  .tags { display:flex; gap:8px; flex-wrap:wrap; }
+  .tag { background:transparent; border:1px dashed rgba(0,0,0,0.06); padding:4px 8px; border-radius:999px; font-size:12px; color:var(--navy); }
+
+  .card-footer { margin-top:auto; display:flex; gap:8px; align-items:center; justify-content:space-between; }
+  .download { background:var(--accent); color:var(--navy); border-radius:8px; padding:8px 12px; text-decoration:none; font-weight:700; }
+  .details-btn { background:transparent; color:var(--navy); border-radius:8px; padding:6px 10px; border:1px solid rgba(0,0,0,0.06); cursor:pointer; }
+
+  /* modal */
+  .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:9999; padding:18px; }
+  .modal { width:100%; max-width:760px; background:var(--card-bg); border-radius:10px; padding:18px; border:6px solid var(--accent); box-shadow:0 12px 30px rgba(0,0,0,0.25); }
+  .modal h2 { margin:0 0 8px 0; color:var(--navy); }
+  .modal p { color:var(--muted); margin:0 0 12px 0; }
+  .modal .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+
+  /* empty state */
+  .empty { text-align:center; color:var(--muted); padding:40px 0; }
+
+  /* responsive tweaks */
+  @media (max-width:800px){
+    .search input { width:120px; }
+    .prod-title h1 { font-size:22px; }
+  }
+</style>
+
+<div class="prod-wrap" aria-live="polite">
+  <div class="prod-header">
+    <div class="prod-title">
+      <div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(180deg,var(--accent),#b88b11);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--navy);">DP</div>
+      <div>
+        <h1>Digital Products</h1>
+        <div class="prod-sub">Downloadable resources — no sign-in required</div>
+      </div>
+    </div>
+
+    <div class="prod-controls" role="search">
+      <div class="search" aria-hidden="false">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="#000" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input id="searchInput" placeholder="Search products..." aria-label="Search products">
+      </div>
+
+      <select id="categorySelect" class="select" aria-label="Filter by category">
+        <option value="">All categories</option>
+      </select>
+
+      <select id="sortSelect" class="select" aria-label="Sort products">
+        <option value="new">Newest</option>
+        <option value="az">Title A → Z</option>
+        <option value="za">Title Z → A</option>
+      </select>
+
+      <button id="resetBtn" class="btn" title="Reset filters">Reset</button>
+    </div>
+  </div>
+
+  <div id="grid" class="grid" aria-live="polite"></div>
+
+  <div id="empty" class="empty" style="display:none">No products found.</div>
+</div>
+
+<!-- Modal -->
+<div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal" role="document">
+    <h2 id="modalTitle">Product</h2>
+    <p id="modalDesc">Description</p>
+    <div id="modalMeta" style="color:var(--navy);font-weight:600;margin-top:8px"></div>
+    <div class="modal-actions">
+      <a id="modalDownload" class="download" href="#" download>Download</a>
+      <button id="modalClose" class="details-btn">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/*
+ Product data - add items here.
+ fileUrl must be a direct link to the file (S3, your server, etc.)
+ For demo purposes, if fileUrl is empty we create a demo text file on the fly.
+*/
+const PRODUCTS = [
+  {
+    id: "p1",
+    title: "Data Storytelling Workbook",
+    description: "A practical workbook for crafting narratives with data.",
+    category: "Guides",
+    fileUrl: "",        // leave blank for demo file (browser-generated)
+    fileName: "data-storytelling-workbook.pdf",
+    thumbText: "Workbook",
+    thumbImage: "",
+    thumbPreview: "https://icrrd.com/public/media/15-05-2021-084550The-Alchemist-Paulo-Coelho.pdf"
+  },
+  {
+    id: "p2",
+    title: "Datadog Monitors Cheat Sheet",
+    description: "Compact guide to monitor types, thresholds and best practices.",
+    category: "Cheatsheets",
+    fileUrl: "", 
+    fileName: "datadog-monitors-cheatsheet.pdf",
+    thumbText: "Cheatsheet",
+    thumbImage: "",
+    thumbPreview: ""
+  },
+  {
+    id: "p3",
+    title: "Research Methods for Journalists",
+    description: "Short primer on qualitative and quantitative research methods.",
+    category: "Research",
+    fileUrl: "",
+    fileName: "research-methods-journalists.pdf",
+    thumbText: "Research",
+    thumbImage: "",
+    thumbPreview: ""
+  },
+  {
+    id: "p4",
+    title: "Course: Intro to Digital Democracy (Slides)",
+    description: "Slides and resources covering digital democracy and media influence.",
+    category: "Slides",
+    fileUrl: "",
+    fileName: "digital-democracy-slides.zip",
+    thumbText: "Slides",
+    thumbImage: "",
+    thumbPreview: ""
+  }
+];
+
+/* utility to create a demo download blob (when no fileUrl provided) */
+function createDemoFileBlob(product){
+  const txt = `${product.title}\n\n${product.description}\n\nGenerated: ${new Date().toLocaleString()}\n`;
+  return new Blob([txt], {type: 'text/plain'});
+}
+
+/* state */
+let currentProducts = [...PRODUCTS];
+
+/* populate category filter */
+const categorySelect = document.getElementById('categorySelect');
+(() => {
+  const cats = Array.from(new Set(PRODUCTS.map(p => p.category))).sort();
+  cats.forEach(c => {
+    const opt = document.createElement('option'); opt.value = c; opt.textContent = c;
+    categorySelect.appendChild(opt);
+  });
+})();
+
+/* render grid */
+const grid = document.getElementById('grid');
+const empty = document.getElementById('empty');
+
+function renderProducts(list){
+  grid.innerHTML = '';
+  if(!list.length){ empty.style.display='block'; return; } else empty.style.display='none';
+  list.forEach(prod => {
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.setAttribute('tabindex', '0');
+    card.innerHTML = `
+      ${(() => {
+            if (prod.thumbImage) {
+                return `<div class="thumb-img"><img src="${escapeHtml(prod.thumbImage)}" alt="${escapeHtml(prod.title)} thumbnail"></div>`;
+            }
+            if (prod.thumbPreview) {
+                return `<div class="thumb-img"><img src="${escapeHtml(prod.thumbPreview)}" alt="${escapeHtml(prod.title)} preview"></div>`;
+            }
+            return `<div class="thumb">${escapeHtml(prod.thumbText || prod.title.split(' ')[0])}</div>`;
+        })()}
+      <div class="meta">
+        <h3 class="title">${escapeHtml(prod.title)}</h3>
+        <div style="font-size:12px;color:var(--muted)">${escapeHtml(prod.category)}</div>
+      </div>
+      <p class="desc">${escapeHtml(prod.description)}</p>
+      <div class="card-footer">
+        <div class="tags"><span class="tag">${escapeHtml(prod.fileName.split('.').pop().toUpperCase())}</span></div>
+        <div style="display:flex;gap:8px">
+          <a class="download" href="#" data-id="${prod.id}" role="button">Download</a>
+          <button class="details-btn" data-id="${prod.id}">Details</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* search / filter / sort handlers */
+const searchInput = document.getElementById('searchInput');
+const sortSelect = document.getElementById('sortSelect');
+const resetBtn = document.getElementById('resetBtn');
+
+function applyFilters(){
+  const q = searchInput.value.trim().toLowerCase();
+  const cat = categorySelect.value;
+  let list = PRODUCTS.filter(p => {
+    const inCat = cat ? p.category === cat : true;
+    const inQ = q ? (p.title+ ' ' + p.description + ' ' + p.category).toLowerCase().includes(q) : true;
+    return inCat && inQ;
+  });
+  // sort
+  const sort = sortSelect.value;
+  if(sort === 'az') list.sort((a,b)=> a.title.localeCompare(b.title));
+  else if(sort === 'za') list.sort((a,b)=> b.title.localeCompare(a.title));
+  else list.sort((a,b)=> (b._added||0) - (a._added||0)); // newest (no timestamp provided - original order)
+  currentProducts = list;
+  renderProducts(list);
+}
+
+/* simple escape */
+function escapeHtml(s){ return (s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+/* download & modal logic */
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalTitle = document.getElementById('modalTitle');
+const modalDesc = document.getElementById('modalDesc');
+const modalMeta = document.getElementById('modalMeta');
+const modalDownload = document.getElementById('modalDownload');
+const modalClose = document.getElementById('modalClose');
+
+grid.addEventListener('click', async (e) => {
+  const dl = e.target.closest('.download');
+  const det = e.target.closest('.details-btn');
+  if(dl){
+    const id = dl.dataset.id;
+    await startDownloadById(id);
+    return;
+  }
+  if(det){
+    const id = det.dataset.id;
+    openDetails(id);
+    return;
+  }
+});
+grid.addEventListener('keydown', (e)=> {
+  if(e.key === 'Enter'){
+    const card = e.target;
+    const detBtn = card.querySelector('.details-btn');
+    if(detBtn) openDetails(detBtn.dataset.id);
+  }
+});
+
+/* Download by id — if fileUrl exists, use it; else create blob and download */
+async function startDownloadById(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return alert('Product not found');
+  if(p.fileUrl){
+    // direct link — open in new tab and trigger download if possible
+    const a = document.createElement('a');
+    a.href = p.fileUrl;
+    a.download = p.fileName || '';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    return;
+  }
+  // create blob url
+  const blob = createDemoFileBlob(p);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = p.fileName || (p.title.replace(/\s+/g,'_') + '.txt');
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=> URL.revokeObjectURL(url), 5000);
+}
+
+/* open details modal */
+function openDetails(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  modalTitle.textContent = p.title;
+  modalDesc.textContent = p.description;
+  modalMeta.textContent = `${p.category} • ${p.fileName || 'file'}`;
+  // set download link (if fileUrl exists we point to it; else demo blob)
+  if(p.fileUrl){
+    modalDownload.href = p.fileUrl;
+    modalDownload.setAttribute('download', p.fileName || '');
+    modalDownload.onclick = ()=>{}; // natural
+  } else {
+    modalDownload.href = '#';
+    modalDownload.removeAttribute('download');
+    modalDownload.onclick = (ev) => {
+      ev.preventDefault();
+      startDownloadById(id);
+    }
+  }
+  modalBackdrop.style.display = 'flex';
+  modalBackdrop.setAttribute('aria-hidden','false');
+}
+
+/* modal close */
+modalClose.addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', (e)=> { if(e.target === modalBackdrop) closeModal(); });
+function closeModal(){ modalBackdrop.style.display='none'; modalBackdrop.setAttribute('aria-hidden','true'); }
+
+/* attach controls */
+searchInput.addEventListener('input', applyFilters);
+categorySelect.addEventListener('change', applyFilters);
+sortSelect.addEventListener('change', applyFilters);
+resetBtn.addEventListener('click', ()=>{
+  searchInput.value=''; categorySelect.value=''; sortSelect.value='new'; applyFilters();
+});
+
+/* initial render */
+applyFilters();
+</script>
