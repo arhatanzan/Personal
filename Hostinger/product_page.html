@@ -61,8 +61,9 @@
   .card-footer { margin-top:auto; display:flex; align-items:center; gap:8px; }
   .card-footer .primary-wrap { flex:1 1 auto; }
   .card-footer .actions { flex:0 0 auto; display:flex; gap:8px; align-items:center; }
-  .download-btn { background:var(--accent); color:var(--navy); border-radius:8px; padding:8px 12px; text-decoration:none; font-weight:700; font-size:14px; }
-  .details-btn { background:transparent; border:1px solid rgba(0,0,0,0.1); border-radius:8px; padding:6px 10px; font-size:14px; cursor:pointer; color:var(--navy); }
+  .download-btn { background:var(--accent); color:var(--navy); border-radius:8px; padding:8px 12px; text-decoration:none; font-weight:700; font-size:14px; display:inline-flex; align-items:center; justify-content:center; }
+  /* unify action buttons (Details / Back) so they're visually identical and align perfectly */
+  .details-btn, .back-btn { background:transparent; border:1px solid rgba(0,0,0,0.1); border-radius:8px; padding:6px 12px; font-size:14px; cursor:pointer; color:var(--navy); display:inline-flex; align-items:center; justify-content:center; min-width:86px; box-sizing:border-box; }
   .empty { text-align:center; color:var(--muted); padding:40px 0; }
 
   /* SEO helper button (sitemap) */
