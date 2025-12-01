@@ -58,7 +58,9 @@
   .tag { border:1px solid rgba(0,0,0,0.1); padding:3px 8px; border-radius:999px; font-size:12px; }
   .label-free { background:var(--label-free-bg); color:var(--label-free-text); border-radius:999px; padding:3px 8px; font-size:12px; }
   .label-paid { background:var(--label-paid-bg); color:var(--label-paid-text); border-radius:999px; padding:3px 8px; font-size:12px; }
-  .card-footer { margin-top:auto; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .card-footer { margin-top:auto; display:flex; align-items:center; gap:8px; }
+  .card-footer .primary-wrap { flex:1 1 auto; }
+  .card-footer .actions { flex:0 0 auto; display:flex; gap:8px; align-items:center; }
   .download-btn { background:var(--accent); color:var(--navy); border-radius:8px; padding:8px 12px; text-decoration:none; font-weight:700; font-size:14px; }
   .details-btn { background:transparent; border:1px solid rgba(0,0,0,0.1); border-radius:8px; padding:6px 10px; font-size:14px; cursor:pointer; color:var(--navy); }
   .empty { text-align:center; color:var(--muted); padding:40px 0; }
@@ -616,8 +618,8 @@ function renderProductsPage(list, page, pageSize){
           ${renderPriceBlock(p)}
           <p class="desc">${escapeHtml(p.description)}</p>
           <div class="card-footer">
-            ${renderPrimaryButton(p)}
-            <button class="details-btn" data-id="${p.id}" aria-label="Details for ${escapeHtml(p.title)}">Details</button>
+            <div class="primary-wrap">${renderPrimaryButton(p)}</div>
+            <div class="actions"><button class="details-btn" data-id="${p.id}" aria-label="Details for ${escapeHtml(p.title)}">Details</button></div>
           </div>
         </div>
         <div class="card-back" aria-hidden="true">
@@ -626,8 +628,8 @@ function renderProductsPage(list, page, pageSize){
           ${renderPriceBlock(p)}
           <p class="desc">${escapeHtml(p.description)}</p>
           <div class="card-footer" style="margin-top:auto;">
-            ${renderPrimaryButton(p)}
-            <button class="back-btn" data-id="${p.id}" aria-label="Back to product">Back</button>
+            <div class="primary-wrap">${renderPrimaryButton(p)}</div>
+            <div class="actions"><button class="back-btn" data-id="${p.id}" aria-label="Back to product">Back</button></div>
           </div>
         </div>
       </div>
