@@ -40,8 +40,8 @@
   }
 
   .thumb {
-    height:110px; border-radius:6px; background: #fff; border:1px dashed rgba(0,0,0,0.1);
-    display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--muted);
+    height:110px; border-radius:6px; background: linear-gradient(180deg,#ececec,#fff); display:flex; align-items:center; justify-content:center;
+    font-weight:700; color:var(--muted);
   }
 
   .title { font-size:16px; font-weight:700; margin:0; color:var(--navy); }
@@ -51,7 +51,7 @@
   .tag { border:1px solid rgba(0,0,0,0.1); padding:3px 8px; border-radius:999px; font-size:12px; }
 
   .label-free { background:#0a2342; color:#f8f6f2; border-radius:999px; padding:3px 8px; font-size:12px; }
-  .label-paid { background:var(--accent); color:#0a2342; border-radius:999px; padding:3px 8px; font-size:12px; }
+  .label-paid { background:#7a2e2e; color:#f8f6f2; border-radius:999px; padding:3px 8px; font-size:12px; }
 
   .card-footer { margin-top:auto; display:flex; justify-content:space-between; align-items:center; gap:8px; }
 
@@ -214,6 +214,15 @@ function escapeHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;"
   });
 })();
 
+function getFileType(prod){
+  if(prod.type === "external") {
+    return "LINK";
+  }
+  if(prod.fileName){
+    return prod.fileName.split('.').pop().toUpperCase();
+  }
+  return "FILE";
+}
 
 /* Generate Demo File if fileUrl is blank */
 function createDemoFileBlob(p){
@@ -260,6 +269,7 @@ function renderProducts(list){
 
       <div class="tags">
         <span class="tag">${escapeHtml(p.category)}</span>
+        <span class="tag">${escapeHtml(getFileType(p))}</span>
         ${renderPriceLabel(p)}
       </div>
 
