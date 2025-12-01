@@ -23,7 +23,7 @@
   .btn { cursor:pointer; }
   .btn.primary { background:var(--accent); color:var(--navy); font-weight:600; }
   .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:var(--gap); margin-top:18px; }
-  .card { background:var(--card-bg); border-radius:var(--radius); padding:16px; border:6px solid var(--accent); display:flex; flex-direction:column; gap:12px; min-height:240px; overflow:hidden; }
+  .card { background:var(--card-bg); border-radius:var(--radius); padding:16px; border:4px solid var(--accent); display:flex; flex-direction:column; gap:12px; min-height:240px; overflow:hidden; }
   .thumb { height:110px; border-radius:6px; background:linear-gradient(180deg,#ececec,#fff); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--muted); position:relative; overflow:hidden; }
   .thumb img { width:100%; height:100%; object-fit:cover; display:block; border-radius:6px; }
   .title { font-size:16px; font-weight:700; margin:0; color:var(--navy); }
@@ -58,7 +58,7 @@
 
   /* Modal */
   .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:9999; padding:18px; }
-  .modal { width:100%; max-width:760px; background:#fff; border-radius:10px; padding:18px; border:6px solid var(--accent); }
+  .modal { width:100%; max-width:760px; background:#fff; border-radius:10px; padding:18px; border:4px solid var(--accent); }
   .modal h2 { margin:0 0 8px 0; color:var(--navy); }
   .modal p { margin:0 0 12px 0; color:var(--muted); }
   .modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
@@ -67,7 +67,7 @@
   .price-row { display:flex; gap:8px; align-items:center; margin-top:8px; }
   .price-old { text-decoration:line-through; color:var(--muted); font-size:13px; }
   .price-now { font-weight:800; color:var(--navy); font-size:15px; }
-  .discount-badge { background:#7a2e2e; color:#fff; border-radius:8px; padding:4px 6px; font-size:12px; font-weight:700; }
+  .discount-badge { background:var(--accent); color:var(--navy); border-radius:8px; padding:4px 6px; font-size:12px; font-weight:700; }
 
   @media (max-width:800px) { .search input { width:130px; } .prod-title h1 { font-size:22px; } }
 </style>
@@ -108,8 +108,7 @@
 
       <button id="resetBtn" class="btn" aria-label="Reset filters">Reset</button>
 
-      <!-- Sitemap download for static hosting -->
-      <button id="sitemapBtn" title="Download sitemap.xml for your host" aria-label="Download sitemap">Download sitemap</button>
+      <!-- Sitemap generator moved to hidden keyboard shortcut (Ctrl+Shift+S) -->
     </div>
   </div>
 
@@ -146,83 +145,93 @@ const SITE_BASE = (window.SITE_BASE_URL && window.SITE_BASE_URL.replace(/\/$/, "
 const LISTING_PATH = '/products'; // relative path for listing pages in sitemap/canonical (change if needed)
 
 /* ============================
-   PRODUCT DATA – EDIT HERE
-   Add optional fields:
-   - imageUrl (string) for thumbnail images
-   - productUrl (string) absolute or root-relative canonical product page
-   - priceValue (string, e.g. "499.00")
-   - priceCurrency (string, e.g. "INR", "USD")
+  PRODUCT DATA – EDIT HERE
+  Add optional fields:
+  - imageUrl (string) for thumbnail images
+  - productUrl (string) absolute or root-relative external/purchase URL (for external products)
+  - seoUrl (string) root-relative SEO-friendly product page (e.g. "/product/my-product")
+  - priceCurrency (string, e.g. "INR", "USD") — optional, defaults to INR
 ============================ */
 const PRODUCTS = [
   {
     id: "p1",
-    title: "Data Storytelling Workbook",
-    description: "A practical workbook for crafting narratives using data.",
+    buttonLabel: "",
     category: "Guides",
-    type: "download",
-    price: "free",
-    fileUrl: "",
+    description: "A practical workbook for crafting narratives using data.",
+    discountPercent: null,
     fileName: "data-storytelling-workbook.pdf",
-    thumbText: "Workbook",
     imageUrl: "",
+    originalPrice: "",
+    priceCurrency: "",
     productUrl: "/product/data-storytelling-workbook",
-    // priceValue and priceCurrency optional for paid items
+    seoUrl: "/product/data-storytelling-workbook",
+    thumbText: "Workbook",
+    title: "Data Storytelling Workbook",
+    type: "download"
   },
   {
     id: "p2",
-    title: "Datadog Monitors Cheat Sheet",
-    description: "Quick access reference for creating effective monitors.",
+    buttonLabel: "",
     category: "Cheatsheets",
-    type: "download",
-    price: "free",
-    fileUrl: "",
+    description: "Quick access reference for creating effective monitors.",
+    discountPercent: null,
     fileName: "datadog-monitors-cheatsheet.pdf",
-    thumbText: "Cheatsheet",
     imageUrl: "",
-    productUrl: "/product/datadog-monitors-cheatsheet"
+    originalPrice: "",
+    priceCurrency: "",
+    productUrl: "/product/datadog-monitors-cheatsheet",
+    seoUrl: "/product/datadog-monitors-cheatsheet",
+    thumbText: "Cheatsheet",
+    title: "Datadog Monitors Cheat Sheet",
+    type: "download"
   },
   {
     id: "p3",
-    title: "Modern Leadership (Hardcover)",
-    description: "A hardcover book available on Amazon.",
-    category: "Books",
-    type: "external",
-    price: "paid",
-    externalUrl: "https://amazon.in/your-product",
     buttonLabel: "Buy on Amazon",
-    thumbText: "Hardcover",
+    category: "Books",
+    description: "A hardcover book available on Amazon.",
+    discountPercent: null,
+    fileName: "",
     imageUrl: "",
-    productUrl: "https://your-site.com/product/modern-leadership",
-    priceValue: "499.00",
-    priceCurrency: "INR"
+    originalPrice: "",
+    priceCurrency: "INR",
+    productUrl: "https://amazon.in/your-product",
+    seoUrl: "/product/modern-leadership",
+    thumbText: "Hardcover",
+    title: "Modern Leadership (Hardcover)",
+    type: "external"
   },
   {
     id: "p4",
-    title: "Digital Democracy Course (Slides)",
-    description: "Download slide deck on digital democracy & media.",
+    buttonLabel: "",
     category: "Slides",
-    type: "download",
-    price: "free",
-    fileUrl: "",
+    description: "Download slide deck on digital democracy & media.",
+    discountPercent: null,
     fileName: "digital-democracy-slides.zip",
-    thumbText: "Slides",
     imageUrl: "",
-    productUrl: "/product/digital-democracy-slides"
+    originalPrice: "",
+    priceCurrency: "",
+    productUrl: "/product/digital-democracy-slides",
+    seoUrl: "/product/digital-democracy-slides",
+    thumbText: "Slides",
+    title: "Digital Democracy Course (Slides)",
+    type: "download"
   },
   {
     id: "p5",
-    title: "Aesthetic Portfolio Template",
-    description: "A premium digital template on Gumroad.",
-    category: "Templates",
-    type: "external",
-    price: "paid",
-    externalUrl: "https://gumroad.com/your-product",
     buttonLabel: "Get Template",
-    thumbText: "Template",
+    category: "Templates",
+    description: "A premium digital template on Gumroad.",
+    discountPercent: null,
+    fileName: "",
     imageUrl: "",
-    productUrl: "https://your-site.com/product/aesthetic-portfolio-template",
-    priceValue: "799.00",
-    priceCurrency: "INR"
+    originalPrice: "",
+    priceCurrency: "INR",
+    productUrl: "https://gumroad.com/your-product",
+    seoUrl: "/product/aesthetic-portfolio-template",
+    thumbText: "Template",
+    title: "Aesthetic Portfolio Template",
+    type: "external"
   }
 ];
 
@@ -239,7 +248,7 @@ const pageSizeSelect = document.getElementById('pageSizeSelect');
 const searchInput = document.getElementById('searchInput');
 const sortSelect = document.getElementById('sortSelect');
 const resetBtn = document.getElementById('resetBtn');
-const sitemapBtn = document.getElementById('sitemapBtn');
+// sitemap button removed from UI; hidden sitemap generator available via keyboard shortcut
 
 const goTopBtn = document.getElementById('goTopBtn');
 const toastEl = document.getElementById('toast');
@@ -292,6 +301,8 @@ function ensureLinkRel(rel, href){
   }
   el.setAttribute('href', href || '');
 }
+
+/* renderPriceLabel moved earlier to be shared */
 
 function updateTitleAndMeta(){
   // Create a context-aware title & description (dynamic)
@@ -366,8 +377,8 @@ function updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize){
   }
 }
 
-/* JSON-LD injection: richer offers if priceValue + priceCurrency present */
-/* --------- Replace injectStructuredData() with richer price logic ---------- */
+/* JSON-LD injection: builds Offer objects from originalPrice + discountPercent (priceCurrency optional) */
+/* --------- injectStructuredData() uses originalPrice/discountPercent ---------- */
 function injectStructuredData(){
   const items = PRODUCTS.map(p => {
     const node = {
@@ -376,56 +387,49 @@ function injectStructuredData(){
       "description": p.description
     };
 
-    if(p.productUrl){
-      node.url = p.productUrl.startsWith('http') ? p.productUrl : SITE_BASE + (p.productUrl.startsWith('/') ? p.productUrl : '/' + p.productUrl);
+    // Prefer SEO-friendly URL for canonical product page in structured data
+    const urlSource = p.seoUrl || p.productUrl;
+    if(urlSource){
+      node.url = urlSource.startsWith('http') ? urlSource : SITE_BASE + (urlSource.startsWith('/') ? urlSource : '/' + urlSource);
     }
     if(p.imageUrl) node.image = p.imageUrl.startsWith('http') ? p.imageUrl : SITE_BASE + (p.imageUrl.startsWith('/') ? p.imageUrl : '/' + p.imageUrl);
 
-    // Compute priceNow if originalPrice + discountPercent present
-    function toNumber(s){
-      if(s === undefined || s === null || s === '') return NaN;
-      const n = Number(String(s).replace(/,/g,''));
-      return isNaN(n) ? NaN : n;
-    }
+    // Compute price and offers using only originalPrice + discountPercent
+    function toNumber(s){ if(s === undefined || s === null || s === '') return NaN; const n = Number(String(s).replace(/,/g,'')); return isNaN(n) ? NaN : n; }
     const origNum = toNumber(p.originalPrice);
     const disc = (typeof p.discountPercent === 'number') ? p.discountPercent : (p.discountPercent ? Number(p.discountPercent) : NaN);
-    if(!isNaN(origNum) && !isNaN(disc)){
-      const safeDisc = Math.max(0, Math.min(100, disc));
-      const priceNowNum = +(origNum * (1 - safeDisc / 100)).toFixed(2);
-      node.offers = {
-        "@type": "Offer",
-        "price": priceNowNum.toFixed(2),
-        "priceCurrency": (p.priceCurrency || "INR"),
-        "availability": "https://schema.org/InStock"
-      };
-      // include original price as priceSpecification so rich results know the discount context
-      node.priceSpecification = {
-        "@type": "PriceSpecification",
-        "priceCurrency": (p.priceCurrency || "INR"),
-        "price": origNum.toFixed(2)
-      };
-    } else if(p.priceValue && p.priceCurrency){
-      node.offers = {
-        "@type": "Offer",
-        "price": Number(p.priceValue).toFixed(2),
-        "priceCurrency": p.priceCurrency,
-        "availability": "https://schema.org/InStock"
-      };
-    } else if(p.price === 'free'){
-      node.offers = {
-        "@type": "Offer",
-        "price": "0.00",
-        "priceCurrency": "INR",
-        "availability": "https://schema.org/InStock"
-      };
-      if(!isNaN(origNum)){
+
+    if(!isNaN(origNum)){
+      const curr = p.priceCurrency || 'INR';
+      if(!isNaN(disc)){
+        const safeDisc = Math.max(0, Math.min(100, disc));
+        const priceNowNum = +(origNum * (1 - safeDisc / 100)).toFixed(2);
+        node.offers = {
+          "@type": "Offer",
+          "price": priceNowNum.toFixed(2),
+          "priceCurrency": (p.priceCurrency || "INR"),
+          "availability": "https://schema.org/InStock"
+        };
         node.priceSpecification = {
           "@type": "PriceSpecification",
-          "priceCurrency": "INR",
+          "priceCurrency": (p.priceCurrency || "INR"),
+          "price": origNum.toFixed(2)
+        };
+      } else {
+        node.offers = {
+          "@type": "Offer",
+          "price": origNum.toFixed(2),
+          "priceCurrency": (p.priceCurrency || "INR"),
+          "availability": "https://schema.org/InStock"
+        };
+        node.priceSpecification = {
+          "@type": "PriceSpecification",
+          "priceCurrency": (p.priceCurrency || "INR"),
           "price": origNum.toFixed(2)
         };
       }
     } else {
+      // No reliable numeric price — include an Offer without a price (keeps item discoverable)
       node.offers = { "@type": "Offer", "availability": "https://schema.org/InStock" };
     }
 
@@ -449,18 +453,66 @@ function injectStructuredData(){
    =========== */
 function getFileType(prod){ if(prod.type === "external") return "LINK"; if(prod.fileName) return prod.fileName.split('.').pop().toUpperCase(); return "FILE"; }
 function createDemoFileBlob(p){ const txt = `${p.title}\n---\n${p.description}\nGenerated: ${new Date().toLocaleString()}`; return new Blob([txt], {type:'text/plain'}); }
-function renderPrimaryButton(prod){ if(prod.type === "download"){ return `<a class="download-btn" data-id="${prod.id}" href="#" aria-label="Download ${escapeHtml(prod.title)}">Download</a>`; } if(prod.type === "external"){ const label = prod.buttonLabel || "Buy Now"; return `<a class="download-btn" href="${prod.externalUrl}" target="_blank" rel="noopener" aria-label="${escapeHtml(label)}">${escapeHtml(label)}</a>`; } return ''; }
-function renderPriceLabel(prod){ if(prod.price === "free") return `<span class="label-free">FREE</span>`; if(prod.price === "paid") return `<span class="label-paid">PAID</span>`; if(prod.price) return `<span class="tag">${escapeHtml(prod.price)}</span>`; return ''; }
+function renderPrimaryButton(prod){
+  if(prod.type === "download"){
+    return `<a class="download-btn" data-id="${prod.id}" href="#" aria-label="Download ${escapeHtml(prod.title)}">Download</a>`;
+  }
+  if(prod.type === "external"){
+    const label = prod.buttonLabel || "Buy Now";
+    const href = prod.productUrl || '#';
+    return `<a class="download-btn" href="${escapeHtml(href)}" target="_blank" rel="noopener" aria-label="${escapeHtml(label)}">${escapeHtml(label)}</a>`;
+  }
+  return '';
+}
+// Return a short text label (FREE / PAID) based solely on originalPrice + discountPercent
+function getPriceLabelText(prod){
+  function toNumber(s){ if(s === undefined || s === null || s === '') return NaN; const n = Number(String(s).replace(/,/g,'')); return isNaN(n) ? NaN : n; }
+  const orig = toNumber(prod.originalPrice);
+  const disc = (typeof prod.discountPercent === 'number') ? prod.discountPercent : (prod.discountPercent ? Number(prod.discountPercent) : NaN);
+
+  if(!isNaN(orig)){
+    if(!isNaN(disc)){
+      const safeDisc = Math.max(0, Math.min(100, disc));
+      const priceNow = +(orig * (1 - safeDisc / 100)).toFixed(2);
+      if(priceNow === 0 || safeDisc === 100) return 'FREE';
+      return 'PAID';
+    }
+    return orig === 0 ? 'FREE' : 'PAID';
+  }
+
+  // Unknown/not provided
+  return '';
+}
+
+// Render HTML badge based on inferred price label or explicit token
+function renderPriceLabel(prod){
+  const txt = getPriceLabelText(prod);
+  if(txt === 'FREE') return `<span class="label-free">FREE</span>`;
+  if(txt === 'PAID') return `<span class="label-paid">PAID</span>`;
+  if(txt) return `<span class="tag">${escapeHtml(txt)}</span>`;
+  return '';
+}
 
 /* Format number as INR currency string (₹ with grouping) */
-function formatINR(v){
+function formatCurrency(v, currency){
+  const curr = (currency && String(currency).trim()) || 'INR';
   const n = Number(String(v).replace(/,/g,''));
-  if(isNaN(n)) return '₹0.00';
+  if(isNaN(n)){
+    try{
+      // show zero in requested currency
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: curr, minimumFractionDigits:2, maximumFractionDigits:2 }).format(0);
+    }catch(e){
+      return curr === 'INR' ? '₹0.00' : `${curr}0.00`;
+    }
+  }
   try{
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits:2, maximumFractionDigits:2 }).format(n);
+    // Use a locale that commonly maps to the currency for nicer formatting
+    const locale = curr === 'INR' ? 'en-IN' : (curr === 'USD' ? 'en-US' : 'en-US');
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: curr, minimumFractionDigits:2, maximumFractionDigits:2 }).format(n);
   }catch(e){
     // fallback
-    return '₹' + n.toFixed(2);
+    if(curr === 'INR') return '₹' + n.toFixed(2);
+    return curr + ' ' + n.toFixed(2);
   }
 }
 
@@ -476,8 +528,8 @@ function renderPriceBlock(p){
 
   // If product has explicit discountPercent + originalPrice
   const origNum = toNumber(p.originalPrice);
-  const disc = (typeof p.discountPercent === 'number') ? p.discountPercent : (p.discountPercent ? Number(p.discountPercent) : NaN);
-
+    const disc = (typeof p.discountPercent === 'number') ? p.discountPercent : (p.discountPercent ? Number(p.discountPercent) : NaN); 
+    const curr = p.priceCurrency || 'INR';
   // Case: discount provided and original price valid
   if(!isNaN(origNum) && !isNaN(disc)){
     // clamp discount between 0 and 100
@@ -485,30 +537,21 @@ function renderPriceBlock(p){
     const priceNowNum = +(origNum * (1 - safeDisc / 100)).toFixed(2);
     // For 100% off show FREE
     if(safeDisc === 100){
-      const origHtml = `<span class="price-old">${escapeHtml(formatINR(origNum))}</span>`;
+        const origHtml = `<span class="price-old">${escapeHtml(formatCurrency(origNum, curr))}</span>`;
       return `<div class="price-row">${origHtml}<span class="price-now">FREE</span><span class="discount-badge">${safeDisc}% OFF</span></div>`;
     }
     // Normal discounted price
-    const origHtml = `<span class="price-old">${escapeHtml(formatINR(origNum))}</span>`;
-    const nowHtml = `<span class="price-now">${escapeHtml(formatINR(priceNowNum))}</span>`;
+      const origHtml = `<span class="price-old">${escapeHtml(formatCurrency(origNum, curr))}</span>`;
+      const nowHtml = `<span class="price-now">${escapeHtml(formatCurrency(priceNowNum, curr))}</span>`;
     return `<div class="price-row">${origHtml}${nowHtml}<span class="discount-badge">${safeDisc}% OFF</span></div>`;
   }
 
-  // If product already has explicit priceValue (current price)
-  if(p.priceValue){
-    return `<div class="price-row"><span class="price-now">${escapeHtml(formatINR(p.priceValue))}</span></div>`;
+  // If originalPrice present but no discount specified, treat originalPrice as current price
+  if(!isNaN(origNum) && (isNaN(disc) || disc === 0)){
+      return `<div class="price-row"><span class="price-now">${escapeHtml(formatCurrency(origNum, curr))}</span></div>`;
   }
 
-  // Fallback: free label or nothing
-  if(p.price === 'free'){
-    // attempt to show original price if available
-    if(!isNaN(origNum)){
-      const origHtml = `<span class="price-old">${escapeHtml(formatINR(origNum))}</span>`;
-      return `<div class="price-row">${origHtml}<span class="price-now">FREE</span><span class="discount-badge">100% OFF</span></div>`;
-    }
-    return `<div class="price-row"><span class="price-now">FREE</span></div>`;
-  }
-
+  // No reliable pricing info (originalPrice not provided) — render nothing
   return '';
 }
 function renderProductsPage(list, page, pageSize){
@@ -540,11 +583,13 @@ function renderProductsPage(list, page, pageSize){
     let thumbHtml = `<div class="thumb" aria-hidden="true">${escapeHtml(p.thumbText)}</div>`;
     if(p.imageUrl){
       // add loading="lazy" and onerror fallback
-      const imgSrc = escapeHtml(p.imageUrl);
-      thumbHtml = `<div class="thumb" data-thumb-text="${escapeHtml(p.thumbText)}"><img src="${imgSrc}" alt="${escapeHtml(p.title)} thumbnail" loading="lazy" onerror="this.dataset.failed='1'; this.style.display='none'; this.parentNode.classList.add('thumb-failed');"></div>`;
+          const imgSrc = escapeHtml(p.imageUrl);
+          thumbHtml = `<div class="thumb" data-thumb-text="${escapeHtml(p.thumbText)}"><img src="${imgSrc}" alt="${escapeHtml(p.title)} thumbnail" loading="lazy" onerror="this.dataset.failed='1'; this.style.display='none'; this.parentNode.classList.add('thumb-failed');"></div>`;
     }
 
-    const titleLink = p.productUrl ? `<a href="${escapeHtml(p.productUrl)}">${escapeHtml(p.title)}</a>` : `<span>${escapeHtml(p.title)}</span>`;
+    // Link title to SEO-friendly URL when available; otherwise fall back to productUrl if present
+    const titleHref = p.seoUrl || p.productUrl || '';
+    const titleLink = titleHref ? `<a href="${escapeHtml(titleHref)}">${escapeHtml(p.title)}</a>` : `<span>${escapeHtml(p.title)}</span>`;
 
     card.innerHTML = `
       ${thumbHtml}
@@ -666,8 +711,8 @@ function applyFilters(){
 
   filteredProducts = PRODUCTS.filter(p => {
     const m1 = !cat || p.category === cat;
-    const m2 = !price || p.price === price;
-    const m3 = !q || (p.title + p.description + p.category + (p.price||'')).toLowerCase().includes(q);
+    const m2 = !price || (getPriceLabelText(p) || '').toLowerCase() === price;
+    const m3 = !q || (p.title + p.description + p.category + (p.seoUrl||'')).toLowerCase().includes(q);
     return m1 && m2 && m3;
   });
 
@@ -689,14 +734,34 @@ resetBtn.addEventListener('click', ()=>{ searchInput.value=''; categorySelect.va
 
 /* Modal */
 function closeModal(){ modalBackdrop.style.display='none'; modalBackdrop.setAttribute('aria-hidden','true'); }
-function openDetails(id){ const p = PRODUCTS.find(x=>x.id===id); if(!p) return; modalTitle.textContent = p.title; modalDesc.textContent = p.description; modalMeta.textContent = `${p.category} • ${p.price ? p.price.toUpperCase() : ''}`; if(p.type === 'download'){ modalDownload.textContent='Download'; modalDownload.onclick=(e)=>{ e.preventDefault(); startDownloadById(id); }; modalDownload.href='#'; } else if(p.type === 'external'){ modalDownload.textContent=p.buttonLabel||'Buy Now'; modalDownload.onclick = ()=> window.open(p.externalUrl,'_blank'); modalDownload.href = p.externalUrl; modalDownload.target='_blank'; modalDownload.rel='noopener'; } modalBackdrop.style.display='flex'; modalBackdrop.setAttribute('aria-hidden','false'); }
+function openDetails(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  modalTitle.textContent = p.title;
+  modalDesc.textContent = p.description;
+  const priceLabel = getPriceLabelText(p);
+  modalMeta.textContent = `${p.category}${priceLabel ? ' • ' + priceLabel : ''}`;
+  if(p.type === 'download'){
+    modalDownload.textContent='Download';
+    modalDownload.onclick=(e)=>{ e.preventDefault(); startDownloadById(id); };
+    modalDownload.href='#';
+  } else if(p.type === 'external'){
+    modalDownload.textContent=p.buttonLabel||'Buy Now';
+    modalDownload.onclick = ()=> window.open(p.productUrl,'_blank');
+    modalDownload.href = p.productUrl;
+    modalDownload.target='_blank';
+    modalDownload.rel='noopener';
+  }
+  modalBackdrop.style.display='flex';
+  modalBackdrop.setAttribute('aria-hidden','false');
+}
 modalClose.addEventListener('click', closeModal);
 modalBackdrop.addEventListener('click', (e)=>{ if(e.target === modalBackdrop) closeModal(); });
 document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
 
 /* Downloads + toast */
 function showToast(msg, duration=2500){ if(toastTimer){ clearTimeout(toastTimer); toastTimer=null; } toastEl.textContent = msg; toastEl.classList.add('show'); toastTimer = setTimeout(()=>{ toastEl.classList.remove('show'); toastTimer=null; }, duration); }
-function startDownloadById(id){ const p = PRODUCTS.find(x=>x.id === id); if(!p) return; if(p.fileUrl){ const a = document.createElement('a'); a.href = p.fileUrl; a.download = p.fileName || ''; a.click(); showToast('Download started'); return; } const blob = createDemoFileBlob(p); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = p.fileName || p.title + '.txt'; a.click(); showToast('Download prepared — check your downloads'); setTimeout(()=> URL.revokeObjectURL(url), 4000); }
+function startDownloadById(id){ const p = PRODUCTS.find(x=>x.id === id); if(!p) return; if(p.productUrl){ const a = document.createElement('a'); a.href = p.productUrl; a.download = p.fileName || ''; a.click(); showToast('Download started'); return; } const blob = createDemoFileBlob(p); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = p.fileName || p.title + '.txt'; a.click(); showToast('Download prepared — check your downloads'); setTimeout(()=> URL.revokeObjectURL(url), 4000); }
 
 /* Delegated grid click */
 grid.addEventListener('click', (e)=>{ const dl = e.target.closest('.download-btn'); const det = e.target.closest('.details-btn'); if(dl && dl.dataset.id){ e.preventDefault(); startDownloadById(dl.dataset.id); return; } if(det){ openDetails(det.dataset.id); return; } });
@@ -705,50 +770,89 @@ grid.addEventListener('click', (e)=>{ const dl = e.target.closest('.download-btn
 window.addEventListener('scroll', ()=>{ if(window.scrollY > 300) goTopBtn.classList.add('show'); else goTopBtn.classList.remove('show'); });
 goTopBtn.addEventListener('click', ()=> window.scrollTo({ top:0, behavior:'smooth' }));
 
-/* Sitemap generator (downloadable) */
-function buildSitemapXml(){
-  // include listing root + products productUrl if present
-  const urls = [];
-  // listing root (allow pagination detection)
-  urls.push({ loc: SITE_BASE + (LISTING_PATH.startsWith('/') ? LISTING_PATH : '/' + LISTING_PATH), priority: 0.8 });
+/* ============================
+   HIDDEN SITEMAP GENERATOR
+   Trigger: Ctrl + Shift + S
+============================ */
+function buildSitemapXml() {
+  const domain = window.location.origin;
 
-  // individual products
-  PRODUCTS.forEach(p => {
-    if(p.productUrl){
-      const loc = p.productUrl.startsWith('http') ? p.productUrl : (SITE_BASE + (p.productUrl.startsWith('/') ? p.productUrl : '/' + p.productUrl));
-      urls.push({ loc, priority: p.price === 'paid' ? 0.7 : 0.6 });
-    } else {
-      // fallback: create a listing fragment URL with anchor
-      urls.push({ loc: SITE_BASE + (LISTING_PATH.startsWith('/') ? LISTING_PATH : '/' + LISTING_PATH) + `#${encodeURIComponent(p.id)}`, priority: 0.4 });
-    }
-  });
+  const urls = PRODUCTS.map(p => {
+    const loc = p.seoUrl || p.productUrl || `${domain}/product/${p.id}`;
+    return `
+      <url>
+        <loc>${loc}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+      </url>
+    `;
+  }).join("");
 
-  const now = new Date().toISOString();
-  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
-  urls.forEach(u => {
-    xml += `  <url>\n    <loc>${u.loc}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${u.priority}</priority>\n  </url>\n`;
-  });
-  xml += `</urlset>`;
-  return xml;
+  return `<?xml version="1.0" encoding="UTF-8"?>
+  <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+      <loc>${domain}</loc>
+      <changefreq>daily</changefreq>
+      <priority>1.0</priority>
+    </url>
+    ${urls}
+  </urlset>`;
 }
 
-sitemapBtn.addEventListener('click', ()=>{
-  const xml = buildSitemapXml();
-  const blob = new Blob([xml], {type:'application/xml'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'sitemap.xml';
-  a.click();
-  setTimeout(()=> URL.revokeObjectURL(url), 4000);
-  showToast('sitemap.xml prepared for download');
+/* Keyboard shortcut: CTRL + SHIFT + S */
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
+
+    const xml = buildSitemapXml();
+    const blob = new Blob([xml], { type: "application/xml" });
+    const url = URL.createObjectURL(blob);
+
+    const win = window.open();
+    win.document.write(`
+      <pre>${xml.replace(/</g,"&lt;")}</pre>
+      <a href="${url}" download="sitemap.xml">Download sitemap.xml</a>
+      <p>Upload this file to your site root (/sitemap.xml)</p>
+    `);
+    win.document.close();
+
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
 });
 
 /* Populate filters from PRODUCTS */
 (function setupFilters(){
+  // Ensure each product has an SEO-friendly URL (`seoUrl`).
+  // Auto-generate from `title` when not provided and ensure uniqueness.
+  function slugify(s){
+    return (s||'').toString().trim().toLowerCase()
+      .replace(/["'`]/g,'')
+      .replace(/[^a-z0-9\s-]/g,'')
+      .replace(/\s+/g,'-')
+      .replace(/-+/g,'-')
+      .replace(/^[-]+|[-]+$/g,'');
+  }
+  function ensureSeoUrls(){
+    const seen = new Set();
+    // pre-seed with provided seoUrls
+    PRODUCTS.forEach(p => { if(p.seoUrl) seen.add(p.seoUrl); });
+    PRODUCTS.forEach(p => {
+      if(!p.seoUrl || !String(p.seoUrl).trim()){
+        const base = '/product/' + slugify(p.title || p.id || '') || ('product-' + p.id);
+        let candidate = base;
+        let i = 1;
+        while(seen.has(candidate)){
+          candidate = base + '-' + i; i++;
+        }
+        p.seoUrl = candidate;
+        seen.add(candidate);
+      }
+    });
+  }
+  ensureSeoUrls();
   const cats = [...new Set(PRODUCTS.map(p => p.category))].sort();
   cats.forEach(c => { const op = document.createElement('option'); op.value = c; op.textContent = c; categorySelect.appendChild(op); });
 
-  const prices = [...new Set(PRODUCTS.map(p => p.price || 'unknown'))].filter(Boolean).sort();
+  const prices = [...new Set(PRODUCTS.map(p => (getPriceLabelText(p) || 'unknown').toLowerCase()))].filter(Boolean).sort();
   prices.forEach(pv => { const op = document.createElement('option'); op.value = pv; op.textContent = cap(pv); priceSelect.appendChild(op); });
 
   // initial SEO injection
