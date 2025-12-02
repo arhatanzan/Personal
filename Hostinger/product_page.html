@@ -48,7 +48,7 @@
 
   /* Grid & Cards */
   .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:var(--gap); margin-top:18px; }
-  .card { background:var(--card-bg); border-radius:var(--radius); padding:16px; border:4px solid var(--accent); display:flex; flex-direction:column; gap:12px; min-height:240px; overflow:hidden; }
+  .card { background:var(--card-bg); border-radius:var(--radius); padding:16px; border:4px solid var(--accent); display:flex; flex-direction:column; gap:12px; height:320px; overflow:hidden; }
   .thumb { height:110px; border-radius:6px; background:linear-gradient(180deg,var(--thumb-grad-1),var(--white)); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--muted); position:relative; overflow:hidden; }
   .thumb img { width:100%; height:100%; object-fit:cover; display:block; border-radius:6px; }
   .title { font-size:16px; font-weight:700; margin:0; color:var(--navy); }
@@ -85,18 +85,17 @@
   #toast { position:fixed; left:50%; transform:translateX(-50%); bottom:36px; background:rgba(var(--navy-rgb),0.95); color:var(--white); padding:10px 14px; border-radius:8px; font-weight:600; box-shadow:0 6px 18px rgba(var(--navy-rgb),0.25); opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; z-index:10000; }
   #toast.show { opacity:1; pointer-events:all; transform:translateX(-50%) translateY(0); }
 
-  /* Modal */
   /* Card flip: use grid-based overlap (avoids absolute/fixed positioning) */
-  .card { background:var(--card-bg); border-radius:var(--radius); padding:0; border:4px solid var(--accent); display:flex; flex-direction:column; gap:0; min-height:240px; overflow:hidden; perspective:1000px; }
+  .card { background:var(--card-bg); border-radius:var(--radius); padding:0; border:4px solid var(--accent); display:flex; flex-direction:column; gap:0; /* height set dynamically via JS */ overflow:hidden; perspective:1000px; }
   .card-inner { transition: transform .5s ease; transform-style: preserve-3d; display:grid; width:100%; height:100%; }
-  .card-front, .card-back { grid-area: 1/1; display:flex; flex-direction:column; gap:12px; padding:16px; box-sizing:border-box; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .card-front, .card-back { grid-area: 1/1; display:flex; flex-direction:column; gap:12px; padding:16px; box-sizing:border-box; backface-visibility: hidden; -webkit-backface-visibility: hidden; height: 100%; }
   .card-front { background:transparent; }
-  .card-back { background:var(--card-bg); color:var(--navy); transform: rotateY(180deg); border-radius: calc(var(--radius) - 2px); align-items:flex-start; }
+  .card-back { background:var(--card-bg); color:var(--navy); transform: rotateY(180deg); border-radius: calc(var(--radius) - 2px); align-items:flex-start; min-height:0; overflow:hidden; }
+  /* Ensure the description on the back of the card scrolls if content overflows */
+  .card-back .desc { flex:1 1 auto; overflow-y:auto; min-height:0; }
   /* Ensure the footer on the back face stretches full width so actions can be pushed right */
   .card-back .card-footer { width: 100%; }
   .card.is-flipped .card-inner { transform: rotateY(180deg); }
-  /* Ensure long content on back side scrolls within the card without moving layout */
-  .card-back { overflow:auto; }
 
   /* Price display */
   .price-row { display:flex; gap:8px; align-items:center; margin-top:8px; }
@@ -188,14 +187,14 @@ function setTheme(vars){
 const PRODUCTS = [
   {
     id: "p1",
-    summary: "Hands-on workbook to structure and tell data-driven stories.",
+    summary: "Hands-on workbook to structure and tell data-driven stories. Hands-on workbook to structure and tell data-driven stories.",
     buttonLabel: "",
     category: "Guides",
     description: "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line in section 1.10.32",
-    discountPercent: null,
+    discountPercent: 100,
     fileName: "data-storytelling-workbook.pdf",
     imageUrl: "",
-    originalPrice: "",
+    originalPrice: 2000,
     priceCurrency: "",
     productUrl: "/product/data-storytelling-workbook",
     seoUrl: "/product/data-storytelling-workbook",
@@ -209,10 +208,10 @@ const PRODUCTS = [
     buttonLabel: "",
     category: "Cheatsheets",
     description: "Quick access reference for creating effective monitors.",
-    discountPercent: null,
+    discountPercent: 20,
     fileName: "datadog-monitors-cheatsheet.pdf",
     imageUrl: "",
-    originalPrice: "",
+    originalPrice: 400,
     priceCurrency: "",
     productUrl: "/product/datadog-monitors-cheatsheet",
     seoUrl: "/product/datadog-monitors-cheatsheet",
@@ -291,34 +290,42 @@ const refs = {
   
 };
 
-// Modal removed — using card flip interaction instead.
-
 // Note: use `refs.*` for DOM access throughout the file.
 
-let filteredProducts = []; // unpaged
+let filteredProducts = []; // Holds products after filtering, before pagination.
 let currentPage = 1;
 let currentPageSize = 'all';
 let toastTimer = null;
 
-/* Helpers */
+/* --- HELPERS --- */
 function escapeHtml(s){ return (s||"").toString().replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 function cap(s){ return (s||'').charAt(0).toUpperCase() + (s||'').slice(1); }
-// Return a short summary for the front of the card. Prefer explicit `summary`, else derive.
+/**
+ * Returns a short summary for the card's front face.
+ * Prefers the explicit `summary` field, otherwise derives from `description`.
+ */
 function getSummary(p){
   if(!p) return '';
   if(p.summary && String(p.summary).trim()) return String(p.summary).trim();
   const s = (p.description || '').toString().trim();
   if(!s) return '';
-  // Try first sentence
+  // Try to use the first sentence if it's a reasonable length.
   const first = s.split(/[\.?!]\s/)[0];
   if(first && first.length <= 160) return first + (/[\.?!]$/.test(first) ? '' : '...');
-  // Fallback to a short truncate
+  // Fallback to a simple truncation.
   return s.length > 140 ? s.slice(0,140).trim() + '...' : s;
 }
 
-/* SEO elements: dynamic title/meta/og/twitter and JSON-LD injection */
+/* --- SEO & METADATA --- */
+
+/**
+ * Ensures a <meta> tag exists in the <head> with the specified name/property and value.
+ * Creates the tag if it doesn't exist, otherwise updates it.
+ * @param {string} nameOrProp - The meta tag's `name` or `property` attribute.
+ * @param {string} value - The value for the `content` attribute.
+ * @param {boolean} isProperty - Set to true if `nameOrProp` is a `property` (e.g., 'og:title').
+ */
 function ensureMetaTag(nameOrProp, value, isProperty=false){
-  // nameOrProp: meta name or property (og:)
   let selector = isProperty ? `meta[property="${nameOrProp}"]` : `meta[name="${nameOrProp}"]`;
   let m = document.head.querySelector(selector);
   if(!m){
@@ -330,6 +337,11 @@ function ensureMetaTag(nameOrProp, value, isProperty=false){
   m.setAttribute('content', value || '');
 }
 
+/**
+ * Ensures a <link> tag with a given `rel` attribute exists and sets its `href`.
+ * @param {string} rel - The `rel` attribute value (e.g., 'canonical').
+ * @param {string} href - The `href` attribute value.
+ */
 function ensureLinkRel(rel, href){
   let el = document.head.querySelector(`link[rel="${rel}"]`);
   if(!el){
@@ -340,16 +352,19 @@ function ensureLinkRel(rel, href){
   el.setAttribute('href', href || '');
 }
 
+/**
+ * Updates the page title and meta tags based on current filters and search query.
+ * This makes the page SEO-friendly and improves user context.
+ */
 function updateTitleAndMeta(){
-  // Create a context-aware title & description (dynamic)
   const parts = [];
   const cat = refs.categorySelect.value;
   const price = refs.priceSelect.value;
   const q = refs.searchInput.value.trim();
 
-  if(q) parts.push(`${q} —`);
-  if(cat) parts.push(`${cap(cat)}`);
-  if(price) parts.push(`${cap(price)}`);
+  if(q) parts.push(`"${q}"`);
+  if(cat) parts.push(cap(cat));
+  if(price) parts.push(cap(price));
   parts.push('Digital & Physical Products');
   const title = parts.join(' | ');
   document.title = title;
@@ -361,7 +376,7 @@ function updateTitleAndMeta(){
   descParts.push('Instant downloads, external store links, and templates.');
   const description = descParts.join(' • ');
 
-  // ensure meta tags
+  // Update standard and social media meta tags for SEO.
   ensureMetaTag('description', description);
   ensureMetaTag('robots', 'index,follow');
   ensureMetaTag('twitter:card', 'summary_large_image');
@@ -371,14 +386,16 @@ function updateTitleAndMeta(){
   ensureMetaTag('og:description', description, true);
   ensureMetaTag('og:type', 'website', true);
   ensureMetaTag('og:site_name', document.location.hostname || SITE_BASE, true);
-  // fallback OG image - set if you have an asset
+  // Set a fallback Open Graph/Twitter image.
   ensureMetaTag('og:image', `${SITE_BASE}/assets/og-products.jpg`, true);
   ensureMetaTag('twitter:image', `${SITE_BASE}/assets/og-products.jpg`);
 }
 
-/* Update canonical + prev/next links dynamically */
+/**
+ * Updates canonical, prev, and next link tags for paginated results.
+ * This helps search engines understand the paginated structure of the content.
+ */
 function updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize){
-  // Build canonical URL for listing (with page & size query params)
   const urlBase = SITE_BASE + (LISTING_PATH.startsWith('/') ? LISTING_PATH : '/' + LISTING_PATH);
   const params = new URLSearchParams();
   if(pageNum && pageNum > 1) params.set('page', pageNum);
@@ -387,8 +404,7 @@ function updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize){
 
   ensureLinkRel('canonical', canonicalHref);
 
-  // prev / next
-  // remove prev/next if first or last
+  // Set or remove 'prev' link
   if(pageNum > 1){
     const prevParams = new URLSearchParams();
     const prevPage = pageNum - 1;
@@ -396,11 +412,11 @@ function updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize){
     if(pageSize && pageSize !== 'all') prevParams.set('pageSize', pageSize);
     ensureLinkRel('prev', prevParams.toString() ? `${urlBase}?${prevParams.toString()}` : urlBase);
   } else {
-    // remove prev if present
     const prevEl = document.head.querySelector('link[rel="prev"]');
     if(prevEl) prevEl.remove();
   }
 
+  // Set or remove 'next' link
   if(pageNum < totalPages){
     const nextParams = new URLSearchParams();
     const nextPage = pageNum + 1;
@@ -413,7 +429,10 @@ function updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize){
   }
 }
 
-/* JSON-LD injection (builds product Offers when price data provided) */
+/**
+ * Injects JSON-LD structured data for products into the page header.
+ * This helps search engines understand product details like name, price, and offers.
+ */
 function injectStructuredData(){
   const items = PRODUCTS.map(p => {
     const node = {
@@ -422,14 +441,14 @@ function injectStructuredData(){
       "description": p.description
     };
 
-    // Prefer SEO-friendly URL for canonical product page in structured data
+    // Use the SEO-friendly URL if available.
     const urlSource = p.seoUrl || p.productUrl;
     if(urlSource){
       node.url = urlSource.startsWith('http') ? urlSource : SITE_BASE + (urlSource.startsWith('/') ? urlSource : '/' + urlSource);
     }
     if(p.imageUrl) node.image = p.imageUrl.startsWith('http') ? p.imageUrl : SITE_BASE + (p.imageUrl.startsWith('/') ? p.imageUrl : '/' + p.imageUrl);
 
-    // Compute price and offers using only originalPrice + discountPercent
+    // Safely parse price and discount to generate structured data for offers.
     function toNumber(s){ if(s === undefined || s === null || s === '') return NaN; const n = Number(String(s).replace(/,/g,'')); return isNaN(n) ? NaN : n; }
     const origNum = toNumber(p.originalPrice);
     const disc = (typeof p.discountPercent === 'number') ? p.discountPercent : (p.discountPercent ? Number(p.discountPercent) : NaN);
@@ -445,6 +464,7 @@ function injectStructuredData(){
           "priceCurrency": (p.priceCurrency || "INR"),
           "availability": "https://schema.org/InStock"
         };
+        // Also include the original price for context.
         node.priceSpecification = {
           "@type": "PriceSpecification",
           "priceCurrency": (p.priceCurrency || "INR"),
@@ -464,7 +484,7 @@ function injectStructuredData(){
         };
       }
     } else {
-      // No reliable numeric price — include an Offer without a price (keeps item discoverable)
+      // If no price, still include an Offer to indicate availability.
       node.offers = { "@type": "Offer", "availability": "https://schema.org/InStock" };
     }
 
@@ -483,7 +503,8 @@ function injectStructuredData(){
   }
 }
 
-/* Rendering, filters and pagination (updates SEO hooks after render) */
+/* --- UI RENDERING & INTERACTIONS --- */
+
 function getFileType(prod){ if(prod.type === "external") return "LINK"; if(prod.fileName) return prod.fileName.split('.').pop().toUpperCase(); return "FILE"; }
 function createDemoFileBlob(p){ const txt = `${p.title}\n---\n${p.description}\nGenerated: ${new Date().toLocaleString()}`; return new Blob([txt], {type:'text/plain'}); }
 function renderPrimaryButton(prod){
@@ -497,7 +518,9 @@ function renderPrimaryButton(prod){
   }
   return '';
 }
-// Return a short text label (FREE / PAID) based solely on originalPrice + discountPercent
+/**
+ * Determines if a product is 'FREE' or 'PAID' based on its price and discount.
+ */
 function getPriceLabelText(prod){
   function toNumber(s){ if(s === undefined || s === null || s === '') return NaN; const n = Number(String(s).replace(/,/g,'')); return isNaN(n) ? NaN : n; }
   const orig = toNumber(prod.originalPrice);
@@ -513,11 +536,13 @@ function getPriceLabelText(prod){
     return orig === 0 ? 'FREE' : 'PAID';
   }
 
-  // Unknown/not provided
+  // Return empty if price is not specified
   return '';
 }
 
-// Render HTML badge based on inferred price label or explicit token
+/**
+ * Renders a 'FREE' or 'PAID' badge based on the product's price.
+ */
 function renderPriceLabel(prod){
   const txt = getPriceLabelText(prod);
   if(txt === 'FREE') return `<span class="label-free">FREE</span>`;
@@ -526,67 +551,72 @@ function renderPriceLabel(prod){
   return '';
 }
 
-/* Format number as INR currency string (₹ with grouping) */
+/**
+ * Formats a numeric value as a currency string (e.g., ₹1,234.56).
+ * Defaults to INR but supports other currency codes.
+ */
 function formatCurrency(v, currency){
   const curr = (currency && String(currency).trim()) || 'INR';
   const n = Number(String(v).replace(/,/g,''));
   if(isNaN(n)){
     try{
-      // show zero in requested currency
+      // Show zero in the requested currency format.
       return new Intl.NumberFormat('en-US', { style: 'currency', currency: curr, minimumFractionDigits:2, maximumFractionDigits:2 }).format(0);
     }catch(e){
       return curr === 'INR' ? '₹0.00' : `${curr}0.00`;
     }
   }
   try{
-    // Use a locale that commonly maps to the currency for nicer formatting
+    // Use a locale that matches the currency for better formatting.
     const locale = curr === 'INR' ? 'en-IN' : (curr === 'USD' ? 'en-US' : 'en-US');
     return new Intl.NumberFormat(locale, { style: 'currency', currency: curr, minimumFractionDigits:2, maximumFractionDigits:2 }).format(n);
   }catch(e){
-    // fallback
+    // Fallback for unsupported currency codes.
     if(curr === 'INR') return '₹' + n.toFixed(2);
     return curr + ' ' + n.toFixed(2);
   }
 }
 
-/* renderPriceBlock(p) */
+/**
+ * Renders the price block, showing the current price and any applicable discount.
+ */
 function renderPriceBlock(p){
-  // Helper to parse price string to number safely
   function toNumber(s){
     if(s === undefined || s === null || s === '') return NaN;
-    // Remove commas if any, then parse
     const n = Number(String(s).replace(/,/g,''));
     return isNaN(n) ? NaN : n;
   }
 
-  // If product has explicit discountPercent + originalPrice
   const origNum = toNumber(p.originalPrice);
     const disc = (typeof p.discountPercent === 'number') ? p.discountPercent : (p.discountPercent ? Number(p.discountPercent) : NaN); 
     const curr = p.priceCurrency || 'INR';
-  // Case: discount provided and original price valid
+  // Case 1: Valid original price and discount percentage.
   if(!isNaN(origNum) && !isNaN(disc)){
-    // clamp discount between 0 and 100
     const safeDisc = Math.max(0, Math.min(100, disc));
     const priceNowNum = +(origNum * (1 - safeDisc / 100)).toFixed(2);
-    // For 100% off show FREE
+    // If 100% off, show as FREE.
     if(safeDisc === 100){
         const origHtml = `<span class="price-old">${escapeHtml(formatCurrency(origNum, curr))}</span>`;
       return `<div class="price-row">${origHtml}<span class="price-now">FREE</span><span class="discount-badge">${safeDisc}% OFF</span></div>`;
     }
-    // Normal discounted price
+    // Otherwise, show discounted price.
       const origHtml = `<span class="price-old">${escapeHtml(formatCurrency(origNum, curr))}</span>`;
       const nowHtml = `<span class="price-now">${escapeHtml(formatCurrency(priceNowNum, curr))}</span>`;
     return `<div class="price-row">${origHtml}${nowHtml}<span class="discount-badge">${safeDisc}% OFF</span></div>`;
   }
 
-  // If originalPrice present but no discount specified, treat originalPrice as current price
+  // Case 2: Valid original price but no discount.
   if(!isNaN(origNum) && (isNaN(disc) || disc === 0)){
       return `<div class="price-row"><span class="price-now">${escapeHtml(formatCurrency(origNum, curr))}</span></div>`;
   }
 
-  // No reliable pricing info (originalPrice not provided) — render nothing
+  // Case 3: No reliable pricing info.
   return '';
 }
+/**
+ * Renders the list of products for the current page.
+ * Handles pagination logic and updates the grid.
+ */
 function renderProductsPage(list, page, pageSize){
   refs.grid.innerHTML = '';
 
@@ -612,7 +642,7 @@ function renderProductsPage(list, page, pageSize){
   slice.forEach(p => {
     const card = document.createElement('div'); card.className = 'card';
 
-    // image fallback: prefer imageUrl; fallback to thumbText
+    // Image fallback: use `imageUrl` if present, otherwise show `thumbText`.
     let thumbHtml = `<div class="thumb" aria-hidden="true">${escapeHtml(p.thumbText)}</div>`;
     if(p.imageUrl){
       const imgSrc = escapeHtml(p.imageUrl);
@@ -624,7 +654,7 @@ function renderProductsPage(list, page, pageSize){
 
     const priceLabel = getPriceLabelText(p);
 
-    // card inner contains front + back faces; use grid to overlay them (avoids absolute positioning)
+    // The card's inner structure contains front and back faces for the flip effect.
     card.innerHTML = `
       <div class="card-inner">
         <div class="card-front">
@@ -653,6 +683,7 @@ function renderProductsPage(list, page, pageSize){
     `;
     refs.grid.appendChild(card);
 
+    // Handle broken image links gracefully by showing the thumb text.
     const img = card.querySelector('.thumb img');
     if(img){
       img.addEventListener('error', ()=> {
@@ -666,22 +697,27 @@ function renderProductsPage(list, page, pageSize){
     }
   });
 
-  // update pagination controls
   renderPagination(totalItems, pageNum, totalPages, pageSize);
 
-  // update SEO: title/meta + JSON-LD + canonical/prev/next
+  // Update all SEO and metadata after rendering.
   updateTitleAndMeta();
   injectStructuredData();
   updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize);
 
-  // update visible H1/description to reflect context
+  // Update the visible H1 and description to reflect the current view.
   let h = 'Digital & Physical Products';
   if(refs.categorySelect.value) h = `${cap(refs.categorySelect.value)} — ${h}`;
   if(refs.searchInput.value) h = `Results for "${refs.searchInput.value}" — ${h}`;
   refs.pageH1.textContent = h;
-  refs.pageDescEl.textContent = document.title; // quick summary
+  refs.pageDescEl.textContent = document.title; // Use the dynamic title as a sub-header.
+
+  // After rendering, normalize card heights to the tallest front face.
+  requestAnimationFrame(adjustCardHeights);
 }
 
+/**
+ * Renders pagination controls based on the total number of items and pages.
+ */
 function renderPagination(totalItems, current, totalPages, pageSize){
   if(pageSize === 'all' || totalPages <= 1){
     refs.paginationWrap.style.display = 'none';
@@ -695,6 +731,7 @@ function renderPagination(totalItems, current, totalPages, pageSize){
   prev.addEventListener('click', ()=> { if(current > 1){ currentPage--; refreshPage(); } });
   refs.paginationWrap.appendChild(prev);
 
+  // Smart pagination: show all pages or use ellipses for large page counts.
   if(totalPages <= 10){
       for(let i=1;i<=totalPages;i++){
       const b = document.createElement('button');
@@ -730,7 +767,7 @@ function renderPagination(totalItems, current, totalPages, pageSize){
   next.addEventListener('click', ()=> { if(current < totalPages){ currentPage++; refreshPage(); } });
   refs.paginationWrap.appendChild(next);
 
-  // Go to page quick-jump
+  // "Go to page" input for quick navigation.
   const goWrap = document.createElement('div'); goWrap.className = 'go-page';
   const goLabel = document.createElement('span'); goLabel.style.color='var(--muted)'; goLabel.textContent='Go to';
   const goInput = document.createElement('input'); goInput.type='number'; goInput.min=1; goInput.max=totalPages; goInput.value=current;
@@ -746,7 +783,11 @@ function renderPagination(totalItems, current, totalPages, pageSize){
   refs.paginationWrap.appendChild(info);
 }
 
-/* Apply filters & sorting */
+/* --- DATA FILTERING & SORTING --- */
+
+/**
+ * Filters and sorts the products based on the current UI controls.
+ */
 function applyFilters(){
   const q = refs.searchInput.value.toLowerCase().trim();
   const cat = refs.categorySelect.value;
@@ -762,13 +803,17 @@ function applyFilters(){
 
   if(sort === 'az') filteredProducts.sort((a,b) => a.title.localeCompare(b.title));
   else if(sort === 'za') filteredProducts.sort((a,b) => b.title.localeCompare(a.title));
+  // 'new' is the default, no sort needed as data is pre-sorted.
 
   currentPage = 1;
   refreshPage();
 }
+/**
+ * Refreshes the product grid with the current page and page size.
+ */
 function refreshPage(){ currentPageSize = refs.pageSizeSelect.value || 'all'; renderProductsPage(filteredProducts, currentPage, currentPageSize); }
 
-/* Event wiring */
+/* --- EVENT LISTENERS --- */
 refs.searchInput.addEventListener('input', applyFilters);
 refs.categorySelect.addEventListener('change', applyFilters);
 refs.priceSelect.addEventListener('change', applyFilters);
@@ -776,22 +821,29 @@ refs.sortSelect.addEventListener('change', applyFilters);
 refs.pageSizeSelect.addEventListener('change', ()=>{ currentPage=1; refreshPage(); });
 refs.resetBtn.addEventListener('click', ()=>{ refs.searchInput.value=''; refs.categorySelect.value=''; refs.priceSelect.value=''; refs.sortSelect.value='new'; refs.pageSizeSelect.value='all'; currentPage=1; applyFilters(); });
 
-// Modal removed — card flip replaces modal interactions.
-
-/* Downloads & toast */
+/**
+ * Shows a short-lived notification toast at the bottom of the screen.
+ */
 function showToast(msg, duration=2500){ if(toastTimer){ clearTimeout(toastTimer); toastTimer=null; } refs.toastEl.textContent = msg; refs.toastEl.classList.add('show'); toastTimer = setTimeout(()=>{ refs.toastEl.classList.remove('show'); toastTimer=null; }, duration); }
+/**
+ * Initiates a file download for a given product ID.
+ * For "download" type, it creates a blob; for "external", it opens the URL.
+ */
 function startDownloadById(id){ const p = PRODUCTS.find(x=>x.id === id); if(!p) return; if(p.productUrl){ const a = document.createElement('a'); a.href = p.productUrl; a.download = p.fileName || ''; a.click(); showToast('Download started'); return; } const blob = createDemoFileBlob(p); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = p.fileName || p.title + '.txt'; a.click(); showToast('Download prepared — check your downloads'); setTimeout(()=> URL.revokeObjectURL(url), 4000); }
 
-/* Card flip helpers and delegated grid click */
+/**
+ * Flips a product card to show its back face, and flips back any other card.
+ */
 function flipCard(cardEl){
   if(!cardEl) return;
-  // close other flipped cards
+  // Close any other card that is already flipped.
   document.querySelectorAll('.card.is-flipped').forEach(c => { if(c !== cardEl) c.classList.remove('is-flipped'); });
-  // toggle this card
+  // Toggle the flip state of the target card.
   const willFlip = !cardEl.classList.contains('is-flipped');
   if(willFlip) cardEl.classList.add('is-flipped'); else cardEl.classList.remove('is-flipped');
 }
 
+// Delegated event listener for the product grid to handle card interactions.
 refs.grid.addEventListener('click', (e)=>{
   const dl = e.target.closest('.download-btn');
   const det = e.target.closest('.details-btn');
@@ -812,15 +864,21 @@ refs.grid.addEventListener('click', (e)=>{
   if(det){
     const card = det.closest('.card');
     if(card) flipCard(card);
+    // Ensure height persists after flip; height is based on front but uniform across.
+    requestAnimationFrame(adjustCardHeights);
     return;
   }
 });
 
-/* Go to top */
+/* Go To Top Button */
 window.addEventListener('scroll', ()=>{ if(window.scrollY > 300) refs.goTopBtn.classList.add('show'); else refs.goTopBtn.classList.remove('show'); });
 refs.goTopBtn.addEventListener('click', ()=> window.scrollTo({ top:0, behavior:'smooth' }));
 
-/* Hidden sitemap generator (Ctrl+Shift+S) */
+/* --- UTILITIES --- */
+
+/**
+ * Generates a sitemap.xml string from the product data.
+ */
 function buildSitemapXml() {
   const domain = window.location.origin;
 
@@ -846,7 +904,7 @@ function buildSitemapXml() {
   </urlset>`;
 }
 
-/* Keyboard shortcut: CTRL + SHIFT + S */
+/* Keyboard shortcut: CTRL + SHIFT + S to generate and show the sitemap. */
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
 
@@ -866,27 +924,34 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-/* Populate filters from PRODUCTS */
+/* --- INITIALIZATION --- */
+
+/**
+ * IIFE to set up initial state: populates filters and ensures data integrity.
+ */
 (function setupFilters(){
-  // Ensure each product has an SEO-friendly URL (`seoUrl`).
-  // Auto-generate from `title` when not provided and ensure uniqueness.
-  function slugify(s){
-    return (s||'').toString().trim().toLowerCase()
-      .replace(/["'`]/g,'')
-      .replace(/[^a-z0-9\s-]/g,'')
-      .replace(/\s+/g,'-')
-      .replace(/-+/g,'-')
-      .replace(/^[-]+|[-]+$/g,'');
-  }
+  /**
+   * Ensures each product has a unique, SEO-friendly URL (`seoUrl`).
+   * Auto-generates a slug from the title if `seoUrl` is missing.
+   */
   function ensureSeoUrls(){
+    function slugify(s){
+      return (s||'').toString().trim().toLowerCase()
+        .replace(/["'`]/g,'')
+        .replace(/[^a-z0-9\s-]/g,'')
+        .replace(/\s+/g,'-')
+        .replace(/-+/g,'-')
+        .replace(/^[-]+|[-]+$/g,'');
+    }
     const seen = new Set();
-    // pre-seed with provided seoUrls
+    // Pre-seed with any existing seoUrls to avoid duplicates.
     PRODUCTS.forEach(p => { if(p.seoUrl) seen.add(p.seoUrl); });
     PRODUCTS.forEach(p => {
       if(!p.seoUrl || !String(p.seoUrl).trim()){
-        const base = '/product/' + slugify(p.title || p.id || '') || ('product-' + p.id);
+        const base = '/product/' + (slugify(p.title || p.id) || ('product-' + p.id));
         let candidate = base;
         let i = 1;
+        // Append a number if the slug already exists.
         while(seen.has(candidate)){
           candidate = base + '-' + i; i++;
         }
@@ -899,18 +964,64 @@ document.addEventListener("keydown", (e) => {
   const cats = [...new Set(PRODUCTS.map(p => p.category))].sort();
   cats.forEach(c => { const op = document.createElement('option'); op.value = c; op.textContent = c; refs.categorySelect.appendChild(op); });
 
-  const prices = [...new Set(PRODUCTS.map(p => (getPriceLabelText(p) || 'unknown').toLowerCase()))].filter(Boolean).sort();
+  const prices = [...new Set(PRODUCTS.map(p => (getPriceLabelText(p) || 'unknown').toLowerCase()))].filter(p => p !== 'unknown').sort();
   prices.forEach(pv => { const op = document.createElement('option'); op.value = pv; op.textContent = cap(pv); refs.priceSelect.appendChild(op); });
 
-  // initial SEO injection
+  // Perform initial SEO and structured data injection on load.
   updateTitleAndMeta();
   injectStructuredData();
 })();
 
-/* INITIAL LOAD */
+/* INITIAL RENDER */
 applyFilters();
-// expose minimal API
+// Expose a minimal API to the global scope for runtime theme changes.
 window.setTheme = setTheme;
+
+/**
+ * Measures all visible cards' front faces and sets a uniform height
+ * equal to the tallest front content. Back face will scroll within this height.
+ */
+function adjustCardHeights(){
+  const cards = Array.from(document.querySelectorAll('.card'));
+  if(!cards.length) return;
+  // Reset inline heights to re-measure accurately.
+  cards.forEach(c => { c.style.height = ''; const inner = c.querySelector('.card-inner'); if(inner) inner.style.height=''; });
+  let max = 0;
+  // Measure the front face in-place by disabling transform temporarily.
+  cards.forEach(card => {
+    const inner = card.querySelector('.card-inner');
+    const front = card.querySelector('.card-front');
+    if(!inner || !front) return;
+    const prevTransform = inner.style.transform;
+    inner.style.transform = 'none';
+    // Ensure not flipped while measuring front
+    const wasFlipped = card.classList.contains('is-flipped');
+    if(wasFlipped) card.classList.remove('is-flipped');
+    const h = front.scrollHeight;
+    if(h > max) max = h;
+    // Restore state
+    if(wasFlipped) card.classList.add('is-flipped');
+    inner.style.transform = prevTransform || '';
+  });
+  if(max <= 0) return;
+  // Apply uniform height to all cards and their inner containers.
+  cards.forEach(card => {
+    card.style.height = max + 'px';
+    const inner = card.querySelector('.card-inner');
+    if(inner) inner.style.height = '100%';
+  });
+}
+
+// Recalculate on resize and orientation changes.
+window.addEventListener('resize', () => requestAnimationFrame(adjustCardHeights));
+window.addEventListener('orientationchange', () => requestAnimationFrame(adjustCardHeights));
+// Recalculate when images inside thumbs load (affects front height)
+document.addEventListener('load', (ev) => {
+  const t = ev.target;
+  if(t && t.tagName === 'IMG' && t.closest('.thumb')){
+    requestAnimationFrame(adjustCardHeights);
+  }
+}, true);
 
 })();
 </script>
