@@ -40,7 +40,7 @@
   .prod-header {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     align-items: flex-start;
     margin-bottom: 12px;
   }
@@ -55,7 +55,7 @@
   .prod-sub {
     color: var(--muted);
     font-size: 14px;
-    margin: 0;
+    margin: 6px 0 0; /* add space below heading */
   }
   /* Stack search above filters; keep controls right-aligned */
   .prod-controls {
@@ -241,6 +241,12 @@
     align-items: center;
     justify-content: center;
   }
+  /* Downloaded state styling */
+  .download-btn.downloaded {
+    background: var(--navy);
+    color: var(--page-bg);
+    border-color: var(--navy);
+  }
   /* unify action buttons (Details / Back) so they're visually identical and align perfectly */
   .details-btn,
   .back-btn {
@@ -330,28 +336,6 @@
     border: 1px solid var(--border);
   }
 
-  /* Toast */
-  #toast {
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 36px;
-    background: rgba(var(--navy-rgb), 0.95);
-    color: var(--white);
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-weight: 600;
-    box-shadow: 0 6px 18px rgba(var(--navy-rgb), 0.25);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    z-index: 10000;
-  }
-  #toast.show {
-    opacity: 1;
-    pointer-events: all;
-    transform: translateX(-50%) translateY(0);
-  }
 
   /* Card flip: use grid-based overlap (avoids absolute/fixed positioning) */
   .card {
@@ -473,9 +457,9 @@
 <div class="prod-wrap" aria-live="polite">
   <div class="prod-header">
     <div class="prod-title">
-      <h1 id="pageH1">Digital & Physical Products - No Sign Required</h1>
+      <h1 id="pageH1">Digital & Physical Products</h1>
       <div id="pageDesc" class="prod-sub">
-        Instant downloads + external store products
+        Instant downloads + external store products - No Sign Required
       </div>
     </div>
 
@@ -534,7 +518,7 @@
 </div>
 
 <button id="goTopBtn" aria-label="Go to top">↑ Top</button>
-<div id="toast" role="status" aria-live="polite"></div>
+
 
 <script>
   (function () {
@@ -705,7 +689,6 @@
       sortSelect: document.getElementById("sortSelect"),
       resetBtn: document.getElementById("resetBtn"),
       goTopBtn: document.getElementById("goTopBtn"),
-      toastEl: document.getElementById("toast"),
       pageH1: document.getElementById("pageH1"),
       pageDescEl: document.getElementById("pageDesc"),
     };
@@ -715,7 +698,7 @@
     let filteredProducts = []; // Holds products after filtering, before pagination.
     let currentPage = 1;
     let currentPageSize = "all";
-    let toastTimer = null;
+    
 
     /* --- HELPERS --- */
     function escapeHtml(s) {
@@ -1238,14 +1221,24 @@
       injectStructuredData();
       updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize);
 
-      // Update the visible H1 and description to reflect the current view.
-      let h = "Digital & Physical Products";
-      if (refs.categorySelect.value)
-        h = `${cap(refs.categorySelect.value)} — ${h}`;
-      if (refs.searchInput.value)
-        h = `Results for "${refs.searchInput.value}" — ${h}`;
-      refs.pageH1.textContent = h;
-      refs.pageDescEl.textContent = document.title; // Use the dynamic title as a sub-header.
+      // Update the visible H1 and description only if auto-update is enabled.
+      // To enable, set `data-auto="true"` on the respective element.
+      const shouldAutoH1 = refs.pageH1 && refs.pageH1.dataset.auto === "true";
+      const shouldAutoDesc =
+        refs.pageDescEl && refs.pageDescEl.dataset.auto === "true";
+
+      if (shouldAutoH1) {
+        let h = "Digital & Physical Products";
+        if (refs.categorySelect.value)
+          h = `${cap(refs.categorySelect.value)} — ${h}`;
+        if (refs.searchInput.value)
+          h = `Results for "${refs.searchInput.value}" — ${h}`;
+        refs.pageH1.textContent = h;
+      }
+
+      if (shouldAutoDesc) {
+        refs.pageDescEl.textContent = document.title; // Use the dynamic title as a sub-header.
+      }
 
       // After rendering, normalize card heights to the tallest front face.
       requestAnimationFrame(adjustCardHeights);
@@ -1441,33 +1434,32 @@
     });
 
     /**
-     * Shows a short-lived notification toast at the bottom of the screen.
-     */
-    function showToast(msg, duration = 2500) {
-      if (toastTimer) {
-        clearTimeout(toastTimer);
-        toastTimer = null;
-      }
-      refs.toastEl.textContent = msg;
-      refs.toastEl.classList.add("show");
-      toastTimer = setTimeout(() => {
-        refs.toastEl.classList.remove("show");
-        toastTimer = null;
-      }, duration);
-    }
-    /**
      * Initiates a file download for a given product ID.
      * For "download" type, it creates a blob; for "external", it opens the URL.
      */
-    function startDownloadById(id) {
+    function startDownloadById(id, triggerEl) {
       const p = PRODUCTS.find((x) => x.id === id);
       if (!p) return;
+      // Visual feedback: change clicked button to "Downloaded" temporarily
+      const btn = triggerEl || (document.querySelector(`.download-btn[data-id="${CSS.escape(id)}"]`));
+      const revertBtn = () => {
+        if (btn) {
+          btn.textContent = p.type === "external" ? (p.buttonLabel || "Buy Now") : "Download";
+          btn.disabled = false;
+          btn.classList.remove("downloaded");
+        }
+      };
       if (p.productUrl) {
         const a = document.createElement("a");
         a.href = p.productUrl;
         a.download = p.fileName || "";
         a.click();
-        showToast("Download started");
+        if (btn) {
+          btn.textContent = "Downloaded";
+          btn.disabled = true;
+          btn.classList.add("downloaded");
+          setTimeout(revertBtn, 2500);
+        }
         return;
       }
       const blob = createDemoFileBlob(p);
@@ -1476,7 +1468,12 @@
       a.href = url;
       a.download = p.fileName || p.title + ".txt";
       a.click();
-      showToast("Download prepared — check your downloads");
+      if (btn) {
+        btn.textContent = "Downloaded";
+        btn.disabled = true;
+        btn.classList.add("downloaded");
+        setTimeout(revertBtn, 2500);
+      }
       setTimeout(() => URL.revokeObjectURL(url), 4000);
     }
 
@@ -1503,7 +1500,7 @@
 
       if (dl && dl.dataset.id) {
         e.preventDefault();
-        startDownloadById(dl.dataset.id);
+        startDownloadById(dl.dataset.id, dl);
         return;
       }
 
