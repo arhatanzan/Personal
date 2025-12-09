@@ -145,7 +145,7 @@
     border: 4px solid var(--accent);
     display: flex;
     flex-direction: column;
-    gap: 0; 
+    gap: 0;
     overflow: hidden;
     perspective: 1000px;
     contain: layout paint style; /* Isolate card to prevent external reflow/flicker */
@@ -154,7 +154,7 @@
   .thumb {
     height: 110px;
     /* Ensure thumb never shrinks even if layout gets squeezed */
-    flex: 0 0 auto; 
+    flex: 0 0 auto;
     border-radius: 6px;
     background: linear-gradient(180deg, var(--thumb-grad-1), var(--white));
     display: flex;
@@ -189,7 +189,7 @@
     margin: 0;
     line-height: 1.5;
   }
-  
+
   /* Tags Styling */
   .tags {
     display: flex;
@@ -370,7 +370,7 @@
     min-height: 0;
     overflow: hidden; /* IMPORTANT: Keeps back content inside card */
   }
-  
+
   /* Back Description Scroll */
   .card-back .desc {
     flex: 1 1 auto;
@@ -391,7 +391,7 @@
     background: transparent;
   }
   .card-back .desc::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.25);
+    background-color: rgba(0, 0, 0, 0.25);
     border-radius: 10px;
     border: 2px solid transparent; /* adds spacing illusion */
   }
@@ -430,7 +430,9 @@
       font-size: 22px;
     }
     /* Remove fixed min-height so JS can set uniform height dynamically */
-    .card { min-height: 0; }
+    .card {
+      min-height: 0;
+    }
   }
 </style>
 
@@ -439,7 +441,8 @@
     <div class="prod-title">
       <h1 id="pageH1">Democracy Game Library</h1>
       <div id="pageDesc" class="prod-sub">
-        Single-player civic simulation games about media, coalitions, and democracy.
+        Single-player civic simulation games about media, coalitions, and
+        democracy.
       </div>
     </div>
 
@@ -507,10 +510,10 @@
   (function () {
     "use strict";
     // Height mode: 'uniform' (tallest front applied to all) or 'per-card'
-    let HEIGHT_MODE = 'uniform';
-    window.setHeightMode = function(mode) {
-      const m = String(mode || '').toLowerCase();
-      if (m === 'uniform' || m === 'per-card') HEIGHT_MODE = m;
+    let HEIGHT_MODE = "uniform";
+    window.setHeightMode = function (mode) {
+      const m = String(mode || "").toLowerCase();
+      if (m === "uniform" || m === "per-card") HEIGHT_MODE = m;
     };
     const SITE_BASE =
       (window.SITE_BASE_URL && window.SITE_BASE_URL.replace(/\/$/, "")) ||
@@ -633,15 +636,20 @@
 
     /* --- HELPERS --- */
     function escapeHtml(s) {
-      return (s || "")
-        .toString()
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;");
+      return (s || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;");
     }
-    
+
     // Tiny sanitizer: allows a safe whitelist of tags/attributes
     function sanitizeHtml(input, options) {
-      const allowedTags = (options && options.allowedTags) || ["strong", "em", "br", "a", "ul", "ol", "li"];
+      const allowedTags = (options && options.allowedTags) || [
+        "strong",
+        "em",
+        "br",
+        "a",
+        "ul",
+        "ol",
+        "li",
+      ];
       const allowedAttrs = (options && options.allowedAttrs) || {
         a: ["href", "title", "target", "rel"],
       };
@@ -720,7 +728,7 @@
       });
       return out;
     }
-    
+
     // FORMATTER FOR BACK CARD
     function formatBackDescription(text) {
       if (!text) return "";
@@ -927,7 +935,7 @@
 
     function renderProductsPage(list, page, pageSize) {
       // Prevent flicker: hide grid visually but keep it in layout for measurement
-      refs.grid.style.visibility = 'hidden';
+      refs.grid.style.visibility = "hidden";
       refs.grid.innerHTML = "";
 
       if (!list.length) {
@@ -937,7 +945,7 @@
         injectStructuredData();
         updateCanonicalAndPaginationLinks(1, 1, "all");
         // Ensure grid is visible for subsequent non-empty renders
-        refs.grid.style.visibility = '';
+        refs.grid.style.visibility = "";
         return;
       }
       refs.empty.style.display = "none";
@@ -989,7 +997,9 @@
             <span class="tag">${escapeHtml(p.category)}</span>
             ${
               p.difficulty
-                ? `<span class="${diffClass}">${escapeHtml(p.difficulty)}</span>`
+                ? `<span class="${diffClass}">${escapeHtml(
+                    p.difficulty
+                  )}</span>`
                 : ""
             }
           </div>
@@ -997,7 +1007,9 @@
           <div class="card-footer">
             <div class="primary-wrap">${renderPrimaryButton(p)}</div>
             <div class="actions">
-              <button class="details-btn" data-id="${p.id}" aria-label="Details for ${escapeHtml(
+              <button class="details-btn" data-id="${
+                p.id
+              }" aria-label="Details for ${escapeHtml(
           p.title
         )}">Details</button>
             </div>
@@ -1039,9 +1051,12 @@
       refs.grid.appendChild(frag);
 
       // Wait for fonts to be ready to avoid metric changes, then measure FRONT heights
-      const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+      const fontsReady =
+        document.fonts && document.fonts.ready
+          ? document.fonts.ready
+          : Promise.resolve();
       fontsReady.then(() => {
-        if (HEIGHT_MODE === 'uniform') {
+        if (HEIGHT_MODE === "uniform") {
           let maxFront = 0;
           tempCards.forEach((card) => {
             const h = measureFrontContentHeight(card);
@@ -1050,9 +1065,9 @@
 
           if (maxFront > 0) {
             tempCards.forEach((card) => {
-              card.style.height = maxFront + 'px';
-              const inner = card.querySelector('.card-inner');
-              if (inner) inner.style.height = '100%';
+              card.style.height = maxFront + "px";
+              const inner = card.querySelector(".card-inner");
+              if (inner) inner.style.height = "100%";
               clampBackScrollBounds(card);
             });
             // Safety: ensure front content is fully visible; if not, correct height per card
@@ -1060,7 +1075,7 @@
               const needed = measureFrontContentHeight(card);
               const current = Math.ceil(card.getBoundingClientRect().height);
               if (needed > current) {
-                card.style.height = needed + 'px';
+                card.style.height = needed + "px";
                 clampBackScrollBounds(card);
               }
             });
@@ -1070,39 +1085,39 @@
           tempCards.forEach((card) => {
             const h = measureFrontContentHeight(card);
             if (h > 0) {
-              card.style.height = h + 'px';
-              const inner = card.querySelector('.card-inner');
-              if (inner) inner.style.height = '100%';
+              card.style.height = h + "px";
+              const inner = card.querySelector(".card-inner");
+              if (inner) inner.style.height = "100%";
               clampBackScrollBounds(card);
             }
           });
         }
 
-      renderPagination(totalItems, pageNum, totalPages, pageSize);
+        renderPagination(totalItems, pageNum, totalPages, pageSize);
 
-      updateTitleAndMeta();
-      injectStructuredData();
-      updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize);
+        updateTitleAndMeta();
+        injectStructuredData();
+        updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize);
 
-      const shouldAutoH1 = refs.pageH1 && refs.pageH1.dataset.auto === "true";
-      const shouldAutoDesc =
-        refs.pageDescEl && refs.pageDescEl.dataset.auto === "true";
+        const shouldAutoH1 = refs.pageH1 && refs.pageH1.dataset.auto === "true";
+        const shouldAutoDesc =
+          refs.pageDescEl && refs.pageDescEl.dataset.auto === "true";
 
-      if (shouldAutoH1) {
-        let h = "Democracy Game Library";
-        if (refs.categorySelect.value)
-          h = `${cap(refs.categorySelect.value)} — ${h}`;
-        if (refs.searchInput.value)
-          h = `Results for "${refs.searchInput.value}" — ${h}`;
-        refs.pageH1.textContent = h;
-      }
+        if (shouldAutoH1) {
+          let h = "Democracy Game Library";
+          if (refs.categorySelect.value)
+            h = `${cap(refs.categorySelect.value)} — ${h}`;
+          if (refs.searchInput.value)
+            h = `Results for "${refs.searchInput.value}" — ${h}`;
+          refs.pageH1.textContent = h;
+        }
 
-      if (shouldAutoDesc) {
-        refs.pageDescEl.textContent = document.title;
-      }
+        if (shouldAutoDesc) {
+          refs.pageDescEl.textContent = document.title;
+        }
 
         // Reveal grid now that heights are final (no resize after this)
-        refs.grid.style.visibility = '';
+        refs.grid.style.visibility = "";
       });
     }
 
@@ -1239,9 +1254,13 @@
       const sort = refs.sortSelect.value;
 
       // Validate selected values against available sets to avoid sticky 'no results'
-      const validCats = new Set(PRODUCTS.map((p) => (p.category || "").trim()).filter(Boolean));
+      const validCats = new Set(
+        PRODUCTS.map((p) => (p.category || "").trim()).filter(Boolean)
+      );
       const validDiffs = new Set(
-        PRODUCTS.map((p) => (getDifficultyValue(p) || "").toLowerCase().trim()).filter(Boolean)
+        PRODUCTS.map((p) =>
+          (getDifficultyValue(p) || "").toLowerCase().trim()
+        ).filter(Boolean)
       );
       const useCat = cat && validCats.has(cat) ? cat : "";
       const useDiff = diff && validDiffs.has(diff) ? diff : "";
@@ -1262,8 +1281,10 @@
         return m1 && m2 && m3;
       });
 
-      if (sort === "az") filteredProducts.sort((a, b) => a.title.localeCompare(b.title));
-      else if (sort === "za") filteredProducts.sort((a, b) => b.title.localeCompare(a.title));
+      if (sort === "az")
+        filteredProducts.sort((a, b) => a.title.localeCompare(b.title));
+      else if (sort === "za")
+        filteredProducts.sort((a, b) => b.title.localeCompare(a.title));
 
       currentPage = 1;
       refreshPage();
@@ -1309,7 +1330,12 @@
       if (back) {
         const card = back.closest(".card");
         if (card) card.classList.remove("is-flipped");
-        console.log('[FLIP] Card flipped to front:', card ? Array.from(document.querySelectorAll('.card')).indexOf(card) : 'unknown');
+        console.log(
+          "[FLIP] Card flipped to front:",
+          card
+            ? Array.from(document.querySelectorAll(".card")).indexOf(card)
+            : "unknown"
+        );
         return;
       }
 
@@ -1320,7 +1346,12 @@
           // Ensure back side scroll bounds are clamped precisely to card height
           clampBackScrollBounds(card);
         }
-        console.log('[FLIP] Card flipped to back:', card ? Array.from(document.querySelectorAll('.card')).indexOf(card) : 'unknown');
+        console.log(
+          "[FLIP] Card flipped to back:",
+          card
+            ? Array.from(document.querySelectorAll(".card")).indexOf(card)
+            : "unknown"
+        );
         return;
       }
     });
@@ -1451,64 +1482,69 @@
     function clampBackScrollBounds(card) {
       try {
         if (!card) return;
-        const back = card.querySelector('.card-back');
-        const desc = back && back.querySelector('.desc');
-        const footer = back && back.querySelector('.card-footer');
+        const back = card.querySelector(".card-back");
+        const desc = back && back.querySelector(".desc");
+        const footer = back && back.querySelector(".card-footer");
         if (!back || !desc) return;
         // Use the inner container height to avoid border/perspective discrepancies
-        const inner = card.querySelector('.card-inner');
-        const containerRect = inner ? inner.getBoundingClientRect() : card.getBoundingClientRect();
+        const inner = card.querySelector(".card-inner");
+        const containerRect = inner
+          ? inner.getBoundingClientRect()
+          : card.getBoundingClientRect();
         const backStyles = getComputedStyle(back);
         const padTop = parseFloat(backStyles.paddingTop) || 0;
         const padBottom = parseFloat(backStyles.paddingBottom) || 0;
         const footerHeight = footer ? footer.getBoundingClientRect().height : 0;
         // Available vertical space for the description area within the back side
-        const available = Math.max(0, containerRect.height - padTop - padBottom - footerHeight);
-        desc.style.maxHeight = available + 'px';
-        desc.style.overflowY = 'auto';
-        desc.style.minHeight = '0';
+        const available = Math.max(
+          0,
+          containerRect.height - padTop - padBottom - footerHeight
+        );
+        desc.style.maxHeight = available + "px";
+        desc.style.overflowY = "auto";
+        desc.style.minHeight = "0";
       } catch (e) {
-        console.warn('[CLAMP BACK SCROLL] Failed:', e);
+        console.warn("[CLAMP BACK SCROLL] Failed:", e);
       }
     }
 
     // Measure the front content height accurately by temporarily disabling absolute positioning
     function measureFrontContentHeight(card) {
       try {
-        const front = card.querySelector('.card-front');
-        const back = card.querySelector('.card-back');
-        const inner = card.querySelector('.card-inner');
+        const front = card.querySelector(".card-front");
+        const back = card.querySelector(".card-back");
+        const inner = card.querySelector(".card-inner");
         if (!front) return 0;
 
-        const prevBackDisplay = back ? back.style.display : '';
-        if (back) back.style.display = 'none';
+        const prevBackDisplay = back ? back.style.display : "";
+        if (back) back.style.display = "none";
 
         const prevFrontPos = front.style.position;
         const prevFrontHeight = front.style.height;
         const prevFrontInset = front.style.inset;
         const prevFrontWidth = front.style.width;
-        const prevInnerHeight = inner ? inner.style.height : '';
+        const prevInnerHeight = inner ? inner.style.height : "";
 
-        if (inner) inner.style.height = 'auto';
-        front.style.position = 'static';
-        front.style.height = 'auto';
-        front.style.inset = '';
-        front.style.width = '100%';
+        if (inner) inner.style.height = "auto";
+        front.style.position = "static";
+        front.style.height = "auto";
+        front.style.inset = "";
+        front.style.width = "100%";
 
         // Force layout and measure
         const h = Math.ceil(front.getBoundingClientRect().height);
 
         // Restore styles
-        front.style.position = prevFrontPos || 'absolute';
-        front.style.height = prevFrontHeight || '100%';
-        front.style.inset = prevFrontInset || '0';
-        front.style.width = prevFrontWidth || '100%';
-        if (inner) inner.style.height = prevInnerHeight || '100%';
+        front.style.position = prevFrontPos || "absolute";
+        front.style.height = prevFrontHeight || "100%";
+        front.style.inset = prevFrontInset || "0";
+        front.style.width = prevFrontWidth || "100%";
+        if (inner) inner.style.height = prevInnerHeight || "100%";
         if (back) back.style.display = prevBackDisplay;
 
         return h || 0;
       } catch (e) {
-        console.warn('[MEASURE FRONT] Failed:', e);
+        console.warn("[MEASURE FRONT] Failed:", e);
         return 0;
       }
     }
@@ -1520,4 +1556,14 @@
     // Optional: auto-recalc when front content changes dynamically
     // Disable ResizeObserver usage to avoid reflows after initial render
   })();
+  function sendHeight() {
+    const height = document.body.scrollHeight;
+    parent.postMessage({ type: "resizeIframe", height: height }, "*");
+  }
+
+  window.addEventListener("load", sendHeight);
+
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(sendHeight).observe(document.body);
+  }
 </script>
