@@ -36,8 +36,8 @@
         align-items: center;
         /* Dynamic height to fix mobile scroll issues */
         min-height: 100vh;
-        min-height: 100dvh;
         overflow-x: hidden;
+        overflow-y: auto;
       }
 
       /* --- HEADER --- */
@@ -151,15 +151,17 @@
 
       /* --- GAME BOARD --- */
       .game-board {
-        flex-grow: 1;
+        /* Do not force the board to stretch to fill the viewport; let it size to content
+           This prevents large empty space when users zoom out or change viewport dimensions */
+        flex: 0 0 auto;
         display: flex;
         flex-direction: column;
         width: 95%;
         max-width: 600px;
         gap: 15px;
         padding-bottom: 20px;
-        overflow-y: auto; /* Allow inner scrolling if vertical space is tight */
-        -webkit-overflow-scrolling: touch;
+        /* Keep internal scrolling only as needed */
+        overflow-y: visible;
       }
 
       /* Law Card */
@@ -270,7 +272,7 @@
       /* --- ACTION BAR --- */
       .action-bar {
         text-align: center;
-        margin-top: auto; /* Push to bottom of container */
+        margin-top: 12px;
         padding: 10px 0;
       }
 
@@ -355,6 +357,30 @@
         .game-board {
           justify-content: center;
         }
+      }
+      /* Small-screen responsive fixes: reduce vertical gaps and stack stat boxes */
+      @media (max-width: 600px) {
+        .stats-bar, .dashboard {
+          grid-template-columns: 1fr;
+          gap: 8px;
+          width: 95%;
+          margin: 0.5rem 0;
+        }
+        /* Avoid large vertical centering on tall small-viewports */
+        .game-container, .game-layout, .game-board {
+          max-width: 100%;
+          padding-bottom: 1rem;
+          justify-content: flex-start !important;
+          padding-top: 0.25rem;
+          flex: 0 0 auto;
+          min-height: 0;
+        }
+        .card-stack { height: auto !important; margin-bottom: 8px; }
+        .card { position: relative !important; height: auto !important; top: auto !important; left: auto !important; padding: 1.25rem; }
+        body { min-height: auto !important; height: auto !important; }
+        .controls, .broadcast-slots { gap: 8px; padding: 8px; justify-content: center; }
+        header { padding: 0.6rem; }
+        .copyright { margin-top: 8px; font-size: 0.7rem; }
       }
     </style>
   </head>

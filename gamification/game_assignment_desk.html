@@ -34,9 +34,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        height: 100vh;
-        height: 100dvh;
-        overflow: hidden;
+        min-height: 100vh; /* allow content to determine actual height */
+        overflow-y: auto; /* allow scrolling when content grows or zoom changes */
         /* Prevent pull-to-refresh on mobile */
         overscroll-behavior: none;
       }
@@ -53,6 +52,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: relative;
+        z-index: 30;
       }
       h1 {
         margin: 0;
@@ -80,6 +81,8 @@
         grid-template-columns: 1fr 1fr 1fr;
         gap: 8px;
         flex-shrink: 0;
+        position: relative;
+        z-index: 25;
       }
       .stat-box {
         background: var(--card-bg);
@@ -126,12 +129,13 @@
 
       /* --- GAME AREA --- */
       .game-layout {
-        flex-grow: 1;
+        /* Do not force the layout to stretch to viewport height; size to content */
+        flex: 0 0 auto;
         width: 100%;
         max-width: 800px;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow: visible;
         padding-bottom: 10px;
         position: relative;
       }
@@ -173,12 +177,16 @@
 
       /* The Incoming Feed (Whack-a-mole area) */
       .news-feed {
-        flex-grow: 1;
         position: relative;
         background: var(--bg-color);
         padding: 10px;
-        overflow: hidden;
+        overflow: visible;
         touch-action: none; /* Disables browser gestures inside game area */
+        /* Reserve a central stage area for floating story cards so they don't overlap header or footer
+           Use a responsive min-height to avoid magic fixed numbers */
+        min-height: clamp(360px, 45vh, 720px);
+        border-radius: 8px;
+        border: 1px solid rgba(0,0,0,0.04);
       }
 
       /* Story Card */
@@ -199,6 +207,7 @@
         animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         user-select: none; /* Critical for mobile tapping */
         -webkit-user-select: none;
+        z-index: 5;
       }
       .story-card:active {
         transform: scale(0.95);
@@ -337,6 +346,32 @@
         font-size: 0.9rem;
         margin-bottom: 10px;
         text-align: left;
+      }
+      /* Small-screen responsive fixes: reduce vertical gaps and stack stat boxes */
+      @media (max-width: 600px) {
+        .dashboard {
+          grid-template-columns: 1fr;
+          gap: 8px;
+          width: 95%;
+          margin: 0.5rem 0;
+        }
+        .stats-bar { grid-template-columns: 1fr; }
+        /* Avoid large vertical centering on tall small-viewports */
+        .game-container, .game-layout {
+          max-width: 100%;
+          padding-bottom: 1rem;
+          justify-content: flex-start !important;
+          padding-top: 0.25rem;
+          flex: 0 0 auto;
+          min-height: 0;
+        }
+        .card-stack { height: auto !important; margin-bottom: 8px; }
+        .card { position: relative !important; height: auto !important; top: auto !important; left: auto !important; padding: 1.25rem; }
+        body { min-height: auto !important; height: auto !important; }
+        .controls, .broadcast-slots { gap: 8px; padding: 8px; justify-content: center; }
+        .btn, .btn-modal, .deal-btn { padding: 0.6rem; font-size: 0.95rem; }
+        header { padding: 0.6rem; }
+        .copyright { margin-top: 8px; font-size: 0.7rem; }
       }
     </style>
   </head>

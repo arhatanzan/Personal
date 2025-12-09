@@ -34,9 +34,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        height: 100vh;
-        height: 100dvh;
-        overflow: hidden;
+        min-height: 100vh;
+        overflow-y: auto;
       }
 
       /* --- HEADER --- */
@@ -106,14 +105,16 @@
 
       /* --- MAIN LAYOUT --- */
       .game-container {
-        flex-grow: 1;
+        /* Size to content to avoid stretching gaps on zoom changes */
+        flex: 0 0 auto;
         display: flex;
         flex-direction: column;
+        justify-content: flex-start;
         width: 98%;
         max-width: 1000px;
         gap: 10px;
         padding-bottom: 5px;
-        overflow: hidden;
+        overflow: visible;
       }
 
       /* Canvas Area */
@@ -270,7 +271,7 @@
         font-size: 0.9rem;
         text-transform: uppercase;
         cursor: pointer;
-        margin-top: auto;
+        margin-top: 12px;
         box-shadow: 0 2px 0 #b38612;
       }
       .btn-plant:disabled {
@@ -284,15 +285,22 @@
       @media (min-width: 768px) {
         .game-container {
           flex-direction: row;
-          height: 80vh;
+          /* Ensure desktop layout keeps a stable height for the viz area */
+          height: 80vh !important;
+          overflow: hidden;
+          align-items: stretch; /* force children to match container height */
         }
         .viz-wrapper {
           flex: 2;
-          height: 100%;
+          height: 100% !important;
+          min-height: 300px;
+          overflow: hidden;
         }
         .controls-container {
           flex: 1;
-          max-height: none;
+          height: 100% !important; /* match viz height */
+          max-height: 100% !important;
+          overflow-y: auto; /* allow controls to scroll without pushing the viz */
         }
       }
 
@@ -369,6 +377,31 @@
       .tutorial-step strong {
         display: block;
         color: var(--text-main);
+      }
+      /* Small-screen responsive fixes: reduce vertical gaps and stack stat boxes */
+      @media (max-width: 600px) {
+        .stats-bar, .dashboard {
+          grid-template-columns: 1fr;
+          gap: 8px;
+          width: 95%;
+          margin: 0.5rem 0;
+        }
+        /* Avoid large vertical centering on tall small-viewports */
+        .game-container, .game-layout, .viz-wrapper {
+          max-width: 100%;
+          padding-bottom: 1rem;
+          justify-content: flex-start !important;
+          padding-top: 0.25rem;
+          flex: 0 0 auto;
+          min-height: 0;
+        }
+        .card-stack { height: auto !important; margin-bottom: 8px; }
+        .card { position: relative !important; height: auto !important; top: auto !important; left: auto !important; padding: 1.25rem; }
+        body { min-height: auto !important; height: auto !important; }
+        .controls, .broadcast-slots { gap: 8px; padding: 8px; justify-content: center; }
+        .btn, .btn-modal { padding: 0.6rem; font-size: 0.95rem; }
+        .viz-legend { display: none; }
+        header { padding: 0.6rem; }
       }
     </style>
   </head>
@@ -694,7 +727,8 @@
         rollDailyNarratives();
         renderTargets();
         updateStats();
-        resize();
+         resize(); // Ensure canvas is sized after the page finishes loading and CSS layout is applied
+         window.addEventListener("load", resize);
         draw();
       }
 
@@ -706,7 +740,9 @@
         ctx.scale(dpr, dpr);
         draw();
       }
-      window.addEventListener("resize", resize);
+        window.addEventListener("resize", resize);
+        // Ensure canvas is sized after the page finishes loading and CSS layout is applied
+        window.addEventListener("load", resize);
 
       function draw() {
         const w = canvas.width / (window.devicePixelRatio || 1);
