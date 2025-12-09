@@ -1,0 +1,1569 @@
+<style>
+  /* Theme variables — change these to update site colors quickly */
+  :root {
+    --page-bg: #f8f6f2;
+    --card-bg: #ffffff;
+    --white: #ffffff;
+    --accent: #d4a017;
+    --navy: #0a2342;
+    --navy-rgb: 10, 34, 66;
+    --muted: #5a6673;
+    --paid-bg: #7a2e2e;
+    --label-free-bg: var(--navy);
+    --label-free-text: var(--page-bg);
+    --label-paid-bg: var(--paid-bg);
+    --label-paid-text: var(--page-bg);
+    --border: rgba(0, 0, 0, 0.06);
+    --radius: 10px;
+    --gap: 18px;
+    --container: 1200px;
+    --thumb-grad-1: #ececec;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  body,
+  html {
+    margin: 0;
+    padding: 0;
+    font-family: Calibri, Arial, sans-serif;
+    background: var(--page-bg);
+    color: var(--navy);
+  }
+  .prod-wrap {
+    max-width: var(--container);
+    margin: 28px auto;
+    padding: 20px;
+  }
+  /* Stack header vertically and left-align contents for a precise layout */
+  .prod-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .prod-title h1 {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1.05;
+    color: var(--navy);
+    font-weight: 700;
+    letter-spacing: -0.2px;
+  }
+  .prod-sub {
+    color: var(--muted);
+    text-align: center;
+    font-size: 14px;
+    margin: 6px 0 0;
+  }
+  /* Stack search above filters; keep controls right-aligned */
+  .prod-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+    width: 100%;
+  }
+
+  /* Controls */
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--white);
+    border-radius: 8px;
+    padding: 8px 10px;
+    flex: 0 0 auto;
+    max-width: 480px;
+    min-width: 200px;
+  }
+  .search input {
+    border: 0;
+    outline: 0;
+    width: 100%;
+    font-size: 14px;
+    color: var(--navy);
+    background: transparent;
+  }
+
+  /* Grouped row for filters + reset button */
+  .controls-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    width: auto;
+    margin-top: 0;
+    justify-content: flex-end;
+  }
+  .select,
+  .btn {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+  }
+  .btn {
+    cursor: pointer;
+  }
+  .btn.primary {
+    background: var(--accent);
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  #resetBtn {
+    background: var(--navy);
+    color: var(--white);
+    border: 1px solid var(--navy);
+    font-weight: 600;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+    box-shadow: 0 6px 12px rgba(10, 34, 66, 0.08);
+  }
+  #resetBtn:hover {
+    opacity: 0.95;
+  }
+  #resetBtn:active {
+    transform: translateY(1px) scale(0.996);
+    box-shadow: 0 3px 8px rgba(10, 34, 66, 0.06);
+  }
+
+  /* Grid & Cards */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--gap);
+    margin-top: 18px;
+  }
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 0;
+    border: 4px solid var(--accent);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    perspective: 1000px;
+    contain: layout paint style; /* Isolate card to prevent external reflow/flicker */
+    /* Height is set dynamically by JS based on Front Face content */
+  }
+  .thumb {
+    height: 110px;
+    /* Ensure thumb never shrinks even if layout gets squeezed */
+    flex: 0 0 auto;
+    border-radius: 6px;
+    background: linear-gradient(180deg, var(--thumb-grad-1), var(--white));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--muted);
+    position: relative;
+    overflow: hidden;
+  }
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 6px;
+  }
+  .title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--navy);
+  }
+  .title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  /* Description styling */
+  .desc {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Tags Styling */
+  .tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .tag {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+  }
+  /* Specific Difficulty Colors */
+  .tag.diff-low {
+    background-color: #5a6673; /* Muted Gray */
+    color: #ffffff;
+    border-color: #5a6673;
+  }
+  .tag.diff-medium {
+    background-color: #0a2342; /* Navy */
+    color: #ffffff;
+    border-color: #0a2342;
+  }
+  .tag.diff-high {
+    background-color: #7a2e2e; /* Red/Paid */
+    color: #ffffff;
+    border-color: #7a2e2e;
+  }
+
+  .card-footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-footer .primary-wrap {
+    flex: 1 1 auto;
+  }
+  .card-footer .actions {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-left: auto;
+  }
+  .download-btn {
+    background: var(--accent);
+    color: var(--navy);
+    border-radius: 8px;
+    padding: 8px 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .details-btn,
+  .back-btn {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--navy);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 86px;
+    box-sizing: border-box;
+  }
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 0;
+  }
+
+  /* SEO helper button */
+  #sitemapBtn {
+    background: var(--white);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    cursor: pointer;
+  }
+
+  /* Go To Top Button */
+  #goTopBtn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--accent);
+    color: var(--navy);
+    border: none;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 9999;
+  }
+  #goTopBtn.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* Pagination */
+  .pagination-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .page-btn {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+  .page-btn.active {
+    background: var(--navy);
+    color: var(--white);
+    border-color: var(--navy);
+  }
+  .go-page {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: 8px;
+  }
+  .go-page input {
+    width: 64px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  /* Card flip mechanics */
+  .card-inner {
+    transition: transform 0.5s ease;
+    transform-style: preserve-3d;
+    position: relative; /* Use absolute faces to isolate layout */
+    width: 100%;
+    height: 100%; /* Ensure inner strictly matches card height */
+  }
+  .card-front,
+  .card-back {
+    position: absolute;
+    inset: 0; /* Fill inner container exactly */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 16px 20px; /* Unified extra bottom padding for consistent spacing */
+    box-sizing: border-box;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    height: 100%; /* Front/back must exactly match card height */
+  }
+  .card-front {
+    background: transparent;
+    overflow: visible; /* Ensure front content is fully visible */
+  }
+  .card-back {
+    background: var(--card-bg);
+    color: var(--navy);
+    transform: rotateY(180deg);
+    border-radius: calc(var(--radius) - 2px);
+    align-items: flex-start;
+    min-height: 0;
+    overflow: hidden; /* IMPORTANT: Keeps back content inside card */
+  }
+
+  /* Back Description Scroll */
+  .card-back .desc {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 4px;
+    width: 100%;
+    /* Smooth scrolling and thin scrollbar across browsers */
+    scroll-behavior: smooth;
+    scrollbar-width: thin; /* Firefox */
+    max-height: 100%; /* Prevent back content from expanding card height */
+    -webkit-overflow-scrolling: touch; /* Enable momentum scroll on iOS */
+  }
+  .card-back .desc::-webkit-scrollbar {
+    width: 6px;
+  }
+  .card-back .desc::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .card-back .desc::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    border: 2px solid transparent; /* adds spacing illusion */
+  }
+
+  .card-back .card-footer {
+    width: 100%;
+    flex: 0 0 auto;
+  }
+  .card.is-flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  @media (max-width: 1000px) {
+    .search {
+      max-width: 420px;
+    }
+    .prod-title h1 {
+      font-size: 28px;
+    }
+  }
+  @media (max-width: 600px) {
+    .search {
+      max-width: 100%;
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+    .controls-row {
+      width: 100%;
+      justify-content: flex-start;
+      margin-top: 6px;
+    }
+    .search input {
+      width: 130px;
+    }
+    .prod-title h1 {
+      font-size: 22px;
+    }
+    /* Remove fixed min-height so JS can set uniform height dynamically */
+    .card {
+      min-height: 0;
+    }
+  }
+</style>
+
+<div class="prod-wrap" aria-live="polite">
+  <div class="prod-header">
+    <div class="prod-title">
+      <h1 id="pageH1">Democracy Game Library</h1>
+      <div id="pageDesc" class="prod-sub">
+        Single-player civic simulation games about media, coalitions, and
+        democracy.
+      </div>
+    </div>
+
+    <div class="prod-controls" id="controls">
+      <div class="search">
+        <input
+          id="searchInput"
+          placeholder="Search games…"
+          aria-label="Search games"
+        />
+      </div>
+
+      <div class="controls-row">
+        <select
+          id="categorySelect"
+          class="select"
+          aria-label="Filter by game type"
+        >
+          <option value="">All Genre</option>
+        </select>
+
+        <select
+          id="priceSelect"
+          class="select"
+          aria-label="Filter by difficulty"
+        >
+          <option value="">All Levels</option>
+        </select>
+
+        <select
+          id="pageSizeSelect"
+          class="select"
+          title="Items per page"
+          aria-label="Items per page"
+        >
+          <option value="all">All (default)</option>
+          <option value="10">10 / page</option>
+          <option value="30">30 / page</option>
+          <option value="50">50 / page</option>
+          <option value="100">100 / page</option>
+        </select>
+
+        <select id="sortSelect" class="select" aria-label="Sort games">
+          <option value="new">Newest</option>
+          <option value="az">A → Z</option>
+          <option value="za">Z → A</option>
+        </select>
+
+        <button id="resetBtn" class="btn" aria-label="Reset filters">
+          Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="grid" class="grid"></div>
+  <div id="empty" class="empty" style="display: none">No games found.</div>
+
+  <div id="pagination" class="pagination-wrap" style="display: none"></div>
+</div>
+
+<button id="goTopBtn" aria-label="Go to top">↑ Top</button>
+
+<script>
+  (function () {
+    "use strict";
+    // Height mode: 'uniform' (tallest front applied to all) or 'per-card'
+    let HEIGHT_MODE = "uniform";
+    window.setHeightMode = function (mode) {
+      const m = String(mode || "").toLowerCase();
+      if (m === "uniform" || m === "per-card") HEIGHT_MODE = m;
+    };
+    const SITE_BASE =
+      (window.SITE_BASE_URL && window.SITE_BASE_URL.replace(/\/$/, "")) ||
+      location.origin.replace(/\/$/, "");
+    const LISTING_PATH = "/games";
+
+    function setTheme(vars) {
+      if (!vars || typeof vars !== "object") return;
+      const root = document.documentElement;
+      Object.keys(vars).forEach((k) => {
+        try {
+          root.style.setProperty(k, vars[k]);
+        } catch (e) {}
+      });
+    }
+
+    /* GAME DATA */
+    const PRODUCTS = [
+      {
+        id: "g1",
+        summary:
+          "Control a social media algorithm and balance truth, attention, and polarization.",
+        buttonLabel: "Play Now",
+        category: "Simulation",
+        difficulty: "Low",
+        description:
+          "You control a social media algorithm. For each turn, decide which posts to boost and which to bury as citizens scroll their feeds.\n\nProblem: We blindly trust feeds that are optimized for profit, not truth.\nKey Learning: Algorithms naturally prioritize emotional content, especially anger, because it drives engagement more than nuanced facts.\nOutcome: Players practice spotting 'rage-bait' and engagement traps.\nNeed: Citizens need to understand how their attention is monetized and weaponized.\nGoal: Maintain high Public Info (>60%) while keeping Polarization low (<40%) before the turns run out.",
+        imageUrl: "https://openmoji.org/data/color/svg/1F4ED.svg",
+        productUrl: "/game_civic_feed.html",
+        seoUrl: "/game/the-civic-feed",
+        thumbText: "📱",
+        title: "The Civic Feed",
+        type: "external",
+      },
+      {
+        id: "g2",
+        summary:
+          "Negotiate with rival parties to assemble a governing majority in a fractured parliament.",
+        buttonLabel: "Play Now",
+        category: "Strategy",
+        difficulty: "High",
+        description:
+          "You are tasked with building a governing coalition in a fractured parliament. Negotiate with 4 rival political parties to secure enough seats to govern.\n\nProblem: Voters often struggle to understand messy post-election compromises and alliances.\nKey Learning: Ideological purity often dies in coalition math; power requires trade-offs.\nOutcome: Players grasp government instability and why alliances shift.\nNeed: Demystifying why politicians make seemingly contradictory alliances after elections.\nGoal: Secure 251+ seats (votes) and pass 5 Laws within 10 Weeks without running out of Political Capital.",
+        imageUrl: "https://openmoji.org/data/color/svg/1F91D.svg",
+        productUrl: "/game_coalition.html",
+        seoUrl: "/game/coalition-builder",
+        thumbText: "🤝",
+        title: "Coalition Builder",
+        type: "external",
+      },
+      {
+        id: "g3",
+        summary:
+          "Run the 9 PM news and juggle scandals vs. policy while keeping ratings and civic duty alive.",
+        buttonLabel: "Play Now",
+        category: "Management",
+        difficulty: "Medium",
+        description:
+          "You control a 9 PM news bulletin. Each round, you have 15 seconds to pick stories (Scandals vs Policy) to fill 5 broadcast slots.\n\nProblem: Media businesses rely on capturing attention to survive, often at the cost of quality.\nKey Learning: The attention economy pushes sensationalism over substance.\nOutcome: Players learn to critically consume headlines and question why certain stories are chosen.\nNeed: Understanding the commercial pressures behind editorial choices.\nGoal: Keep both Ratings (Profit) and Civic Info (Duty) above zero for 5 full hours (rounds).",
+        imageUrl: "https://openmoji.org/data/color/svg/1F4FA.svg",
+        productUrl: "/game_assignment_desk.html",
+        seoUrl: "/game/the-news-desk",
+        thumbText: "📺",
+        title: "The News Desk",
+        type: "external",
+      },
+      {
+        id: "g4",
+        summary:
+          "Allocate a strained city budget under pressure from angry sectors and tempting bribes.",
+        buttonLabel: "Play Now",
+        category: "Puzzle",
+        difficulty: "High",
+        description:
+          "You are in charge of a city budget. You have ₹100 Cr but the city demands ₹160 Cr across 5 angry sectors (Roads, Schools, Health, Housing, etc.).\n\nProblem: Citizens demand world-class services but often ignore fiscal limits.\nKey Learning: Budgeting is a zero-sum game; every 'Yes' to one sector forces a 'No' to another.\nOutcome: Players understand policy trade-offs and populist pressure on representatives.\nNeed: Realizing that 'efficiency' isn't magic; resources are finite sand require hard choices.\nGoal: Achieve a Re-election Approval rating of 60%+ without being exposed for corruption (if you took bribes).",
+        imageUrl: "https://openmoji.org/data/color/svg/1F4B0.svg",
+        productUrl: "/game_budget_battle.html",
+        seoUrl: "/game/budget-battle",
+        thumbText: "💰",
+        title: "Budget Battle",
+        type: "external",
+      },
+      {
+        id: "g5",
+        summary:
+          "Seed and track rumors through a network to tilt an election using limited influence.",
+        buttonLabel: "Play Now",
+        category: "Simulation",
+        difficulty: "High",
+        description:
+          "You operate a whisper campaign during an election. Map how rumors spread through a network and choose which groups (nodes) to target.\n\nProblem: Disinformation thrives in insulated echo chambers where facts cannot penetrate.\nKey Learning: Information bubbles insulate voters from reality and can be engineered.\nOutcome: Players develop inoculation against network-based propaganda.\nNeed: Recognizing that misinformation is often designed to exploit social fault lines.\nGoal: Flip District Support to 60%+ (or higher for Dictatorship mode) within 14 Days using limited Influence.",
+        imageUrl: "https://openmoji.org/data/color/svg/1F4E3.svg",
+        productUrl: "/game_whisper_campaign.html",
+        seoUrl: "/game/the-whisper-campaign",
+        thumbText: "📢",
+        title: "The Whisper Campaign",
+        type: "external",
+      },
+    ];
+
+    /* DOM refs (cached) */
+    const refs = {
+      grid: document.getElementById("grid"),
+      empty: document.getElementById("empty"),
+      paginationWrap: document.getElementById("pagination"),
+      categorySelect: document.getElementById("categorySelect"),
+      priceSelect: document.getElementById("priceSelect"),
+      pageSizeSelect: document.getElementById("pageSizeSelect"),
+      searchInput: document.getElementById("searchInput"),
+      sortSelect: document.getElementById("sortSelect"),
+      resetBtn: document.getElementById("resetBtn"),
+      goTopBtn: document.getElementById("goTopBtn"),
+      pageH1: document.getElementById("pageH1"),
+      pageDescEl: document.getElementById("pageDesc"),
+    };
+
+    let filteredProducts = [];
+    let currentPage = 1;
+    let currentPageSize = "all";
+
+    /* --- HELPERS --- */
+    function escapeHtml(s) {
+      return (s || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    }
+
+    // Tiny sanitizer: allows a safe whitelist of tags/attributes
+    function sanitizeHtml(input, options) {
+      const allowedTags = (options && options.allowedTags) || [
+        "strong",
+        "em",
+        "br",
+        "a",
+        "ul",
+        "ol",
+        "li",
+      ];
+      const allowedAttrs = (options && options.allowedAttrs) || {
+        a: ["href", "title", "target", "rel"],
+      };
+      const normalizeTag = (t) => String(t || "").toLowerCase();
+      const container = document.createElement("div");
+      container.innerHTML = String(input || "");
+
+      function escapeText(txt) {
+        return String(txt || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function sanitizeNode(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          return escapeText(node.nodeValue);
+        }
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const tag = normalizeTag(node.tagName);
+          if (!allowedTags.includes(tag)) {
+            // Drop the tag, but keep sanitized text/children content
+            let inner = "";
+            node.childNodes.forEach((child) => {
+              inner += sanitizeNode(child);
+            });
+            return inner;
+          }
+
+          // Build opening tag with allowed attributes
+          let attrs = "";
+          const allowedForTag = allowedAttrs[tag] || [];
+          for (let i = 0; i < node.attributes.length; i++) {
+            const attr = node.attributes[i];
+            const name = normalizeTag(attr.name);
+            if (allowedForTag.includes(name)) {
+              let val = attr.value || "";
+              // Basic URL safety for href
+              if (tag === "a" && name === "href") {
+                const v = String(val).trim();
+                const lower = v.toLowerCase();
+                // Allow http(s), mailto, and relative URLs; strip javascript:
+                if (
+                  lower.startsWith("javascript:") ||
+                  lower.startsWith("data:")
+                ) {
+                  continue; // skip unsafe href
+                }
+              }
+              // Escape attribute value
+              val = String(val)
+                .replace(/&/g, "&amp;")
+                .replace(/"/g, "&quot;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+              attrs += ` ${name}="${val}"`;
+            }
+          }
+
+          // Self-closing for br
+          if (tag === "br") return "<br>";
+
+          // Children
+          let inner = "";
+          node.childNodes.forEach((child) => {
+            inner += sanitizeNode(child);
+          });
+          return `<${tag}${attrs}>${inner}</${tag}>`;
+        }
+        return "";
+      }
+
+      let out = "";
+      container.childNodes.forEach((n) => {
+        out += sanitizeNode(n);
+      });
+      return out;
+    }
+
+    // FORMATTER FOR BACK CARD
+    function formatBackDescription(text) {
+      if (!text) return "";
+      let raw = String(text || "");
+
+      // Convert newlines to <br> before sanitization (we allow br)
+      raw = raw.replace(/\r\n|\r|\n/g, "<br>");
+
+      // Bold known section labels via literal replacement
+      const keys = ["Problem:", "Key Learning:", "Outcome:", "Need:", "Goal:"];
+      keys.forEach((k) => {
+        const regex = new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
+        raw = raw.replace(regex, `<strong>${k}</strong>`);
+      });
+
+      // Sanitize while allowing a tiny safe subset
+      const safe = sanitizeHtml(raw, {
+        allowedTags: ["strong", "em", "br", "a", "ul", "ol", "li"],
+        allowedAttrs: { a: ["href", "title", "target", "rel"] },
+      });
+      return safe;
+    }
+
+    function cap(s) {
+      return (s || "").charAt(0).toUpperCase() + (s || "").slice(1);
+    }
+    function getSummary(p) {
+      if (!p) return "";
+      if (p.summary && String(p.summary).trim())
+        return String(p.summary).trim();
+      const s = (p.description || "").toString().trim();
+      if (!s) return "";
+      const first = s.split(/[\.?!]\s/)[0];
+      if (first && first.length <= 160)
+        return first + (/[\.?!]$/.test(first) ? "" : "...");
+      return s.length > 140 ? s.slice(0, 140).trim() + "..." : s;
+    }
+
+    function getDifficultyValue(p) {
+      return (p.difficulty || "").toLowerCase();
+    }
+
+    /* --- SEO & METADATA --- */
+    function ensureMetaTag(nameOrProp, value, isProperty = false) {
+      let selector = isProperty
+        ? `meta[property="${nameOrProp}"]`
+        : `meta[name="${nameOrProp}"]`;
+      let m = document.head.querySelector(selector);
+      if (!m) {
+        m = document.createElement("meta");
+        if (isProperty) m.setAttribute("property", nameOrProp);
+        else m.setAttribute("name", nameOrProp);
+        document.head.appendChild(m);
+      }
+      m.setAttribute("content", value || "");
+    }
+
+    function ensureLinkRel(rel, href) {
+      let el = document.head.querySelector(`link[rel="${rel}"]`);
+      if (!el) {
+        el = document.createElement("link");
+        el.setAttribute("rel", rel);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("href", href || "");
+    }
+
+    function updateTitleAndMeta() {
+      const parts = [];
+      const cat = refs.categorySelect.value;
+      const diff = refs.priceSelect.value;
+      const q = refs.searchInput.value.trim();
+
+      if (q) parts.push(`"${q}"`);
+      if (cat) parts.push(cap(cat));
+      if (diff) parts.push(`Difficulty: ${cap(diff)}`);
+      parts.push("Democracy Game Library");
+      const title = parts.join(" | ");
+      document.title = title;
+
+      const descParts = [];
+      if (cat) descParts.push(`${cap(cat)} games`);
+      if (diff) descParts.push(`Difficulty: ${cap(diff)}`);
+      if (q) descParts.push(`Search results for "${q}"`);
+      descParts.push(
+        "Single-player civic simulations about media, coalitions, and democracy."
+      );
+      const description = descParts.join(" • ");
+
+      ensureMetaTag("description", description);
+      ensureMetaTag("robots", "index,follow");
+      ensureMetaTag("twitter:card", "summary_large_image");
+      ensureMetaTag("twitter:title", title);
+      ensureMetaTag("twitter:description", description);
+      ensureMetaTag("og:title", title, true);
+      ensureMetaTag("og:description", description, true);
+      ensureMetaTag("og:type", "website", true);
+      ensureMetaTag(
+        "og:site_name",
+        document.location.hostname || SITE_BASE,
+        true
+      );
+      ensureMetaTag("og:image", `${SITE_BASE}/assets/og-games.jpg`, true);
+      ensureMetaTag("twitter:image", `${SITE_BASE}/assets/og-games.jpg`);
+    }
+
+    function updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize) {
+      const urlBase =
+        SITE_BASE +
+        (LISTING_PATH.startsWith("/") ? LISTING_PATH : "/" + LISTING_PATH);
+      const params = new URLSearchParams();
+      if (pageNum && pageNum > 1) params.set("page", pageNum);
+      if (pageSize && pageSize !== "all") params.set("pageSize", pageSize);
+      const canonicalHref = params.toString()
+        ? `${urlBase}?${params.toString()}`
+        : urlBase;
+
+      ensureLinkRel("canonical", canonicalHref);
+
+      if (pageNum > 1) {
+        const prevParams = new URLSearchParams();
+        const prevPage = pageNum - 1;
+        if (prevPage > 1) prevParams.set("page", prevPage);
+        if (pageSize && pageSize !== "all")
+          prevParams.set("pageSize", pageSize);
+        ensureLinkRel(
+          "prev",
+          prevParams.toString()
+            ? `${urlBase}?${prevParams.toString()}`
+            : urlBase
+        );
+      } else {
+        const prevEl = document.head.querySelector('link[rel="prev"]');
+        if (prevEl) prevEl.remove();
+      }
+
+      if (pageNum < totalPages) {
+        const nextParams = new URLSearchParams();
+        const nextPage = pageNum + 1;
+        if (nextPage > 1) nextParams.set("page", nextPage);
+        if (pageSize && pageSize !== "all")
+          nextParams.set("pageSize", pageSize);
+        ensureLinkRel(
+          "next",
+          nextParams.toString()
+            ? `${urlBase}?${nextParams.toString()}`
+            : urlBase
+        );
+      } else {
+        const nextEl = document.head.querySelector('link[rel="next"]');
+        if (nextEl) nextEl.remove();
+      }
+    }
+
+    function injectStructuredData() {
+      const items = PRODUCTS.map((p) => {
+        const node = {
+          "@type": "VideoGame",
+          name: p.title,
+          description: p.description,
+          gamePlatform: "Web browser",
+          applicationCategory: "Game",
+        };
+
+        const urlSource = p.seoUrl || p.productUrl;
+        if (urlSource) {
+          node.url = urlSource.startsWith("http")
+            ? urlSource
+            : SITE_BASE +
+              (urlSource.startsWith("/") ? urlSource : "/" + urlSource);
+        }
+        if (p.imageUrl)
+          node.image = p.imageUrl.startsWith("http")
+            ? p.imageUrl
+            : SITE_BASE +
+              (p.imageUrl.startsWith("/") ? p.imageUrl : "/" + p.imageUrl);
+
+        return node;
+      });
+
+      const graph = { "@context": "https://schema.org", "@graph": items };
+      let existing = document.getElementById("__products_jsonld");
+      if (existing) existing.textContent = JSON.stringify(graph);
+      else {
+        const s = document.createElement("script");
+        s.type = "application/ld+json";
+        s.id = "__products_jsonld";
+        s.textContent = JSON.stringify(graph);
+        document.head.appendChild(s);
+      }
+    }
+
+    /* --- UI RENDERING & INTERACTIONS --- */
+
+    function renderPrimaryButton(prod) {
+      const label = prod.buttonLabel || "Play Now";
+      const href = prod.productUrl || "#";
+      return `<a class="download-btn" href="${escapeHtml(
+        href
+      )}" target="" rel="noopener" aria-label="${escapeHtml(
+        label
+      )}">${escapeHtml(label)}</a>`;
+    }
+
+    function renderProductsPage(list, page, pageSize) {
+      // Prevent flicker: hide grid visually but keep it in layout for measurement
+      refs.grid.style.visibility = "hidden";
+      refs.grid.innerHTML = "";
+
+      if (!list.length) {
+        refs.empty.style.display = "block";
+        refs.paginationWrap.style.display = "none";
+        updateTitleAndMeta();
+        injectStructuredData();
+        updateCanonicalAndPaginationLinks(1, 1, "all");
+        // Ensure grid is visible for subsequent non-empty renders
+        refs.grid.style.visibility = "";
+        return;
+      }
+      refs.empty.style.display = "none";
+
+      let pageNum = parseInt(page, 10) || 1;
+      let size = pageSize === "all" ? list.length : parseInt(pageSize, 10);
+      const totalItems = list.length;
+      const totalPages =
+        size === 0 ? 1 : Math.max(1, Math.ceil(totalItems / size));
+      if (pageNum > totalPages) pageNum = totalPages;
+      const start = pageSize === "all" ? 0 : (pageNum - 1) * size;
+      const end =
+        pageSize === "all" ? totalItems : Math.min(totalItems, start + size);
+      const slice = list.slice(start, end);
+
+      const tempCards = [];
+      slice.forEach((p) => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        let thumbHtml = `<div class="thumb" aria-hidden="true">${escapeHtml(
+          p.thumbText || p.category || "Game"
+        )}</div>`;
+        if (p.imageUrl) {
+          const imgSrc = escapeHtml(p.imageUrl);
+          thumbHtml = `<div class="thumb" data-thumb-text="${escapeHtml(
+            p.thumbText || p.category || "Game"
+          )}"><img src="${imgSrc}" alt="${escapeHtml(
+            p.title
+          )} thumbnail" loading="lazy" onerror="this.dataset.failed='1'; this.style.display='none'; this.parentNode.classList.add('thumb-failed');"></div>`;
+        }
+
+        const titleHref = p.seoUrl || p.productUrl || "";
+        const titleLink = titleHref
+          ? `<a href="${escapeHtml(titleHref)}">${escapeHtml(p.title)}</a>`
+          : `<span>${escapeHtml(p.title)}</span>`;
+
+        const diffVal = (p.difficulty || "medium").toLowerCase();
+        const diffClass = `tag diff-${diffVal}`;
+
+        const backDescHtml = formatBackDescription(p.description);
+
+        card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-front">
+          ${thumbHtml}
+          <h3 class="title">${titleLink}</h3>
+          <div class="tags">
+            <span class="tag">${escapeHtml(p.category)}</span>
+            ${
+              p.difficulty
+                ? `<span class="${diffClass}">${escapeHtml(
+                    p.difficulty
+                  )}</span>`
+                : ""
+            }
+          </div>
+          <p class="desc">${escapeHtml(getSummary(p))}</p>
+          <div class="card-footer">
+            <div class="primary-wrap">${renderPrimaryButton(p)}</div>
+            <div class="actions">
+              <button class="details-btn" data-id="${
+                p.id
+              }" aria-label="Details for ${escapeHtml(
+          p.title
+        )}">Details</button>
+            </div>
+          </div>
+        </div>
+        <div class="card-back" aria-hidden="true">
+          <p class="desc">${backDescHtml}</p>
+          <div class="card-footer" style="margin-top:auto;">
+            <div class="primary-wrap">${renderPrimaryButton(p)}</div>
+            <div class="actions">
+              <button class="back-btn" data-id="${
+                p.id
+              }" aria-label="Back to game">Back</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+        tempCards.push(card);
+
+        const img = card.querySelector(".thumb img");
+        if (img) {
+          img.addEventListener("error", () => {
+            const thumb = card.querySelector(".thumb");
+            thumb.innerHTML = thumb.dataset.thumbText || p.thumbText || "Game";
+          });
+          if (img.dataset && img.dataset.failed === "1") {
+            const thumb = card.querySelector(".thumb");
+            thumb.innerHTML = thumb.dataset.thumbText || p.thumbText || "Game";
+          }
+        }
+
+        // Defer clamping until after height is set below
+      });
+
+      // Append all cards first (still hidden to user)
+      const frag = document.createDocumentFragment();
+      tempCards.forEach((c) => frag.appendChild(c));
+      refs.grid.appendChild(frag);
+
+      // Wait for fonts to be ready to avoid metric changes, then measure FRONT heights
+      const fontsReady =
+        document.fonts && document.fonts.ready
+          ? document.fonts.ready
+          : Promise.resolve();
+      fontsReady.then(() => {
+        if (HEIGHT_MODE === "uniform") {
+          let maxFront = 0;
+          tempCards.forEach((card) => {
+            const h = measureFrontContentHeight(card);
+            if (h > maxFront) maxFront = h;
+          });
+
+          if (maxFront > 0) {
+            tempCards.forEach((card) => {
+              card.style.height = maxFront + "px";
+              const inner = card.querySelector(".card-inner");
+              if (inner) inner.style.height = "100%";
+              clampBackScrollBounds(card);
+            });
+            // Safety: ensure front content is fully visible; if not, correct height per card
+            tempCards.forEach((card) => {
+              const needed = measureFrontContentHeight(card);
+              const current = Math.ceil(card.getBoundingClientRect().height);
+              if (needed > current) {
+                card.style.height = needed + "px";
+                clampBackScrollBounds(card);
+              }
+            });
+          }
+        } else {
+          // per-card heights
+          tempCards.forEach((card) => {
+            const h = measureFrontContentHeight(card);
+            if (h > 0) {
+              card.style.height = h + "px";
+              const inner = card.querySelector(".card-inner");
+              if (inner) inner.style.height = "100%";
+              clampBackScrollBounds(card);
+            }
+          });
+        }
+
+        renderPagination(totalItems, pageNum, totalPages, pageSize);
+
+        updateTitleAndMeta();
+        injectStructuredData();
+        updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize);
+
+        const shouldAutoH1 = refs.pageH1 && refs.pageH1.dataset.auto === "true";
+        const shouldAutoDesc =
+          refs.pageDescEl && refs.pageDescEl.dataset.auto === "true";
+
+        if (shouldAutoH1) {
+          let h = "Democracy Game Library";
+          if (refs.categorySelect.value)
+            h = `${cap(refs.categorySelect.value)} — ${h}`;
+          if (refs.searchInput.value)
+            h = `Results for "${refs.searchInput.value}" — ${h}`;
+          refs.pageH1.textContent = h;
+        }
+
+        if (shouldAutoDesc) {
+          refs.pageDescEl.textContent = document.title;
+        }
+
+        // Reveal grid now that heights are final (no resize after this)
+        refs.grid.style.visibility = "";
+      });
+    }
+
+    function renderPagination(totalItems, current, totalPages, pageSize) {
+      if (pageSize === "all" || totalPages <= 1) {
+        refs.paginationWrap.style.display = "none";
+        return;
+      }
+      refs.paginationWrap.style.display = "flex";
+      refs.paginationWrap.innerHTML = "";
+
+      const prev = document.createElement("button");
+      prev.className = "page-btn";
+      prev.textContent = "Prev";
+      prev.disabled = current <= 1;
+      prev.addEventListener("click", () => {
+        if (current > 1) {
+          currentPage--;
+          refreshPage();
+        }
+      });
+      refs.paginationWrap.appendChild(prev);
+
+      if (totalPages <= 10) {
+        for (let i = 1; i <= totalPages; i++) {
+          const b = document.createElement("button");
+          b.className = "page-btn" + (i === current ? " active" : "");
+          b.textContent = i;
+          b.addEventListener("click", () => {
+            currentPage = i;
+            refreshPage();
+          });
+          refs.paginationWrap.appendChild(b);
+        }
+      } else {
+        const first = document.createElement("button");
+        first.className = "page-btn";
+        first.textContent = "1";
+        first.addEventListener("click", () => {
+          currentPage = 1;
+          refreshPage();
+        });
+        refs.paginationWrap.appendChild(first);
+
+        if (current > 4) {
+          const dots = document.createElement("span");
+          dots.textContent = "...";
+          refs.paginationWrap.appendChild(dots);
+        }
+
+        const start = Math.max(2, current - 2);
+        const end = Math.min(totalPages - 1, current + 2);
+        for (let i = start; i <= end; i++) {
+          const b = document.createElement("button");
+          b.className = "page-btn" + (i === current ? " active" : "");
+          b.textContent = i;
+          b.addEventListener("click", () => {
+            currentPage = i;
+            refreshPage();
+          });
+          refs.paginationWrap.appendChild(b);
+        }
+
+        if (current < totalPages - 3) {
+          const dots2 = document.createElement("span");
+          dots2.textContent = "...";
+          refs.paginationWrap.appendChild(dots2);
+        }
+
+        const last = document.createElement("button");
+        last.className = "page-btn";
+        last.textContent = totalPages;
+        last.addEventListener("click", () => {
+          currentPage = totalPages;
+          refreshPage();
+        });
+        refs.paginationWrap.appendChild(last);
+      }
+      const next = document.createElement("button");
+      next.className = "page-btn";
+      next.textContent = "Next";
+      next.disabled = current >= totalPages;
+      next.addEventListener("click", () => {
+        if (current < totalPages) {
+          currentPage++;
+          refreshPage();
+        }
+      });
+      refs.paginationWrap.appendChild(next);
+
+      const goWrap = document.createElement("div");
+      goWrap.className = "go-page";
+      const goLabel = document.createElement("span");
+      goLabel.style.color = "var(--muted)";
+      goLabel.textContent = "Go to";
+      const goInput = document.createElement("input");
+      goInput.type = "number";
+      goInput.min = 1;
+      goInput.max = totalPages;
+      goInput.value = current;
+      goInput.setAttribute("aria-label", "Page number to go to");
+      const goBtn = document.createElement("button");
+      goBtn.className = "page-btn";
+      goBtn.textContent = "Go";
+      goBtn.addEventListener("click", () => {
+        let v = parseInt(goInput.value, 10);
+        if (isNaN(v)) return;
+        if (v < 1) v = 1;
+        if (v > totalPages) v = totalPages;
+        currentPage = v;
+        refreshPage();
+        goBtn.blur();
+      });
+      goInput.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter") goBtn.click();
+      });
+      goWrap.appendChild(goLabel);
+      goWrap.appendChild(goInput);
+      goWrap.appendChild(goBtn);
+      refs.paginationWrap.appendChild(goWrap);
+
+      const info = document.createElement("div");
+      info.style.marginLeft = "8px";
+      info.style.color = "var(--muted)";
+      info.textContent = `Page ${current} of ${totalPages} • ${totalItems} games`;
+      refs.paginationWrap.appendChild(info);
+    }
+
+    function applyFilters() {
+      const q = (refs.searchInput.value || "").toLowerCase().trim();
+      const cat = (refs.categorySelect.value || "").trim();
+      const diff = (refs.priceSelect.value || "").toLowerCase().trim();
+
+      const sort = refs.sortSelect.value;
+
+      // Validate selected values against available sets to avoid sticky 'no results'
+      const validCats = new Set(
+        PRODUCTS.map((p) => (p.category || "").trim()).filter(Boolean)
+      );
+      const validDiffs = new Set(
+        PRODUCTS.map((p) =>
+          (getDifficultyValue(p) || "").toLowerCase().trim()
+        ).filter(Boolean)
+      );
+      const useCat = cat && validCats.has(cat) ? cat : "";
+      const useDiff = diff && validDiffs.has(diff) ? diff : "";
+
+      filteredProducts = PRODUCTS.filter((p) => {
+        const pCat = (p.category || "").trim();
+        const pDiff = (getDifficultyValue(p) || "").toLowerCase().trim();
+        const m1 = !useCat || pCat === useCat;
+        const m2 = !useDiff || pDiff === useDiff;
+        const hay = (
+          (p.title || "") +
+          (p.description || "") +
+          (p.category || "") +
+          (p.seoUrl || "") +
+          (p.difficulty || "")
+        ).toLowerCase();
+        const m3 = !q || hay.includes(q);
+        return m1 && m2 && m3;
+      });
+
+      if (sort === "az")
+        filteredProducts.sort((a, b) => a.title.localeCompare(b.title));
+      else if (sort === "za")
+        filteredProducts.sort((a, b) => b.title.localeCompare(a.title));
+
+      currentPage = 1;
+      refreshPage();
+    }
+
+    function refreshPage() {
+      currentPageSize = refs.pageSizeSelect.value || "all";
+      renderProductsPage(filteredProducts, currentPage, currentPageSize);
+    }
+
+    refs.searchInput.addEventListener("input", applyFilters);
+    refs.categorySelect.addEventListener("change", applyFilters);
+    refs.priceSelect.addEventListener("change", applyFilters);
+    refs.sortSelect.addEventListener("change", applyFilters);
+    refs.pageSizeSelect.addEventListener("change", () => {
+      currentPage = 1;
+      refreshPage();
+    });
+    refs.resetBtn.addEventListener("click", () => {
+      refs.searchInput.value = "";
+      refs.categorySelect.value = "";
+      refs.priceSelect.value = "";
+      refs.sortSelect.value = "new";
+      refs.pageSizeSelect.value = "all";
+      currentPage = 1;
+      applyFilters();
+    });
+
+    function flipCard(cardEl) {
+      if (!cardEl) return;
+      document.querySelectorAll(".card.is-flipped").forEach((c) => {
+        if (c !== cardEl) c.classList.remove("is-flipped");
+      });
+      const willFlip = !cardEl.classList.contains("is-flipped");
+      if (willFlip) cardEl.classList.add("is-flipped");
+      else cardEl.classList.remove("is-flipped");
+    }
+
+    refs.grid.addEventListener("click", (e) => {
+      const det = e.target.closest(".details-btn");
+      const back = e.target.closest(".back-btn");
+
+      if (back) {
+        const card = back.closest(".card");
+        if (card) card.classList.remove("is-flipped");
+        console.log(
+          "[FLIP] Card flipped to front:",
+          card
+            ? Array.from(document.querySelectorAll(".card")).indexOf(card)
+            : "unknown"
+        );
+        return;
+      }
+
+      if (det) {
+        const card = det.closest(".card");
+        if (card) {
+          flipCard(card);
+          // Ensure back side scroll bounds are clamped precisely to card height
+          clampBackScrollBounds(card);
+        }
+        console.log(
+          "[FLIP] Card flipped to back:",
+          card
+            ? Array.from(document.querySelectorAll(".card")).indexOf(card)
+            : "unknown"
+        );
+        return;
+      }
+    });
+
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 300) refs.goTopBtn.classList.add("show");
+      else refs.goTopBtn.classList.remove("show");
+    });
+    refs.goTopBtn.addEventListener("click", () =>
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    );
+
+    function buildSitemapXml() {
+      const domain = window.location.origin;
+
+      const urls = PRODUCTS.map((p) => {
+        const loc =
+          p.seoUrl && p.seoUrl.startsWith("http")
+            ? p.seoUrl
+            : domain +
+              (p.seoUrl
+                ? p.seoUrl
+                : `/game/${encodeURIComponent(p.id.toString())}`);
+        return `
+      <url>
+        <loc>${loc}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+      </url>
+    `;
+      }).join("");
+
+      return `<?xml version="1.0" encoding="UTF-8"?>
+  <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+      <loc>${domain}</loc>
+      <changefreq>daily</changefreq>
+      <priority>1.0</priority>
+    </url>
+    ${urls}
+  </urlset>`;
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
+        const xml = buildSitemapXml();
+        const blob = new Blob([xml], { type: "application/xml" });
+        const url = URL.createObjectURL(blob);
+
+        const win = window.open();
+        win.document.write(`
+      <pre>${xml.replace(/</g, "&lt;")}</pre>
+      <a href="${url}" download="sitemap.xml">Download sitemap.xml</a>
+      <p>Upload this file to your site root (/sitemap.xml)</p>
+    `);
+        win.document.close();
+
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      }
+    });
+
+    (function setupFilters() {
+      function ensureSeoUrls() {
+        function slugify(s) {
+          return (s || "")
+            .toString()
+            .trim()
+            .toLowerCase()
+            .replace(/["'`]/g, "")
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^[-]+|[-]+$/g, "");
+        }
+        const seen = new Set();
+        PRODUCTS.forEach((p) => {
+          if (p.seoUrl) seen.add(p.seoUrl);
+        });
+        PRODUCTS.forEach((p) => {
+          if (!p.seoUrl || !String(p.seoUrl).trim()) {
+            const base =
+              "/game/" + (slugify(p.title || p.id) || "game-" + p.id);
+            let candidate = base;
+            let i = 1;
+            while (seen.has(candidate)) {
+              candidate = base + "-" + i;
+              i++;
+            }
+            p.seoUrl = candidate;
+            seen.add(candidate);
+          }
+        });
+      }
+      ensureSeoUrls();
+
+      const cats = [...new Set(PRODUCTS.map((p) => p.category))].sort();
+      cats.forEach((c) => {
+        const op = document.createElement("option");
+        op.value = c;
+        op.textContent = c;
+        refs.categorySelect.appendChild(op);
+      });
+
+      const diffs = [
+        ...new Set(
+          PRODUCTS.map((p) => (getDifficultyValue(p) || "").toLowerCase())
+        ),
+      ]
+        .filter((d) => d)
+        .sort();
+      diffs.forEach((dv) => {
+        const op = document.createElement("option");
+        op.value = dv;
+        op.textContent = cap(dv);
+        refs.priceSelect.appendChild(op);
+      });
+
+      updateTitleAndMeta();
+      injectStructuredData();
+    })();
+
+    applyFilters();
+    window.setTheme = setTheme;
+
+    // No post-render height adjustments — initial measurement locks height.
+
+    // Clamp back-side .desc max-height to ensure internal scroll and no expansion
+    function clampBackScrollBounds(card) {
+      try {
+        if (!card) return;
+        const back = card.querySelector(".card-back");
+        const desc = back && back.querySelector(".desc");
+        const footer = back && back.querySelector(".card-footer");
+        if (!back || !desc) return;
+        // Use the inner container height to avoid border/perspective discrepancies
+        const inner = card.querySelector(".card-inner");
+        const containerRect = inner
+          ? inner.getBoundingClientRect()
+          : card.getBoundingClientRect();
+        const backStyles = getComputedStyle(back);
+        const padTop = parseFloat(backStyles.paddingTop) || 0;
+        const padBottom = parseFloat(backStyles.paddingBottom) || 0;
+        const footerHeight = footer ? footer.getBoundingClientRect().height : 0;
+        // Available vertical space for the description area within the back side
+        const available = Math.max(
+          0,
+          containerRect.height - padTop - padBottom - footerHeight
+        );
+        desc.style.maxHeight = available + "px";
+        desc.style.overflowY = "auto";
+        desc.style.minHeight = "0";
+      } catch (e) {
+        console.warn("[CLAMP BACK SCROLL] Failed:", e);
+      }
+    }
+
+    // Measure the front content height accurately by temporarily disabling absolute positioning
+    function measureFrontContentHeight(card) {
+      try {
+        const front = card.querySelector(".card-front");
+        const back = card.querySelector(".card-back");
+        const inner = card.querySelector(".card-inner");
+        if (!front) return 0;
+
+        const prevBackDisplay = back ? back.style.display : "";
+        if (back) back.style.display = "none";
+
+        const prevFrontPos = front.style.position;
+        const prevFrontHeight = front.style.height;
+        const prevFrontInset = front.style.inset;
+        const prevFrontWidth = front.style.width;
+        const prevInnerHeight = inner ? inner.style.height : "";
+
+        if (inner) inner.style.height = "auto";
+        front.style.position = "static";
+        front.style.height = "auto";
+        front.style.inset = "";
+        front.style.width = "100%";
+
+        // Force layout and measure
+        const h = Math.ceil(front.getBoundingClientRect().height);
+
+        // Restore styles
+        front.style.position = prevFrontPos || "absolute";
+        front.style.height = prevFrontHeight || "100%";
+        front.style.inset = prevFrontInset || "0";
+        front.style.width = prevFrontWidth || "100%";
+        if (inner) inner.style.height = prevInnerHeight || "100%";
+        if (back) back.style.display = prevBackDisplay;
+
+        return h || 0;
+      } catch (e) {
+        console.warn("[MEASURE FRONT] Failed:", e);
+        return 0;
+      }
+    }
+
+    // Prevent any post-render resizing to eliminate flicker
+    window.addEventListener("resize", () => {});
+    window.addEventListener("orientationchange", () => {});
+
+    // Optional: auto-recalc when front content changes dynamically
+    // Disable ResizeObserver usage to avoid reflows after initial render
+  })();
+  function sendHeight() {
+    const height = document.body.scrollHeight;
+    parent.postMessage({ type: "resizeIframe", height: height }, "*");
+  }
+
+  window.addEventListener("load", sendHeight);
+
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(sendHeight).observe(document.body);
+  }
+</script>
