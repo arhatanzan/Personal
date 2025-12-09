@@ -273,10 +273,13 @@
         .game-container, .game-layout {
           max-width: 100%;
           padding-bottom: 1rem;
-          justify-content: flex-start;
-          padding-top: 0.6rem;
+          justify-content: flex-start !important;
+          padding-top: 0.25rem;
+          flex: 0 0 auto; /* don't stretch to fill viewport */
+          min-height: 0;
         }
-        .card-stack { height: 240px; margin-bottom: 8px; }
+        /* Let the card-stack size to its content on small screens */
+        .card-stack { height: auto; margin-bottom: 8px; }
         .controls, .broadcast-slots { gap: 8px; padding: 8px; justify-content: center; }
         .btn { padding: 0.6rem; font-size: 0.95rem; }
         header { padding: 0.6rem; }

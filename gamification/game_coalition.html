@@ -368,10 +368,12 @@
         .game-container, .game-layout, .game-board {
           max-width: 100%;
           padding-bottom: 1rem;
-          justify-content: flex-start;
-          padding-top: 0.6rem;
+          justify-content: flex-start !important;
+          padding-top: 0.25rem;
+          flex: 0 0 auto;
+          min-height: 0;
         }
-        .card-stack { height: 240px; margin-bottom: 8px; }
+        .card-stack { height: auto; margin-bottom: 8px; }
         .controls, .broadcast-slots { gap: 8px; padding: 8px; justify-content: center; }
         header { padding: 0.6rem; }
         .copyright { margin-top: 8px; font-size: 0.7rem; }

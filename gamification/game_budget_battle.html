@@ -413,10 +413,12 @@
         .game-container, .game-layout, .deals-wrapper {
           max-width: 100%;
           padding-bottom: 1rem;
-          justify-content: flex-start;
-          padding-top: 0.6rem;
+          justify-content: flex-start !important;
+          padding-top: 0.25rem;
+          flex: 0 0 auto;
+          min-height: 0;
         }
-        .card-stack { height: 240px; margin-bottom: 8px; }
+        .card-stack { height: auto; margin-bottom: 8px; }
         .controls, .broadcast-slots, .deals-grid { gap: 8px; padding: 8px; justify-content: center; }
         .btn, .btn-modal, .deal-btn { padding: 0.6rem; font-size: 0.95rem; }
         header { padding: 0.6rem; }
