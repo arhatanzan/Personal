@@ -373,7 +373,9 @@
           flex: 0 0 auto;
           min-height: 0;
         }
-        .card-stack { height: auto; margin-bottom: 8px; }
+        .card-stack { height: auto !important; margin-bottom: 8px; }
+        .card { position: relative !important; height: auto !important; top: auto !important; left: auto !important; padding: 1.25rem; }
+        body { min-height: auto !important; height: auto !important; }
         .controls, .broadcast-slots { gap: 8px; padding: 8px; justify-content: center; }
         header { padding: 0.6rem; }
         .copyright { margin-top: 8px; font-size: 0.7rem; }
