@@ -34,9 +34,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        height: 100vh;
-        height: 100dvh;
-        overflow: hidden;
+        min-height: 100vh; /* allow content to determine actual height */
+        overflow-y: auto; /* allow scrolling when content grows or zoom changes */
         /* Prevent pull-to-refresh on mobile */
         overscroll-behavior: none;
       }
