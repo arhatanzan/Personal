@@ -285,21 +285,21 @@
       @media (min-width: 768px) {
         .game-container {
           flex-direction: row;
-          /* Ensure desktop layout keeps a stable height for the viz area */
-          height: 80vh !important;
-          overflow: hidden;
-          align-items: stretch; /* force children to match container height */
+          /* Let JS size the viz area so it matches the controls height */
+          height: auto;
+          overflow: visible;
+          align-items: flex-start;
         }
         .viz-wrapper {
           flex: 2;
-          height: 100% !important;
+          height: auto;
           min-height: 300px;
           overflow: hidden;
         }
         .controls-container {
           flex: 1;
-          height: 100% !important; /* match viz height */
-          max-height: 100% !important;
+          height: auto;
+          max-height: 80vh;
           overflow-y: auto; /* allow controls to scroll without pushing the viz */
         }
       }
@@ -728,13 +728,29 @@
         renderTargets();
         updateStats();
          resize(); // Ensure canvas is sized after the page finishes loading and CSS layout is applied
-         window.addEventListener("load", resize);
         draw();
       }
 
       function resize() {
         const wrap = document.getElementById("viz-wrapper");
+        const controls = document.querySelector('.controls-container');
+
+        // On larger screens, size the viz to match controls height (plus a small padding)
+        if (window.innerWidth >= 768 && controls) {
+          const padding = 20; // a little more than the controls
+          let desired = controls.clientHeight + padding;
+          const minH = 300;
+          const maxH = Math.floor(window.innerHeight * 0.8);
+          desired = Math.min(Math.max(desired, minH), maxH);
+          wrap.style.height = desired + 'px';
+        } else {
+          // let CSS handle mobile/small screens
+          wrap.style.height = '';
+        }
+
         const dpr = window.devicePixelRatio || 1;
+        // Reset any transform to avoid cumulative scaling
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         canvas.width = wrap.clientWidth * dpr;
         canvas.height = wrap.clientHeight * dpr;
         ctx.scale(dpr, dpr);
