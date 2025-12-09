@@ -387,17 +387,32 @@
           margin: 0.5rem 0;
         }
         /* Avoid large vertical centering on tall small-viewports */
-        .game-container, .game-layout, .viz-wrapper {
+        .game-container, .game-layout {
           max-width: 100%;
           padding-bottom: 1rem;
           justify-content: flex-start !important;
           padding-top: 0.25rem;
           flex: 0 0 auto;
-          min-height: 0;
+        }
+        /* Ensure the visualization area remains tall enough and not clipped on small screens */
+        .viz-wrapper {
+          max-width: 100%;
+          padding-bottom: 0.5rem;
+          justify-content: flex-start !important;
+          padding-top: 0.25rem;
+          flex: 0 0 auto;
+          /* Make the viz taller on phones so the full node circles are visible */
+          min-height: 420px !important;
+          overflow: visible !important; /* allow canvas drawing to extend without clipping */
         }
         .card-stack { height: auto !important; margin-bottom: 8px; }
         .card { position: relative !important; height: auto !important; top: auto !important; left: auto !important; padding: 1.25rem; }
         body { min-height: auto !important; height: auto !important; }
+        /* Let the controls expand and flow with the page on small screens (no internal scroll) */
+        .controls-container {
+          max-height: none !important;
+          overflow-y: visible !important;
+        }
         .controls, .broadcast-slots { gap: 8px; padding: 8px; justify-content: center; }
         .btn, .btn-modal { padding: 0.6rem; font-size: 0.95rem; }
         .viz-legend { display: none; }
