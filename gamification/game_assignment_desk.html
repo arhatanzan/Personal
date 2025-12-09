@@ -125,12 +125,13 @@
 
       /* --- GAME AREA --- */
       .game-layout {
-        flex-grow: 1;
+        /* Do not force the layout to stretch to viewport height; size to content */
+        flex: 0 0 auto;
         width: 100%;
         max-width: 800px;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow: visible;
         padding-bottom: 10px;
         position: relative;
       }
@@ -172,11 +173,10 @@
 
       /* The Incoming Feed (Whack-a-mole area) */
       .news-feed {
-        flex-grow: 1;
         position: relative;
         background: var(--bg-color);
         padding: 10px;
-        overflow: hidden;
+        overflow: visible;
         touch-action: none; /* Disables browser gestures inside game area */
       }
 
