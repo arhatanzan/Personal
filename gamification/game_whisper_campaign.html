@@ -735,10 +735,9 @@
         const wrap = document.getElementById("viz-wrapper");
         const controls = document.querySelector('.controls-container');
 
-        // On larger screens, size the viz to match controls height (plus a small padding)
+        // On larger screens, size the viz to match controls height exactly
         if (window.innerWidth >= 768 && controls) {
-          const padding = 20; // a little more than the controls
-          let desired = controls.clientHeight + padding;
+          let desired = controls.clientHeight;
           const minH = 300;
           const maxH = Math.floor(window.innerHeight * 0.8);
           desired = Math.min(Math.max(desired, minH), maxH);
