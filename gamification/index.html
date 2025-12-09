@@ -558,7 +558,7 @@
         description:
           "You are tasked with building a governing coalition in a fractured parliament. Negotiate with 4 rival political parties to secure enough seats to govern.\n\nProblem: Voters often struggle to understand messy post-election compromises and alliances.\nKey Learning: Ideological purity often dies in coalition math; power requires trade-offs.\nOutcome: Players grasp government instability and why alliances shift.\nNeed: Demystifying why politicians make seemingly contradictory alliances after elections.\nGoal: Secure 251+ seats (votes) and pass 5 Laws within 10 Weeks without running out of Political Capital.",
         imageUrl: "https://openmoji.org/data/color/svg/1F91D.svg",
-        productUrl: "/game_coalition.html",
+        productUrl: "/game_coalition_builder.html",
         seoUrl: "/game/coalition-builder",
         thumbText: "🤝",
         title: "Coalition Builder",
@@ -574,7 +574,7 @@
         description:
           "You control a 9 PM news bulletin. Each round, you have 15 seconds to pick stories (Scandals vs Policy) to fill 5 broadcast slots.\n\nProblem: Media businesses rely on capturing attention to survive, often at the cost of quality.\nKey Learning: The attention economy pushes sensationalism over substance.\nOutcome: Players learn to critically consume headlines and question why certain stories are chosen.\nNeed: Understanding the commercial pressures behind editorial choices.\nGoal: Keep both Ratings (Profit) and Civic Info (Duty) above zero for 5 full hours (rounds).",
         imageUrl: "https://openmoji.org/data/color/svg/1F4FA.svg",
-        productUrl: "/game_assignment_desk.html",
+        productUrl: "/game_news_desk.html",
         seoUrl: "/game/the-news-desk",
         thumbText: "📺",
         title: "The News Desk",
@@ -1556,6 +1556,7 @@
     // Optional: auto-recalc when front content changes dynamically
     // Disable ResizeObserver usage to avoid reflows after initial render
   })();
+  
   function sendHeight() {
     const height = document.body.scrollHeight;
     parent.postMessage({ type: "resizeIframe", height: height }, "*");
