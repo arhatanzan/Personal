@@ -182,6 +182,11 @@
         padding: 10px;
         overflow: visible;
         touch-action: none; /* Disables browser gestures inside game area */
+        /* Reserve a central stage area for floating story cards so they don't overlap header or footer
+           Use a responsive min-height to avoid magic fixed numbers */
+        min-height: clamp(360px, 45vh, 720px);
+        border-radius: 8px;
+        border: 1px solid rgba(0,0,0,0.04);
       }
 
       /* Story Card */
