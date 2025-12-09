@@ -356,6 +356,23 @@
           justify-content: center;
         }
       }
+      /* Small-screen responsive fixes: reduce vertical gaps and stack stat boxes */
+      @media (max-width: 600px) {
+        .stats-bar, .dashboard {
+          grid-template-columns: 1fr;
+          gap: 8px;
+          width: 95%;
+          margin: 0.5rem 0;
+        }
+        .game-container, .game-layout, .game-board {
+          max-width: 100%;
+          padding-bottom: 1rem;
+        }
+        .card-stack { height: 240px; margin-bottom: 8px; }
+        .controls, .broadcast-slots { gap: 8px; padding: 8px; justify-content: center; }
+        header { padding: 0.6rem; }
+        .copyright { margin-top: 8px; font-size: 0.7rem; }
+      }
     </style>
   </head>
   <body>
