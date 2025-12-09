@@ -880,6 +880,7 @@
       });
 
       initGame();
+
       function sendHeight() {
         const height = document.body.scrollHeight;
         parent.postMessage({ type: "resizeIframe", height: height }, "*");
