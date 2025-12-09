@@ -151,15 +151,17 @@
 
       /* --- GAME BOARD --- */
       .game-board {
-        flex-grow: 1;
+        /* Do not force the board to stretch to fill the viewport; let it size to content
+           This prevents large empty space when users zoom out or change viewport dimensions */
+        flex: 0 0 auto;
         display: flex;
         flex-direction: column;
         width: 95%;
         max-width: 600px;
         gap: 15px;
         padding-bottom: 20px;
-        overflow-y: auto; /* Allow inner scrolling if vertical space is tight */
-        -webkit-overflow-scrolling: touch;
+        /* Keep internal scrolling only as needed */
+        overflow-y: visible;
       }
 
       /* Law Card */
@@ -270,7 +272,7 @@
       /* --- ACTION BAR --- */
       .action-bar {
         text-align: center;
-        margin-top: auto; /* Push to bottom of container */
+        margin-top: 12px;
         padding: 10px 0;
       }
 
