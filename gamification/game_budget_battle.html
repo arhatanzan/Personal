@@ -409,9 +409,12 @@
           margin: 0.5rem 0;
         }
         .stats-bar { grid-template-columns: 1fr; }
+        /* Avoid large vertical centering on tall small-viewports */
         .game-container, .game-layout, .deals-wrapper {
           max-width: 100%;
           padding-bottom: 1rem;
+          justify-content: flex-start;
+          padding-top: 0.6rem;
         }
         .card-stack { height: 240px; margin-bottom: 8px; }
         .controls, .broadcast-slots, .deals-grid { gap: 8px; padding: 8px; justify-content: center; }
