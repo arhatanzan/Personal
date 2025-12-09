@@ -288,6 +288,7 @@
           /* Ensure desktop layout keeps a stable height for the viz area */
           height: 80vh !important;
           overflow: hidden;
+          align-items: stretch; /* force children to match container height */
         }
         .viz-wrapper {
           flex: 2;
@@ -297,7 +298,9 @@
         }
         .controls-container {
           flex: 1;
-          max-height: none;
+          height: 100% !important; /* match viz height */
+          max-height: 100% !important;
+          overflow-y: auto; /* allow controls to scroll without pushing the viz */
         }
       }
 
