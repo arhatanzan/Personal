@@ -727,7 +727,8 @@
         rollDailyNarratives();
         renderTargets();
         updateStats();
-        resize();
+         resize(); // Ensure canvas is sized after the page finishes loading and CSS layout is applied
+         window.addEventListener("load", resize);
         draw();
       }
 
@@ -739,7 +740,9 @@
         ctx.scale(dpr, dpr);
         draw();
       }
-      window.addEventListener("resize", resize);
+        window.addEventListener("resize", resize);
+        // Ensure canvas is sized after the page finishes loading and CSS layout is applied
+        window.addEventListener("load", resize);
 
       function draw() {
         const w = canvas.width / (window.devicePixelRatio || 1);
