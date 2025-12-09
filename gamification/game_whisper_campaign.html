@@ -134,26 +134,36 @@
       }
 
       .viz-legend {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 6px;
+        position: static;
+        background: transparent;
+        padding: 6px 0;
         border-radius: 4px;
-        font-size: 0.65rem;
+        font-size: 0.75rem;
         color: var(--text-light);
-        border: 1px solid var(--border-color);
-        pointer-events: none;
+        border: none;
+        pointer-events: auto;
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto 6px auto;
       }
       .legend-item {
         display: flex;
         align-items: center;
-        gap: 6px;
-        margin-top: 2px;
+        gap: 8px;
+        padding: 6px 8px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        color: var(--text-main);
       }
       .dot {
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
       }
 
@@ -443,30 +453,28 @@
       </div>
     </div>
 
+    <div class="viz-legend" aria-hidden="false">
+      <div class="legend-item">
+        <div class="dot" style="background: var(--danger)"></div>
+        Hostile
+      </div>
+      <div class="legend-item">
+        <div class="dot" style="background: var(--text-light)"></div>
+        Neutral
+      </div>
+      <div class="legend-item">
+        <div class="dot" style="background: var(--text-main)"></div>
+        Loyal
+      </div>
+      <div class="legend-item">
+        <div style="width: 18px; height: 3px; background: var(--accent); border-radius:2px"></div>
+        Active Spread
+      </div>
+    </div>
+    
     <main class="game-container">
       <div class="viz-wrapper" id="viz-wrapper">
         <canvas id="networkCanvas"></canvas>
-
-        <div class="viz-legend">
-          <div class="legend-item">
-            <div class="dot" style="background: var(--danger)"></div>
-            Hostile
-          </div>
-          <div class="legend-item">
-            <div class="dot" style="background: var(--text-light)"></div>
-            Neutral
-          </div>
-          <div class="legend-item">
-            <div class="dot" style="background: var(--text-main)"></div>
-            Loyal
-          </div>
-          <div class="legend-item">
-            <div
-              style="width: 15px; height: 2px; background: var(--accent)"
-            ></div>
-            Active Spread
-          </div>
-        </div>
       </div>
 
       <div class="controls-container">
