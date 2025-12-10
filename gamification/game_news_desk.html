@@ -821,5 +821,29 @@
         new ResizeObserver(sendHeight).observe(document.body);
       }
     </script>
+    <!-- Games carousel embed -->
+    <iframe id="games-carousel" src="carousel.html" style="width:100%;border:0;max-height:380px;height:320px;display:block;" scrolling="no" aria-label="Games carousel"></iframe>
+    <script>
+      window.addEventListener("message", function (e) {
+        try {
+          if (!e.data || e.data.type !== "resizeIframe") return;
+          var iframe = document.getElementById("games-carousel");
+          if (!iframe) return;
+          try { console.log('games-carousel message', e.data); } catch (err) {}
+          var requested = Number(e.data.height) || 0;
+          var MAX_H = 380;
+          var newH = Math.min(requested || 0, MAX_H);
+          if (newH <= 0) newH = 320;
+          var curr = parseInt(iframe.style.height, 10) || 0;
+          if (Math.abs(curr - newH) > 3) {
+            iframe.style.height = newH + "px";
+            iframe.style.maxHeight = MAX_H + "px";
+            iframe.style.display = 'block';
+          }
+        } catch (err) {
+          console.warn('Carousel iframe resize failed', err);
+        }
+      }, false);
+    </script>
   </body>
 </html>

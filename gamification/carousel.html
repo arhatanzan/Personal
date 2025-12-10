@@ -30,7 +30,7 @@
   .carousel-wrapper {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px 20px 20px; /* Adjusted padding */
+    padding: 0 12px 0 12px; /* reduced bottom padding to avoid extra space */
     position: relative;
   }
 
@@ -76,7 +76,7 @@
     scroll-behavior: smooth;
     /* FIX FOR CHOPPED BORDER: */
     /* We add padding on all sides so the hover transform has space */
-    padding: 20px 10px 30px 10px; 
+    padding: 12px 8px 6px 8px; 
     
     /* Hide Scrollbar */
     scrollbar-width: none; /* Firefox */
@@ -109,8 +109,8 @@
   }
 
   .c-card:hover {
-    /* Moves up, but now we have padding in the track to catch it */
-    transform: translateY(-6px); 
+    /* Avoid vertical translation to prevent the need for extra bottom spacing */
+    transform: none;
     box-shadow: 0 10px 20px rgba(10, 34, 66, 0.15);
   }
 
@@ -246,10 +246,10 @@
     const track = document.getElementById('track');
 
     function renderCarousel() {
-      // INFINITE EFFECT: 
-      // We repeat the PRODUCTS array 6 times to create a very long list.
-      // This creates the illusion of infinite scrolling without complex JS logic.
-      const loopFactor = 600; 
+      // INFINITE EFFECT:
+      // Repeat the PRODUCTS array a few times to create a longer horizontal track
+      // but avoid extremely large DOM sizes which can affect height calculations.
+      const loopFactor = 600;
       let infiniteList = [];
       for (let i = 0; i < loopFactor; i++) {
         infiniteList = infiniteList.concat(PRODUCTS);
@@ -288,16 +288,24 @@
       track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     });
 
-    // Iframe Resizer
+    // Iframe Resizer: measure visible wrapper, clamp and notify parent
     function sendHeight() {
-      const height = document.body.scrollHeight;
-      window.parent.postMessage({ type: "resizeIframe", height: height + 20 }, "*");
+      const wrapper = document.querySelector('.carousel-wrapper');
+      // Prefer the element's scrollHeight (includes children) and
+      // fall back to bounding rect or body height. Add a small buffer.
+      let rectH = wrapper ? Math.ceil(wrapper.getBoundingClientRect().height) : 0;
+      let scrollH = wrapper ? wrapper.scrollHeight : 0;
+      let height = Math.max(scrollH, rectH, document.body.scrollHeight || 0);
+      height = height + 12; // buffer for padding
+      const MAX_EMBED_H = 380; // allow enough space for visible carousel
+      if (height > MAX_EMBED_H) height = MAX_EMBED_H;
+      window.parent.postMessage({ type: 'resizeIframe', height: height }, '*');
     }
 
-    window.addEventListener("load", sendHeight);
-    window.addEventListener("resize", sendHeight);
-    if ("ResizeObserver" in window) {
-      new ResizeObserver(sendHeight).observe(document.body);
+    window.addEventListener('load', sendHeight);
+    window.addEventListener('resize', sendHeight);
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(sendHeight).observe(document.querySelector('.carousel-wrapper') || document.body);
     }
   })();
 </script>
