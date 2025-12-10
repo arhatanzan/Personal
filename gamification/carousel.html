@@ -210,6 +210,43 @@
 
     const track = document.getElementById('track');
 
+    function toKebab(path) {
+      // normalize to "/kebab-case" (no extension)
+      if (!path) return path;
+      let p = path.replace(/^\//, '');
+      // remove extension if present
+      p = p.replace(/\.html?$/i, '');
+      p = p.replace(/[_\s]+/g, '-').replace(/-+/g, '-').toLowerCase();
+      return '/' + p;
+    }
+
+    function toOriginal(path) {
+      // normalize to "/underscore_name.html"
+      if (!path) return path;
+      let p = path.replace(/^\//, '');
+      // remove extension if present
+      p = p.replace(/\.html?$/i, '');
+      p = p.replace(/[-\s]+/g, '_').replace(/_+/g, '_').toLowerCase();
+      return '/' + p + '.html';
+    }
+
+    function shouldUseKebab() {
+      const baseParam = urlParams.get('base');
+      if (baseParam) return baseParam.indexOf('kaifabbas.com') !== -1;
+      // fallback: use kebab if we're actually on kaifabbas domain
+      try { return location.hostname.indexOf('kaifabbas.com') !== -1; } catch(e) { return false; }
+    }
+
+    const useKebab = shouldUseKebab();
+
+    function buildHref(p) {
+      if (useKebab) {
+        return (HOST_URL.replace(/\/$/, '') || '') + toKebab(p.url);
+      }
+      // Default: prefer original filenames (underscore + .html) so it resolves on other hosts
+      return toOriginal(p.url);
+    }
+
     function renderCarousel() {
       // Keep loopFactor modest to avoid huge DOM sizes
       const loopFactor = 6;
@@ -218,8 +255,9 @@
         infiniteList = infiniteList.concat(PRODUCTS);
       }
 
+      const linkTarget = useKebab ? '_top' : '_self';
       track.innerHTML = infiniteList.map(p => `
-        <a href="${HOST_URL}${p.url}" class="c-card" target="_top">
+        <a href="${buildHref(p)}" class="c-card" target="${linkTarget}">
           <div class="c-thumb">
             ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">` : p.icon}
           </div>
