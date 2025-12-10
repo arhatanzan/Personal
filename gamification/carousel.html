@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Games Carousel</title>
+<style>
+  /* --- THEME VARIABLES --- */
+  :root {
+    --page-bg: #f8f6f2;
+    --card-bg: #ffffff;
+    --accent: #d4a017;
+    --navy: #0a2342;
+    --muted: #5a6673;
+    --border: rgba(0, 0, 0, 0.06);
+    --radius: 10px;
+    --gap: 20px;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Calibri, Arial, sans-serif;
+    background: transparent;
+    color: var(--navy);
+    box-sizing: border-box;
+  }
+
+  /* --- CAROUSEL CONTAINER --- */
+  .carousel-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 20px 20px; /* Adjusted padding */
+    position: relative;
+  }
+
+  .header-row {
+    display: flex;
+    /* Pushes buttons to the right since heading is gone */
+    justify-content: flex-end; 
+    align-items: center;
+    margin-bottom: 0px; /* Reduced margin */
+    padding-right: 4px;
+  }
+
+  .nav-btns {
+    display: flex;
+    gap: 10px;
+  }
+
+  .nav-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--navy);
+    color: var(--navy);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.2s ease;
+  }
+
+  .nav-btn:hover {
+    background: var(--navy);
+    color: #ffffff;
+  }
+
+  /* --- TRACK & SCROLLING --- */
+  .carousel-track {
+    display: flex;
+    gap: var(--gap);
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    /* FIX FOR CHOPPED BORDER: */
+    /* We add padding on all sides so the hover transform has space */
+    padding: 20px 10px 30px 10px; 
+    
+    /* Hide Scrollbar */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE/Edge */
+    scroll-snap-type: x mandatory;
+  }
+  
+  .carousel-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* --- CARD STYLING --- */
+  .c-card {
+    flex: 0 0 auto;
+    width: 280px;
+    background: var(--card-bg);
+    border: 4px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-snap-align: start;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    /* Ensure border renders inside nicely */
+    box-sizing: border-box; 
+  }
+
+  .c-card:hover {
+    /* Moves up, but now we have padding in the track to catch it */
+    transform: translateY(-6px); 
+    box-shadow: 0 10px 20px rgba(10, 34, 66, 0.15);
+  }
+
+  .c-thumb {
+    height: 100px;
+    background: #ececec;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+  }
+
+  .c-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .c-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .c-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--navy);
+  }
+
+  .c-cat {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .c-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+    margin: 4px 0 0 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .c-btn {
+    margin-top: 12px;
+    background: var(--navy);
+    color: #fff;
+    text-align: center;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .c-card { width: 85vw; }
+  }
+</style>
+</head>
+<body>
+
+<div class="carousel-wrapper">
+  <div class="header-row">
+    <div class="nav-btns">
+      <button id="prevBtn" class="nav-btn" aria-label="Previous">←</button>
+      <button id="nextBtn" class="nav-btn" aria-label="Next">→</button>
+    </div>
+  </div>
+
+  <div id="track" class="carousel-track">
+    </div>
+</div>
+
+<script>
+  (function() {
+    const PRODUCTS = [
+      {
+        id: "g1",
+        title: "The Civic Feed",
+        category: "Simulation",
+        summary: "Control a social media algorithm and balance truth vs. polarization.",
+        imageUrl: "https://openmoji.org/data/color/svg/1F4ED.svg",
+        url: "/game_civic_feed.html",
+        icon: "📱"
+      },
+      {
+        id: "g2",
+        title: "Coalition Builder",
+        category: "Strategy",
+        summary: "Negotiate with rival parties to assemble a governing majority.",
+        imageUrl: "https://openmoji.org/data/color/svg/1F91D.svg",
+        url: "/game_coalition_builder.html",
+        icon: "🤝"
+      },
+      {
+        id: "g3",
+        title: "The News Desk",
+        category: "Management",
+        summary: "Run the 9 PM news. Juggle scandals vs. policy under deadline.",
+        imageUrl: "https://openmoji.org/data/color/svg/1F4FA.svg",
+        url: "/game_news_desk.html",
+        icon: "📺"
+      },
+      {
+        id: "g4",
+        title: "Budget Battle",
+        category: "Puzzle",
+        summary: "Allocate a strained city budget under pressure from angry sectors.",
+        imageUrl: "https://openmoji.org/data/color/svg/1F4B0.svg",
+        url: "/game_budget_battle.html",
+        icon: "💰"
+      },
+      {
+        id: "g5",
+        title: "The Whisper Campaign",
+        category: "Simulation",
+        summary: "Seed rumors through a network to tilt an election.",
+        imageUrl: "https://openmoji.org/data/color/svg/1F4E3.svg",
+        url: "/game_whisper_campaign.html",
+        icon: "📢"
+      }
+    ];
+
+    const track = document.getElementById('track');
+
+    function renderCarousel() {
+      // INFINITE EFFECT: 
+      // We repeat the PRODUCTS array 6 times to create a very long list.
+      // This creates the illusion of infinite scrolling without complex JS logic.
+      const loopFactor = 600; 
+      let infiniteList = [];
+      for (let i = 0; i < loopFactor; i++) {
+        infiniteList = infiniteList.concat(PRODUCTS);
+      }
+
+      track.innerHTML = infiniteList.map(p => `
+        <a href="${p.url}" class="c-card" target="_top">
+          <div class="c-thumb">
+            ${p.imageUrl 
+              ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">` 
+              : p.icon}
+          </div>
+          <div class="c-info">
+            <span class="c-cat">${p.category}</span>
+            <h3 class="c-title">${p.title}</h3>
+            <p class="c-desc">${p.summary}</p>
+          </div>
+          <div class="c-btn">Play Now</div>
+        </a>
+      `).join('');
+    }
+
+    renderCarousel();
+
+    // Navigation Logic
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    prevBtn.addEventListener('click', () => {
+      const scrollAmount = track.querySelector('.c-card').offsetWidth + 20; 
+      track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    });
+
+    nextBtn.addEventListener('click', () => {
+      const scrollAmount = track.querySelector('.c-card').offsetWidth + 20; 
+      track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    });
+
+    // Iframe Resizer
+    function sendHeight() {
+      const height = document.body.scrollHeight;
+      window.parent.postMessage({ type: "resizeIframe", height: height + 20 }, "*");
+    }
+
+    window.addEventListener("load", sendHeight);
+    window.addEventListener("resize", sendHeight);
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(sendHeight).observe(document.body);
+    }
+  })();
+</script>
+
+</body>
+</html>
