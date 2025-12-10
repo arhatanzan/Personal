@@ -196,98 +196,32 @@
 <script>
   (function() {
     // --- START NEW CONFIGURATION ---
-    // 1. Get the 'base' parameter from the URL (passed from Hostinger)
     const urlParams = new URLSearchParams(window.location.search);
-    
-    // 2. Define the Host URL (Fallback to your main domain if missing)
-    // NOTE: Ensure your paths in PRODUCTS start with '/' so they append correctly.
-    const HOST_URL = urlParams.get('base') || "https://kaifabbas.com"; 
+    const HOST_URL = urlParams.get('base') || "https://kaifabbas.com";
     // --- END NEW CONFIGURATION ---
 
     const PRODUCTS = [
-      {
-        id: "g1",
-        title: "The Civic Feed",
-        category: "Simulation",
-        summary: "Control a social media algorithm and balance truth vs. polarization.",
-        imageUrl: "https://openmoji.org/data/color/svg/1F4ED.svg",
-        url: "/game_civic_feed.html",
-        icon: "📱"
-      },
-      {
-        id: "g2",
-        title: "Coalition Builder",
-        category: "Strategy",
-        summary: "Negotiate with rival parties to assemble a governing majority.",
-        imageUrl: "https://openmoji.org/data/color/svg/1F91D.svg",
-        url: "/game_coalition_builder.html",
-        icon: "🤝"
-      },
-      {
-        id: "g3",
-        title: "The News Desk",
-        category: "Management",
-        summary: "Run the 9 PM news. Juggle scandals vs. policy under deadline.",
-        imageUrl: "https://openmoji.org/data/color/svg/1F4FA.svg",
-        url: "/game_news_desk.html",
-        icon: "📺"
-      },
-      {
-        id: "g4",
-        title: "Budget Battle",
-        category: "Puzzle",
-        summary: "Allocate a strained city budget under pressure from angry sectors.",
-        imageUrl: "https://openmoji.org/data/color/svg/1F4B0.svg",
-        url: "/game_budget_battle.html",
-        icon: "💰"
-      },
-      {
-        id: "g5",
-        title: "The Whisper Campaign",
-        category: "Simulation",
-        summary: "Seed rumors through a network to tilt an election.",
-        imageUrl: "https://openmoji.org/data/color/svg/1F4E3.svg",
-        url: "/game_whisper_campaign.html",
-        icon: "📢"
-      }
+      { id: "g1", title: "The Civic Feed", category: "Simulation", summary: "Control a social media algorithm and balance truth vs. polarization.", imageUrl: "https://openmoji.org/data/color/svg/1F4ED.svg", url: "/game_civic_feed.html", icon: "📱" },
+      { id: "g2", title: "Coalition Builder", category: "Strategy", summary: "Negotiate with rival parties to assemble a governing majority.", imageUrl: "https://openmoji.org/data/color/svg/1F91D.svg", url: "/game_coalition_builder.html", icon: "🤝" },
+      { id: "g3", title: "The News Desk", category: "Management", summary: "Run the 9 PM news. Juggle scandals vs. policy under deadline.", imageUrl: "https://openmoji.org/data/color/svg/1F4FA.svg", url: "/game_news_desk.html", icon: "📺" },
+      { id: "g4", title: "Budget Battle", category: "Puzzle", summary: "Allocate a strained city budget under pressure from angry sectors.", imageUrl: "https://openmoji.org/data/color/svg/1F4B0.svg", url: "/game_budget_battle.html", icon: "💰" },
+      { id: "g5", title: "The Whisper Campaign", category: "Simulation", summary: "Seed rumors through a network to tilt an election.", imageUrl: "https://openmoji.org/data/color/svg/1F4E3.svg", url: "/game_whisper_campaign.html", icon: "📢" }
     ];
 
     const track = document.getElementById('track');
 
     function renderCarousel() {
-      // INFINITE EFFECT:
-      // Repeat the PRODUCTS array a few times to create a longer horizontal track
-      // but avoid extremely large DOM sizes which can affect height calculations.
-      const loopFactor = 600;
+      // Keep loopFactor modest to avoid huge DOM sizes
+      const loopFactor = 6;
       let infiniteList = [];
       for (let i = 0; i < loopFactor; i++) {
         infiniteList = infiniteList.concat(PRODUCTS);
       }
 
-      // --- UPDATE THE LINK GENERATION HERE ---
       track.innerHTML = infiniteList.map(p => `
         <a href="${HOST_URL}${p.url}" class="c-card" target="_top">
           <div class="c-thumb">
-            ${p.imageUrl 
-              ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">` 
-              : p.icon}
-          </div>
-          <div class="c-info">
-            <span class="c-cat">${p.category}</span>
-            <h3 class="c-title">${p.title}</h3>
-            <p class="c-desc">${p.summary}</p>
-          </div>
-          <div class="c-btn">Play Now</div>
-        </a>
-      `).join('');
-    }
-
-      track.innerHTML = infiniteList.map(p => `
-        <a href="${p.url}" class="c-card" target="_top">
-          <div class="c-thumb">
-            ${p.imageUrl 
-              ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">` 
-              : p.icon}
+            ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">` : p.icon}
           </div>
           <div class="c-info">
             <span class="c-cat">${p.category}</span>
@@ -306,25 +240,29 @@
     const nextBtn = document.getElementById('nextBtn');
 
     prevBtn.addEventListener('click', () => {
-      const scrollAmount = track.querySelector('.c-card').offsetWidth + 20; 
+      const card = track.querySelector('.c-card');
+      if (!card) return;
+      const gap = 20;
+      const scrollAmount = card.offsetWidth + gap;
       track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     });
 
     nextBtn.addEventListener('click', () => {
-      const scrollAmount = track.querySelector('.c-card').offsetWidth + 20; 
+      const card = track.querySelector('.c-card');
+      if (!card) return;
+      const gap = 20;
+      const scrollAmount = card.offsetWidth + gap;
       track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     });
 
     // Iframe Resizer: measure visible wrapper, clamp and notify parent
     function sendHeight() {
       const wrapper = document.querySelector('.carousel-wrapper');
-      // Prefer the element's scrollHeight (includes children) and
-      // fall back to bounding rect or body height. Add a small buffer.
       let rectH = wrapper ? Math.ceil(wrapper.getBoundingClientRect().height) : 0;
       let scrollH = wrapper ? wrapper.scrollHeight : 0;
       let height = Math.max(scrollH, rectH, document.body.scrollHeight || 0);
       height = height + 12; // buffer for padding
-      const MAX_EMBED_H = 380; // allow enough space for visible carousel
+      const MAX_EMBED_H = 380;
       if (height > MAX_EMBED_H) height = MAX_EMBED_H;
       window.parent.postMessage({ type: 'resizeIframe', height: height }, '*');
     }
