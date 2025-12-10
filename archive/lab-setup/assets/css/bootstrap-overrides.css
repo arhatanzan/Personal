@@ -1,0 +1,80 @@
+/* bootstrap-overrides.css
+   Centralized theme tokens and small Bootstrap overrides for Democracy Lab.
+
+   Purpose:
+   - Map a few Bootstrap CSS variables to site colors.
+   - Provide tiny, scoped overrides so pages keep the current visual identity
+     while we migrate progressively to Bootstrap components.
+   - Consolidate box-sizing and a few aliases (e.g., .select -> .form-select)
+
+   Load order recommendation (already applied):
+   1) Bootstrap CSS (cdn)
+   2) bootstrap-overrides.css  <-- this file
+   3) assets/css/common.css (site CSS)
+
+   When you later move all :root tokens from common.css into this file,
+   remove duplicates from common.css.
+*/
+
+:root{
+    /* Core tokens retained (others removed as unused). See `unused-css-vars.txt` in repo root for the full removed list. */
+    --max-width-description: 600px;
+
+    /* Primary palette */
+    --page-bg: #f3efe9;
+    --card-bg: #ffffff;
+    --text-main: #0b2b44;
+    --text-light: #6b7680;
+    --accent: #d8a61a;
+    --danger: #d64545;
+    --success: #27ab83;
+
+    /* Brand / layout */
+    --hero-bg: #0a2342;
+    --callout-bg: #7b2f2f;
+
+    /* Fonts */
+    --font-primary: 'Quicksand', sans-serif;
+    --font-secondary: 'Calibri', sans-serif;
+
+    /* Bootstrap mappings */
+    --bs-primary: var(--accent);
+    --bs-body-bg: var(--page-bg);
+    --bs-body-color: var(--text-main);
+    --bs-font-sans-serif: 'Quicksand', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --bs-border-radius: 0.5rem;
+
+    /* Legacy aliases kept for games that still reference them */
+    --bg-color: var(--page-bg);
+    --border-color: rgba(10,35,66,0.15);
+    --font-main: var(--font-secondary);
+}
+
+/* Ensure consistent box-sizing */
+*{box-sizing:border-box}
+
+/* Small component mappings to preserve visual look while migrating
+   - Alias `.select` appearance to Bootstrap's `.form-select` look
+   - Provide a base .btn-primary mapping to site accent
+*/
+.form-select, .select {
+  background: var(--card-bg);
+  color: var(--text-main);
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: var(--text-main);
+  border: none;
+}
+
+/* Legacy Zyro header was previously hidden here during migration.
+  Header functionality has been replaced with a Bootstrap navbar in
+  the HTML, so the legacy markup should be removed from templates
+  instead of being forcibly hidden here. Keep this file focused on
+  theme tokens and small component mappings. */
+
+/* Keep this file small. Move more tokens from common.css here as next step. */

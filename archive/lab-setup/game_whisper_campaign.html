@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>The Whisper Campaign: Hostile Takeover</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap-overrides.css">
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/game_whisper_campaign.css">
+    <script src="assets/js/common.js" defer></script>
+  </head>
+  <body class="game-whisper-campaign">
+    <header>
+      <div class="header-content">
+        <h1>The Whisper Campaign</h1>
+        <div class="subtitle">Scenario: Total Opposition</div>
+      </div>
+    </header>
+
+    <div class="container py-4">
+    <div class="stats-bar">
+      <div class="stat-box">
+        <span class="stat-label">Total Loyalty</span>
+        <div class="stat-val" id="val-opinion">15%</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Influence</span>
+        <div class="stat-val accent" id="val-influence">180</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Days Left</span>
+        <div class="stat-val" id="val-days">14</div>
+      </div>
+    </div>
+
+    <div class="viz-legend" aria-hidden="false">
+      <div class="legend-item">
+        <div class="dot" style="background: var(--danger)"></div>
+        Hostile
+      </div>
+      <div class="legend-item">
+        <div class="dot" style="background: var(--text-light)"></div>
+        Neutral
+      </div>
+      <div class="legend-item">
+        <div class="dot" style="background: var(--text-main)"></div>
+        Loyal
+      </div>
+      <div class="legend-item">
+        <div style="width: 18px; height: 3px; background: var(--accent); border-radius:2px"></div>
+        Active Spread
+      </div>
+    </div>
+    
+    <main class="game-container">
+      <div class="viz-wrapper" id="viz-wrapper">
+        <canvas id="networkCanvas"></canvas>
+      </div>
+
+      <div class="controls-container">
+        <div>
+          <div class="section-header">
+            <span>1. Today's Headlines</span>
+            <span style="font-size: 0.6rem; opacity: 0.7">Cycles Daily</span>
+          </div>
+          <div class="narrative-list" id="narrative-list"></div>
+        </div>
+
+        <div>
+          <div class="section-header">2. Injection Point</div>
+          <select class="target-select" id="target-select"></select>
+        </div>
+
+        <button class="btn btn-success w-100" id="btn-plant" disabled>
+          Launch Campaign
+        </button>
+      </div>
+    </main>
+
+    </div>
+
+    <div class="copyright">© 2025 Kaif Abbas</div>
+
+    <div class="dp-modal active" id="start-modal">
+      <div class="dp-modal-content">
+        <h2>Situation Critical</h2>
+        <p>
+          You are the opposition strategist. The incumbent has
+          <strong>total control</strong>. Every district starts hostile (Red).
+          Your goal: Hijack the election.
+        </p>
+
+        <div class="tutorial-step">
+          <strong>1. Everyone Hates You</strong>
+          Starting Support is ~15%. "Truths" will fail. You must use cheap
+          "Rumors" or "Scandals" to break the initial wall.
+        </div>
+        <div class="tutorial-step">
+          <strong>2. Establish a Beachhead</strong>
+          Target low-resistance groups first (Students or Slums). Do not attack
+          the Country Club yet.
+        </div>
+        <div class="tutorial-step">
+          <strong>3. The Dictator Strategy</strong>
+          Once you flip a node, their neighbors will soften due to "Peer
+          Pressure." Convert the poor to pressure the rich.
+        </div>
+
+        <button class="btn btn-primary w-100" onclick="startGame()">
+          Start Insurgency
+        </button>
+      </div>
+    </div>
+
+    <div class="dp-modal" id="end-modal">
+      <div class="dp-modal-content">
+        <h2 id="end-title">Campaign Over</h2>
+        <p id="end-desc">...</p>
+        <button class="btn btn-secondary w-100" onclick="location.reload()">
+          New Election
+        </button>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="assets/js/game_whisper_campaign.js" defer></script>
+  </body>
+</html>

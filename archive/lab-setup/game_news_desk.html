@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+      <title>The News Desk</title>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="assets/css/bootstrap-overrides.css">
+      <link rel="stylesheet" href="assets/css/common.css">
+      <link rel="stylesheet" href="assets/css/game_news_desk.css">
+      <script src="assets/js/common.js" defer></script>
+  </head>
+  <body class="game-news-desk">
+    <header>
+      <h1>Assignment Desk</h1>
+      <div class="live-badge">● LIVE</div>
+    </header>
+
+    <div class="container py-4">
+    <div class="dashboard">
+      <div class="stat-box">
+        <span class="stat-label">TRP (Ratings)</span>
+        <div class="stat-bar-container">
+          <div class="stat-bar" id="bar-ratings" style="width: 50%"></div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <span class="timer-box" id="timer">15</span>
+        <span class="stat-label">Deadline</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Civic Info</span>
+        <div class="stat-bar-container">
+          <div class="stat-bar" id="bar-info" style="width: 50%"></div>
+        </div>
+      </div>
+    </div>
+
+    </div>
+
+    <div class="game-layout">
+      <div class="news-feed" id="news-feed"></div>
+
+      <div class="broadcast-slots" id="slots-container">
+        <div class="slot">1</div>
+        <div class="slot">2</div>
+        <div class="slot">3</div>
+        <div class="slot">4</div>
+        <div class="slot">5</div>
+      </div>
+    </div>
+
+    <div class="copyright">© 2025 Kaif Abbas</div>
+
+    <div class="dp-modal active" id="start-modal">
+      <div class="dp-modal-content">
+        <h2 style="color: var(--text-main); margin-top: 0">BREAKING NEWS</h2>
+        <p style="color: var(--text-light); font-size: 0.9rem">
+          You are the Editor-in-Chief. You have <strong>15 seconds</strong> to
+          pick 5 stories for the 9 PM broadcast.
+        </p>
+
+        <div class="tutorial-step">
+          📈 <strong>TRP (Profit):</strong> Keep viewers hooked (Scandals,
+          Cricket). If this hits 0, you're fired.
+        </div>
+        <div class="tutorial-step">
+          🧠 <strong>Info (Duty):</strong> Educate the public (Policy, GST). If
+          this hits 0, society fails.
+        </div>
+
+        <button class="btn btn-primary w-100" onclick="startGame()">Start Broadcast</button>
+      </div>
+    </div>
+
+    <div class="dp-modal" id="report-modal">
+      <div class="dp-modal-content">
+        <h2 id="report-title">Hour Ended</h2>
+        <p id="report-desc">...</p>
+        <div style="display:flex;justify-content:space-between;margin:10px 0;font-weight:bold;font-size:0.9rem;">
+          <span id="report-rating">TRP: +0</span>
+          <span id="report-info">Info: -0</span>
+        </div>
+        <button class="btn btn-secondary w-100" id="btn-next-hour" onclick="nextHour()">
+          Next Hour
+        </button>
+      </div>
+    </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="assets/js/game_news_desk.js" defer></script>
+  </body>
+</html>
