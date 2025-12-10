@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>More Games Carousel</title>
 <style>
-  /* --- THEME VARIABLES (Matched to your site) --- */
+  /* --- Shared Theme Variables (Matches your Library) --- */
   :root {
     --page-bg: #f8f6f2;
     --card-bg: #ffffff;
@@ -14,46 +8,41 @@
     --muted: #5a6673;
     --border: rgba(0, 0, 0, 0.06);
     --radius: 10px;
-    --gap: 20px;
+    --thumb-grad-1: #ececec;
   }
 
-  body {
-    margin: 0;
-    padding: 0;
+  /* --- Carousel Specific Styles --- */
+  .mg-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 20px;
     font-family: Calibri, Arial, sans-serif;
-    background: transparent; /* Transparent so it blends into parent footer */
-    color: var(--navy);
     box-sizing: border-box;
   }
 
-  /* --- CAROUSEL CONTAINER --- */
-  .carousel-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    position: relative;
-  }
-
-  .header-row {
+  .mg-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
   }
 
-  .heading {
+  .mg-title {
     font-size: 24px;
     font-weight: 700;
-    margin: 0;
     color: var(--navy);
+    margin: 0;
   }
 
-  .nav-btns {
+  .mg-controls {
     display: flex;
     gap: 10px;
   }
 
-  .nav-btn {
+  .mg-btn {
     background: var(--white);
     border: 1px solid var(--navy);
     color: var(--navy);
@@ -64,248 +53,277 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
+    font-size: 18px;
     transition: all 0.2s ease;
   }
 
-  .nav-btn:hover {
+  .mg-btn:hover {
     background: var(--navy);
     color: #fff;
   }
 
-  /* --- TRACK & SCROLLING --- */
-  .carousel-track {
+  /* Scroll Track */
+  .mg-track {
     display: flex;
-    gap: var(--gap);
+    gap: 20px;
     overflow-x: auto;
-    scroll-behavior: smooth;
-    padding-bottom: 10px; /* Space for shadow */
-    /* Hide Scrollbar */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* IE/Edge */
     scroll-snap-type: x mandatory;
+    padding-bottom: 20px; /* Space for shadow */
+    padding-top: 10px;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
   }
-  
-  .carousel-track::-webkit-scrollbar {
-    display: none;
+  .mg-track::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
 
-  /* --- CARD STYLING (Simplified for Carousel) --- */
-  .c-card {
-    flex: 0 0 auto;
-    width: 280px; /* Fixed width for consistency */
+  /* --- Card Styles (Adapted from Library) --- */
+  .mg-card {
+    flex: 0 0 280px; /* Fixed width for carousel */
+    height: 380px;   /* Fixed height for uniformity */
+    scroll-snap-align: start;
     background: var(--card-bg);
-    border: 4px solid var(--accent);
     border-radius: var(--radius);
+    border: 4px solid var(--accent);
+    perspective: 1000px;
+    position: relative;
+  }
+
+  .mg-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+
+  .mg-card.is-flipped .mg-card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .mg-front, .mg-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     padding: 16px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    scroll-snap-align: start;
-    transition: transform 0.2s;
-    text-decoration: none; /* Card is a link */
-    color: inherit;
+    gap: 10px;
   }
 
-  .c-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(10, 34, 66, 0.1);
+  .mg-back {
+    background: var(--card-bg);
+    transform: rotateY(180deg);
+    border-radius: calc(var(--radius) - 4px);
+    overflow-y: auto;
   }
 
-  .c-thumb {
+  /* Thumbnails */
+  .mg-thumb {
     height: 100px;
-    background: #ececec;
+    background: linear-gradient(180deg, var(--thumb-grad-1), #ffffff);
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 40px;
   }
-
-  .c-thumb img {
+  .mg-thumb img {
     width: 100%;
     height: 100%;
     object-fit: contain;
   }
 
-  .c-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .c-title {
+  /* Typography */
+  .mg-game-title {
     font-size: 18px;
     font-weight: 700;
-    margin: 0;
     color: var(--navy);
+    margin: 0;
+  }
+  .mg-game-title a { text-decoration: none; color: inherit; }
+
+  .mg-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--navy);
+    color: #fff;
+    align-self: flex-start;
   }
 
-  .c-cat {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-    font-weight: 600;
-  }
-
-  .c-desc {
+  .mg-desc {
     font-size: 13px;
     color: var(--muted);
     line-height: 1.4;
-    margin: 4px 0 0 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    margin: 0;
+    flex-grow: 1;
   }
 
-  .c-btn {
-    margin-top: 12px;
-    background: var(--navy);
-    color: #fff;
-    text-align: center;
-    padding: 8px;
+  /* Buttons inside card */
+  .mg-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+  }
+
+  .mg-play-btn {
+    background: var(--accent);
+    color: var(--navy);
+    text-decoration: none;
+    padding: 8px 16px;
     border-radius: 6px;
+    font-weight: 700;
     font-size: 14px;
-    font-weight: 600;
+    flex: 1;
+    text-align: center;
   }
 
-  /* Responsive Adjustments */
+  .mg-details-btn, .mg-back-btn {
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--navy);
+  }
+
   @media (max-width: 600px) {
-    .c-card { width: 85vw; } /* Almost full width on mobile */
-    .heading { font-size: 20px; }
+    .mg-card { flex: 0 0 85vw; } /* Wider cards on mobile */
   }
 </style>
-</head>
-<body>
 
-<div class="carousel-wrapper">
-  <div class="header-row">
-    <h2 class="heading">Play More</h2>
-    <div class="nav-btns">
-      <button id="prevBtn" class="nav-btn" aria-label="Previous">←</button>
-      <button id="nextBtn" class="nav-btn" aria-label="Next">→</button>
+<div class="mg-wrapper">
+  <div class="mg-header">
+    <h3 class="mg-title">Explore More Games</h3>
+    <div class="mg-controls">
+      <button class="mg-btn" id="mgPrev" aria-label="Previous">←</button>
+      <button class="mg-btn" id="mgNext" aria-label="Next">→</button>
     </div>
   </div>
-
-  <div id="track" class="carousel-track">
+  
+  <div class="mg-track" id="mgTrack">
     </div>
 </div>
 
 <script>
-  (function() {
-    // --- CONFIGURATION ---
-    // Change this ID to match the page this carousel is embedded on
-    // e.g. if this is on the "Budget Battle" page, set this to 'g4'
-    const CURRENT_GAME_ID = "g1"; 
-
-    const PRODUCTS = [
+(function() {
+  /* --- 1. DATA SOURCE (Same as your Library) --- */
+  const GAMES = [
       {
         id: "g1",
         title: "The Civic Feed",
-        category: "Simulation",
-        summary: "Control a social media algorithm and balance truth vs. polarization.",
-        imageUrl: "https://openmoji.org/data/color/svg/1F4ED.svg",
+        summary: "Control a social media algorithm and balance truth, attention, and polarization.",
+        description: "<strong>Goal:</strong> Maintain Public Info while reducing Polarization.<br><br>You control the algorithm. Decide what goes viral.",
         url: "/game_civic_feed.html",
-        icon: "📱"
+        img: "https://openmoji.org/data/color/svg/1F4ED.svg",
+        cat: "Simulation"
       },
       {
         id: "g2",
         title: "Coalition Builder",
-        category: "Strategy",
         summary: "Negotiate with rival parties to assemble a governing majority.",
-        imageUrl: "https://openmoji.org/data/color/svg/1F91D.svg",
+        description: "<strong>Goal:</strong> Secure 251+ seats.<br><br>Ideological purity dies in coalition math. Make the trade-offs.",
         url: "/game_coalition_builder.html",
-        icon: "🤝"
+        img: "https://openmoji.org/data/color/svg/1F91D.svg",
+        cat: "Strategy"
       },
       {
         id: "g3",
         title: "The News Desk",
-        category: "Management",
-        summary: "Run the 9 PM news. Juggle scandals vs. policy under deadline.",
-        imageUrl: "https://openmoji.org/data/color/svg/1F4FA.svg",
+        summary: "Run the 9 PM news. Juggle scandals vs. policy under time pressure.",
+        description: "<strong>Goal:</strong> Keep Ratings and Civic Duty high.<br><br>The attention economy pushes sensationalism. Can you resist?",
         url: "/game_news_desk.html",
-        icon: "📺"
+        img: "https://openmoji.org/data/color/svg/1F4FA.svg",
+        cat: "Management"
       },
       {
         id: "g4",
         title: "Budget Battle",
-        category: "Puzzle",
-        summary: "Allocate a strained city budget under pressure from angry sectors.",
-        imageUrl: "https://openmoji.org/data/color/svg/1F4B0.svg",
+        summary: "Allocate a strained city budget between angry sectors.",
+        description: "<strong>Goal:</strong> Get re-elected without bankrupting the city.<br><br>Every 'Yes' is a 'No' somewhere else.",
         url: "/game_budget_battle.html",
-        icon: "💰"
+        img: "https://openmoji.org/data/color/svg/1F4B0.svg",
+        cat: "Puzzle"
       },
       {
         id: "g5",
         title: "The Whisper Campaign",
-        category: "Simulation",
         summary: "Seed rumors through a network to tilt an election.",
-        imageUrl: "https://openmoji.org/data/color/svg/1F4E3.svg",
+        description: "<strong>Goal:</strong> Flip district support using disinformation.<br><br>See how info-bubbles insulate voters from reality.",
         url: "/game_whisper_campaign.html",
-        icon: "📢"
+        img: "https://openmoji.org/data/color/svg/1F4E3.svg",
+        cat: "Simulation"
       }
-    ];
+  ];
 
-    const track = document.getElementById('track');
+  /* --- 2. RENDER LOGIC --- */
+  const track = document.getElementById('mgTrack');
+  const currentPath = window.location.pathname; // Detect current page
 
-    // 1. Render Cards
-    function renderCarousel() {
-      // Filter out the current game so it doesn't show in suggestions
-      const list = PRODUCTS.filter(p => p.id !== CURRENT_GAME_ID);
-      
-      track.innerHTML = list.map(p => `
-        <a href="${p.url}" class="c-card" target="_top">
-          <div class="c-thumb">
-            ${p.imageUrl 
-              ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">` 
-              : p.icon}
+  // Filter out the game currently being played
+  const otherGames = GAMES.filter(g => !currentPath.includes(g.url.replace(/^\//, '')));
+
+  otherGames.forEach(game => {
+    const card = document.createElement('div');
+    card.className = 'mg-card';
+    card.innerHTML = `
+      <div class="mg-card-inner">
+        <div class="mg-front">
+          <div class="mg-thumb">
+            <img src="${game.img}" alt="${game.title}" loading="lazy">
           </div>
-          <div class="c-info">
-            <span class="c-cat">${p.category}</span>
-            <h3 class="c-title">${p.title}</h3>
-            <p class="c-desc">${p.summary}</p>
+          <h4 class="mg-game-title"><a href="${game.url}">${game.title}</a></h4>
+          <span class="mg-tag">${game.cat}</span>
+          <p class="mg-desc">${game.summary}</p>
+          <div class="mg-actions">
+            <a href="${game.url}" class="mg-play-btn">Play Now</a>
+            <button class="mg-details-btn" aria-label="Details">Details</button>
           </div>
-          <div class="c-btn">Play Now</div>
-        </a>
-      `).join('');
-    }
+        </div>
+        
+        <div class="mg-back">
+          <h4 class="mg-game-title">${game.title}</h4>
+          <p class="mg-desc">${game.description}</p>
+          <div class="mg-actions">
+            <a href="${game.url}" class="mg-play-btn">Play Now</a>
+            <button class="mg-back-btn" aria-label="Back">Back</button>
+          </div>
+        </div>
+      </div>
+    `;
+    track.appendChild(card);
+  });
 
-    renderCarousel();
+  /* --- 3. INTERACTION --- */
+  
+  // Navigation Buttons
+  document.getElementById('mgNext').addEventListener('click', () => {
+    track.scrollBy({ left: 300, behavior: 'smooth' });
+  });
+  document.getElementById('mgPrev').addEventListener('click', () => {
+    track.scrollBy({ left: -300, behavior: 'smooth' });
+  });
 
-    // 2. Navigation Logic
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
+  // Flip Logic (Event Delegation)
+  track.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
 
-    prevBtn.addEventListener('click', () => {
-      // Scroll left by width of one card + gap
-      const scrollAmount = track.querySelector('.c-card').offsetWidth + 20; 
-      track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-    });
-
-    nextBtn.addEventListener('click', () => {
-      const scrollAmount = track.querySelector('.c-card').offsetWidth + 20; 
-      track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    });
-
-    // 3. Iframe Resizer (Sends height to parent)
-    function sendHeight() {
-      const height = document.body.scrollHeight;
-      // Post message to parent window
-      window.parent.postMessage({ type: "resizeIframe", height: height + 20 }, "*");
-    }
-
-    window.addEventListener("load", sendHeight);
-    window.addEventListener("resize", sendHeight);
+    const card = btn.closest('.mg-card');
     
-    // Observer for dynamic content loading
-    if ("ResizeObserver" in window) {
-      new ResizeObserver(sendHeight).observe(document.body);
+    if (btn.classList.contains('mg-details-btn')) {
+      card.classList.add('is-flipped');
+    } else if (btn.classList.contains('mg-back-btn')) {
+      card.classList.remove('is-flipped');
     }
-  })();
-</script>
+  });
 
-</body>
-</html>
+})();
+</script>
