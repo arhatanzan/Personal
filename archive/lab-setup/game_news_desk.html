@@ -7,16 +7,19 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
       <title>The News Desk</title>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="assets/css/bootstrap-overrides.css">
       <link rel="stylesheet" href="assets/css/common.css">
       <link rel="stylesheet" href="assets/css/game_news_desk.css">
       <script src="assets/js/common.js" defer></script>
   </head>
-  <body>
+  <body class="game-news-desk">
     <header>
       <h1>Assignment Desk</h1>
       <div class="live-badge">● LIVE</div>
     </header>
 
+    <div class="container py-4">
     <div class="dashboard">
       <div class="stat-box">
         <span class="stat-label">TRP (Ratings)</span>
@@ -36,6 +39,8 @@
       </div>
     </div>
 
+    </div>
+
     <div class="game-layout">
       <div class="news-feed" id="news-feed"></div>
 
@@ -50,8 +55,8 @@
 
     <div class="copyright">© 2025 Kaif Abbas</div>
 
-    <div class="modal active" id="start-modal">
-      <div class="modal-content">
+    <div class="dp-modal active" id="start-modal">
+      <div class="dp-modal-content">
         <h2 style="color: var(--text-main); margin-top: 0">BREAKING NEWS</h2>
         <p style="color: var(--text-light); font-size: 0.9rem">
           You are the Editor-in-Chief. You have <strong>15 seconds</strong> to
@@ -67,32 +72,27 @@
           this hits 0, society fails.
         </div>
 
-        <button class="btn-modal" onclick="startGame()">Start Broadcast</button>
+        <button class="btn btn-primary w-100" onclick="startGame()">Start Broadcast</button>
       </div>
     </div>
 
-    <div class="modal" id="report-modal">
-      <div class="modal-content">
+    <div class="dp-modal" id="report-modal">
+      <div class="dp-modal-content">
         <h2 id="report-title">Hour Ended</h2>
         <p id="report-desc">...</p>
-        <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-            font-weight: bold;
-            font-size: 0.9rem;
-          "
-        >
+        <div style="display:flex;justify-content:space-between;margin:10px 0;font-weight:bold;font-size:0.9rem;">
           <span id="report-rating">TRP: +0</span>
           <span id="report-info">Info: -0</span>
         </div>
-        <button class="btn-modal" id="btn-next-hour" onclick="nextHour()">
+        <button class="btn btn-secondary w-100" id="btn-next-hour" onclick="nextHour()">
           Next Hour
         </button>
       </div>
     </div>
 
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
     <script src="assets/js/game_news_desk.js" defer></script>
   </body>
 </html>

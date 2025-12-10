@@ -1,0 +1,46 @@
+<!-- Reusable navbar partial using Bootstrap markup (clean, maintainable) -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">
+      <img src="assets/image/logo.png" alt="Logo" class="d-inline-block align-text-top">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+        <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="workDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Work</a>
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="workDropdown">
+            <li><a class="dropdown-item" href="/leadership-and-service">Leadership &amp; Service</a></li>
+            <li><a class="dropdown-item" href="/judging-and-global-engagement">Judging &amp; Global Engagement</a></li>
+            <li><a class="dropdown-item" href="/research-and-publications">Research &amp; Publications</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="creativeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Creative</a>
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="creativeDropdown">
+            <li><a class="dropdown-item" href="/poetry-and-art">Poetry &amp; Art</a></li>
+            <li><a class="dropdown-item" href="https://kaifabbas.medium.com/" target="_blank">Blog</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Resources</a>
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="resourcesDropdown">
+            <li><a class="dropdown-item" href="/products">Products</a></li>
+            <li><a class="dropdown-item" href="/democracy-lab">Democracy Lab</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

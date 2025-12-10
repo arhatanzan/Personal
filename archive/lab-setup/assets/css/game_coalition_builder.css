@@ -1,14 +1,4 @@
-:root {
-  --bg-color: #f8f6f2;
-  --card-bg: #ffffff;
-  --text-main: #0a2342;
-  --text-light: #5a6673;
-  --accent: #d4a017;
-  --danger: #7a2e2e;
-  --success: #27ab83;
-  --border-color: rgba(10, 35, 66, 0.1);
-  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
+/* Theme tokens consolidated into `assets/css/bootstrap-overrides.css` */
 
 * { box-sizing: border-box; }
 
@@ -64,23 +54,26 @@ h1 { margin: 0; font-size: 1.4rem; color: var(--text-main); }
 .negotiate-btn:active { transform: scale(0.98); }
 
 .action-bar { text-align: center; margin-top: 12px; padding: 10px 0; }
-.btn-vote { background: var(--accent); color: var(--text-main); border: 2px solid var(--text-main); padding: 12px 30px; font-size: 1rem; font-weight: 800; border-radius:50px; cursor:pointer; box-shadow: 0 4px 0 var(--text-main); width:100%; max-width:300px; transition: transform 0.1s, box-shadow 0.1s; }
-.btn-vote:active { transform: translateY(4px); box-shadow: 0 0 0 var(--text-main); }
-.btn-vote:disabled { opacity: 0.6; pointer-events: none; }
+.btn-vote:not(.btn) { background: var(--accent); color: var(--text-main); border: 2px solid var(--text-main); padding: 12px 30px; font-size: 1rem; font-weight: 800; border-radius:50px; cursor:pointer; box-shadow: 0 4px 0 var(--text-main); width:100%; max-width:300px; transition: transform 0.1s, box-shadow 0.1s; }
+.btn-vote:not(.btn):active { transform: translateY(4px); box-shadow: 0 0 0 var(--text-main); }
+.btn-vote:not(.btn):disabled { opacity: 0.6; pointer-events: none; }
 .copyright { margin-top: 10px; font-size: 0.7rem; color: var(--text-light); text-align: center; opacity: 0.6; padding-bottom: 10px; }
 
-.modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(10,35,66,0.98); display:none; flex-direction: column; justify-content:center; align-items:center; z-index:100; color: white; text-align:center; padding:20px; }
-.modal.active { display:flex; }
-.modal h2 { font-size:2rem; color: var(--accent); margin-bottom:1rem; }
-.modal p { max-width:500px; line-height:1.6; margin-bottom:2rem; font-size:1.1rem; color:#e2e8f0; }
-.btn-restart { background: var(--accent); color: var(--text-main); padding:1rem 2rem; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:1rem; }
+ .game-coalition-builder .btn-vote:not(.btn) { background: var(--accent); color: var(--text-main); border: 2px solid var(--text-main); padding: 12px 30px; font-size: 1rem; font-weight: 800; border-radius:50px; cursor:pointer; box-shadow: 0 4px 0 var(--text-main); width:100%; max-width:300px; transition: transform 0.1s, box-shadow 0.1s; }
+  .game-coalition-builder .btn-vote:not(.btn):active { transform: translateY(4px); box-shadow: 0 0 0 var(--text-main); }
+  .game-coalition-builder .btn-vote:not(.btn):disabled { opacity: 0.6; pointer-events: none; }
+.dp-modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(10,35,66,0.98); display:none; flex-direction: column; justify-content:center; align-items:center; z-index:100; color: white; text-align:center; padding:20px; }
+.dp-modal.active { display:flex; }
+.dp-modal h2 { font-size:2rem; color: var(--accent); margin-bottom:1rem; }
+.dp-modal p { max-width:500px; line-height:1.6; margin-bottom:2rem; font-size:1.1rem; color:#e2e8f0; }
+.btn-restart:not(.btn) { background: var(--accent); color: var(--text-main); padding:1rem 2rem; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:1rem; }
 
 @media (min-height:700px) { .game-board { justify-content: center; } }
 @media (max-width:600px) {
   .stats-bar, .dashboard { grid-template-columns: 1fr; gap:8px; width:95%; margin:0.5rem 0; }
   .game-container, .game-layout, .game-board { max-width:100%; padding-bottom:1rem; justify-content:flex-start !important; padding-top:0.25rem; flex:0 0 auto; min-height:0; }
-  .card-stack { height:auto !important; margin-bottom:8px; }
-  .card { position:relative !important; height:auto !important; top:auto !important; left:auto !important; padding:1.25rem; }
+  .game-coalition-builder .card-stack { height:auto !important; margin-bottom:8px; }
+  .game-coalition-builder .card { position:relative !important; height:auto !important; top:auto !important; left:auto !important; padding:1.25rem; }
   body { min-height:auto !important; height:auto !important; }
   .controls, .broadcast-slots { gap:8px; padding:8px; justify-content:center; }
   header { padding:0.6rem; }

@@ -366,7 +366,7 @@
   function renderPrimaryButton(prod) {
     const label = prod.buttonLabel || "Play Now";
     const href = prod.productUrl || "#";
-    return `<a class="download-btn" href="${escapeHtml(href)}" target="" rel="noopener" aria-label="${escapeHtml(label)}">${escapeHtml(label)}</a>`;
+    return `<a class="btn btn-primary" href="${escapeHtml(href)}" target="" rel="noopener" aria-label="${escapeHtml(label)}">${escapeHtml(label)}</a>`;
   }
 
   function renderProductsPage(list, page, pageSize) {
@@ -395,10 +395,13 @@
         const frag = document.createDocumentFragment();
         for (let i = 0; i < placeholders; i++) {
           const ph = document.createElement('div');
-          ph.className = 'card placeholder';
+          ph.className = 'card placeholder h-100';
           // minimal inner structure to match sizing
           ph.innerHTML = `<div class="card-inner"><div class="card-front"></div></div>`;
-          frag.appendChild(ph);
+          const col = document.createElement('div');
+          col.className = 'col-12 col-sm-6 col-md-4 col-lg-3';
+          col.appendChild(ph);
+          frag.appendChild(col);
         }
         refs.grid.appendChild(frag);
       } catch (e) {
@@ -422,7 +425,7 @@
     const tempCards = [];
     slice.forEach((p) => {
       const card = document.createElement("div");
-      card.className = "card";
+      card.className = "card h-100";
 
       let thumbHtml = `<div class="thumb" aria-hidden="true">${escapeHtml(p.thumbText || p.category || "Game")}</div>`;
       if (p.imageUrl) {
@@ -442,25 +445,18 @@
       <div class="card-inner">
         <div class="card-front">
           ${thumbHtml}
-          <h3 class="title">${titleLink}</h3>
-          <div class="tags">
-            <span class="tag">${escapeHtml(p.category)}</span>
-            ${p.difficulty ? `<span class="${diffClass}">${escapeHtml(p.difficulty)}</span>` : ""}
-          </div>
-          <p class="desc">${escapeHtml(getSummary(p))}</p>
-          <div class="card-footer">
-            <div class="primary-wrap">${renderPrimaryButton(p)}</div>
-            <div class="actions">
-              <button class="details-btn" data-id="${p.id}" aria-label="Details for ${escapeHtml(p.title)}">Details</button>
-            </div>
-          </div>
-        </div>
-        <div class="card-back" aria-hidden="true">
-          <p class="desc">${backDescHtml}</p>
-          <div class="card-footer" style="margin-top:auto;">
-            <div class="primary-wrap">${renderPrimaryButton(p)}</div>
-            <div class="actions">
-              <button class="back-btn" data-id="${p.id}" aria-label="Back to game">Back</button>
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title title mb-2">${titleLink}</h5>
+            <p class="desc card-text mb-3">${escapeHtml(getSummary(p))}</p>
+            <div class="mt-auto d-flex justify-content-between align-items-center">
+              <div class="me-2">
+                <span class="badge bg-light text-dark">${escapeHtml(p.category)}</span>
+                ${p.difficulty ? `<span class="badge bg-secondary ms-1">${escapeHtml(p.difficulty)}</span>` : ""}
+              </div>
+              <div class="btn-group">
+                ${renderPrimaryButton(p)}
+                <a class="btn btn-outline-secondary details-btn" href="${escapeHtml(p.productUrl || '#')}" data-id="${p.id}" aria-label="Details for ${escapeHtml(p.title)}">Details</a>
+              </div>
             </div>
           </div>
         </div>
@@ -482,7 +478,12 @@
     });
 
     const frag = document.createDocumentFragment();
-    tempCards.forEach((c) => frag.appendChild(c));
+    tempCards.forEach((c) => {
+      const col = document.createElement('div');
+      col.className = 'col-12 col-sm-6 col-md-4 col-lg-3';
+      col.appendChild(c);
+      frag.appendChild(col);
+    });
     refs.grid.appendChild(frag);
 
     const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
@@ -729,34 +730,11 @@
     applyFilters();
   });
 
-  function flipCard(cardEl) {
-    if (!cardEl) return;
-    document.querySelectorAll(".card.is-flipped").forEach((c) => {
-      if (c !== cardEl) c.classList.remove("is-flipped");
-    });
-    const willFlip = !cardEl.classList.contains("is-flipped");
-    if (willFlip) cardEl.classList.add("is-flipped");
-    else cardEl.classList.remove("is-flipped");
-  }
-
+  // Simplified: details links are standard anchors/buttons; navigation is handled by the browser
   refs.grid.addEventListener("click", (e) => {
     const det = e.target.closest(".details-btn");
-    const back = e.target.closest(".back-btn");
-
-    if (back) {
-      const card = back.closest(".card");
-      if (card) card.classList.remove("is-flipped");
-      console.log("[FLIP] Card flipped to front:", card ? Array.from(document.querySelectorAll(".card")).indexOf(card) : "unknown");
-      return;
-    }
-
     if (det) {
-      const card = det.closest(".card");
-      if (card) {
-        flipCard(card);
-        clampBackScrollBounds(card);
-      }
-      console.log("[FLIP] Card flipped to back:", card ? Array.from(document.querySelectorAll(".card")).indexOf(card) : "unknown");
+      // let default anchor navigation occur; nothing to do here
       return;
     }
   });
@@ -943,44 +921,5 @@ if ("ResizeObserver" in window) {
   new ResizeObserver(sendHeight).observe(document.body);
 }
 
-/* Mobile hamburger toggle: show/hide mobile dropdown nav */
-(function setupMobileNav(){
-  try{
-    const btn = document.querySelector('.block-header__hamburger-menu');
-    const dropdown = document.querySelector('.block-header-layout-mobile__dropdown');
-    const nav = document.querySelector('.block-header__nav');
-    const header = document.querySelector('.block-header');
-    if(!btn || !dropdown) return;
-
-    btn.setAttribute('aria-expanded','false');
-
-    btn.addEventListener('click', function(e){
-      e.stopPropagation();
-      const open = btn.classList.toggle('open');
-      dropdown.classList.toggle('open', open);
-      if(nav) nav.classList.toggle('open', open);
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
-
-    // clicking outside closes menu
-    document.addEventListener('click', function(e){
-      if(!btn.classList.contains('open')) return;
-      if(header && header.contains(e.target)) return;
-      btn.classList.remove('open');
-      dropdown.classList.remove('open');
-      if(nav) nav.classList.remove('open');
-      btn.setAttribute('aria-expanded','false');
-    });
-
-    // escape key closes
-    document.addEventListener('keydown', function(e){
-      if(e.key === 'Escape' && btn.classList.contains('open')){
-        btn.classList.remove('open');
-        dropdown.classList.remove('open');
-        if(nav) nav.classList.remove('open');
-        btn.setAttribute('aria-expanded','false');
-      }
-    });
-  }catch(err){console.warn('mobile nav init failed', err)}
-})();
+/* Navigation behavior: rely on Bootstrap's navbar/collapse and dropdown JS. */
 

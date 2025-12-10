@@ -1,14 +1,4 @@
-:root {
-  --bg-color: #f8f6f2;
-  --card-bg: #ffffff;
-  --text-main: #0a2342;
-  --text-light: #5a6673;
-  --accent: #d4a017;
-  --danger: #7a2e2e;
-  --success: #27ab83;
-  --border-color: rgba(10,35,66,0.15);
-  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
+/* Theme tokens consolidated into `assets/css/bootstrap-overrides.css` */
 
 * { box-sizing: border-box; }
 
@@ -47,10 +37,10 @@ h1 { margin:0; font-size:1.1rem; color:var(--text-main); text-transform:uppercas
 @keyframes pulse { 0% { opacity:1; } 50% { opacity:0.5; } 100% { opacity:1; } }
 @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(2px); } 75% { transform: translateX(-2px); } 100% { transform: translateX(0); } }
 
-.modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,35,66,0.95); display:none; flex-direction:column; justify-content:center; align-items:center; z-index:1000; color:white; text-align:center; padding:20px; }
-.modal.active { display:flex; }
-.modal-content { background:white; color:var(--text-main); padding:25px; border-radius:10px; max-width:400px; width:100%; box-shadow:0 10px 30px rgba(0,0,0,0.3); border-top:5px solid var(--accent); }
-.btn-modal { background:var(--text-main); color:var(--accent); padding:12px 20px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; width:100%; text-transform:uppercase; margin-top:15px; }
+.dp-modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,35,66,0.95); display:none; flex-direction:column; justify-content:center; align-items:center; z-index:1000; color:white; text-align:center; padding:20px; }
+.dp-modal.active { display:flex; }
+.dp-modal-content { background:white; color:var(--text-main); padding:25px; border-radius:10px; max-width:400px; width:100%; box-shadow:0 10px 30px rgba(0,0,0,0.3); border-top:5px solid var(--accent); }
+.game-news-desk .btn-modal:not(.btn) { background:var(--text-main); color:var(--accent); padding:12px 20px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; width:100%; text-transform:uppercase; margin-top:15px; }
 
 .copyright { font-size:0.7rem; color:var(--text-light); opacity:0.6; text-align:center; padding:8px; flex-shrink:0; width:100%; }
 .tutorial-step { font-size:0.9rem; margin-bottom:10px; text-align:left; }
@@ -59,11 +49,11 @@ h1 { margin:0; font-size:1.1rem; color:var(--text-main); text-transform:uppercas
   .dashboard { grid-template-columns:1fr; gap:8px; width:95%; margin:0.5rem 0; }
   .stats-bar { grid-template-columns:1fr; }
   .game-container, .game-layout { max-width:100%; padding-bottom:1rem; justify-content:flex-start !important; padding-top:0.25rem; flex:0 0 auto; min-height:0; }
-  .card-stack { height:auto !important; margin-bottom:8px; }
-  .card { position:relative !important; height:auto !important; top:auto !important; left:auto !important; padding:1.25rem; }
+  .game-news-desk .card-stack { height:auto !important; margin-bottom:8px; }
+  .game-news-desk .card { position:relative !important; height:auto !important; top:auto !important; left:auto !important; padding:1.25rem; }
   body { min-height:auto !important; height:auto !important; }
   .controls, .broadcast-slots { gap:8px; padding:8px; justify-content:center; }
-  .btn, .btn-modal, .deal-btn { padding:0.6rem; font-size:0.95rem; }
+  .game-news-desk .btn, .game-news-desk .btn-modal:not(.btn), .game-news-desk .deal-btn { padding:0.6rem; font-size:0.95rem; }
   header { padding:0.6rem; }
   .copyright { margin-top:8px; font-size:0.7rem; }
 }
