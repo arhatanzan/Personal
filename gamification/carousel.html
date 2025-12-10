@@ -195,6 +195,15 @@
 
 <script>
   (function() {
+    // --- START NEW CONFIGURATION ---
+    // 1. Get the 'base' parameter from the URL (passed from Hostinger)
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // 2. Define the Host URL (Fallback to your main domain if missing)
+    // NOTE: Ensure your paths in PRODUCTS start with '/' so they append correctly.
+    const HOST_URL = urlParams.get('base') || "https://kaifabbas.com"; 
+    // --- END NEW CONFIGURATION ---
+
     const PRODUCTS = [
       {
         id: "g1",
@@ -254,6 +263,24 @@
       for (let i = 0; i < loopFactor; i++) {
         infiniteList = infiniteList.concat(PRODUCTS);
       }
+
+      // --- UPDATE THE LINK GENERATION HERE ---
+      track.innerHTML = infiniteList.map(p => `
+        <a href="${HOST_URL}${p.url}" class="c-card" target="_top">
+          <div class="c-thumb">
+            ${p.imageUrl 
+              ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">` 
+              : p.icon}
+          </div>
+          <div class="c-info">
+            <span class="c-cat">${p.category}</span>
+            <h3 class="c-title">${p.title}</h3>
+            <p class="c-desc">${p.summary}</p>
+          </div>
+          <div class="c-btn">Play Now</div>
+        </a>
+      `).join('');
+    }
 
       track.innerHTML = infiniteList.map(p => `
         <a href="${p.url}" class="c-card" target="_top">
