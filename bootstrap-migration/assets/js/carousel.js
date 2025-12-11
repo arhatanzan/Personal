@@ -69,17 +69,19 @@ window.initCarousel = async function() {
 
     const linkTarget = useKebab ? '_top' : '_self';
     track.innerHTML = infiniteList.map(p => `
-      <a href="${buildHref(p)}" class="card c-card text-decoration-none" target="${linkTarget}">
-        <div class="card-img-top c-thumb p-3">
-          ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">` : p.icon}
-        </div>
-        <div class="card-body d-flex flex-column p-3">
-          <span class="c-cat mb-1">${p.category}</span>
-          <h3 class="card-title h5 fw-bold mb-2 text-dark">${p.title}</h3>
-          <p class="card-text c-desc mb-3 flex-grow-1">${p.summary}</p>
-          <div class="btn c-btn w-100 mt-auto">Play Now</div>
-        </div>
-      </a>
+      <div class="col-auto">
+        <a href="${buildHref(p)}" class="card c-card text-decoration-none h-100 p-3" target="${linkTarget}">
+          <div class="c-thumb mb-3">
+            ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">` : p.icon}
+          </div>
+          <div class="d-flex flex-column flex-grow-1">
+            <span class="c-cat mb-1">${p.category}</span>
+            <h3 class="card-title h5 fw-bold mb-2 text-dark">${p.title}</h3>
+            <p class="card-text c-desc mb-3 flex-grow-1">${p.summary}</p>
+            <div class="btn c-btn w-100 mt-auto py-2">Play Now</div>
+          </div>
+        </a>
+      </div>
     `).join('');
   }
 

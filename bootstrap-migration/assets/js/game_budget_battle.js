@@ -192,12 +192,15 @@ function calculateStats() {
 }
 
 function finalizeBudget() {
-  const modal = document.getElementById("end-modal");
+  // Use Bootstrap 5 Modal API
+  const modalEl = document.getElementById("end-modal");
+  const modal = new bootstrap.Modal(modalEl);
+  
   const t = document.getElementById("end-title");
   const d = document.getElementById("end-desc");
   const app = document.getElementById("val-approval").innerText;
 
-  modal.classList.add("active");
+  modal.show();
 
   // Chance of Scandal based on Risk
   if (Math.random() * 100 < corruptionRisk) {

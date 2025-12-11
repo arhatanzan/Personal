@@ -15,16 +15,12 @@ body {
 }
 
 /* Carousel Track */
+/* Layout handled by Bootstrap (.row .flex-nowrap .overflow-auto) */
 .carousel-track {
-  display: flex;
-  gap: var(--gap);
-  overflow-x: auto;
   scroll-behavior: smooth;
-  padding: 12px 8px 6px 8px;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none;  /* IE/Edge */
   scroll-snap-type: x mandatory;
-  align-items: stretch;
 }
 
 .carousel-track::-webkit-scrollbar {
@@ -33,14 +29,11 @@ body {
 
 /* Card Styling */
 .c-card {
-  flex: 0 0 auto;
-  width: 280px;
+  width: 260px; /* Reduced width to fit 4 cards comfortably */
   background: var(--card-bg);
   border: 4px solid var(--accent);
   border-radius: var(--radius);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  text-decoration: none;
-  color: inherit;
   scroll-snap-align: start;
 }
 
@@ -51,17 +44,19 @@ body {
 }
 
 .c-thumb {
-  height: 100px;
+  height: 110px; /* Adjusted height for narrower card */
   background: #ececec;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
+  border-radius: 8px;
+  width: 100%;
 }
 
 .c-thumb img {
-  width: 100%;
-  height: 100%;
+  width: 60%; /* Balanced icon size */
+  height: 60%;
   object-fit: contain;
 }
 
