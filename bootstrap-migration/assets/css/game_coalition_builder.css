@@ -32,283 +32,107 @@ body {
 
 /* --- HEADER --- */
 header {
-  width: 100%;
-  max-width: 800px;
-  padding: 1rem 1rem 0.5rem 1rem;
-  text-align: center;
-  background: var(--bg-color);
-  flex-shrink: 0;
-}
-
-h1 {
-  margin: 0;
-  font-size: 1.4rem;
-  color: var(--text-main);
-  font-weight: 800;
-}
-.subtitle {
-  font-size: 0.85rem;
-  color: var(--text-light);
-  margin-top: 0.2rem;
+  background: transparent;
 }
 
 /* --- STATS BAR --- */
-.stats-bar {
-  width: 95%;
-  max-width: 600px;
-  margin: 0.5rem 0;
-  flex-shrink: 0;
-}
-
-.stat-box {
-  background: var(--card-bg);
-  padding: 8px;
-  border-radius: 8px;
-  text-align: center;
-  border: 2px solid var(--border-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.stat-label {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  color: var(--text-light);
-  font-weight: bold;
-  letter-spacing: 0.5px;
-}
-.stat-val {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: var(--text-main);
-  margin-top: 2px;
-}
-.stat-val.gold {
-  color: var(--accent);
-}
+/* Handled by Bootstrap */
 
 /* --- PARLIAMENT VIZ --- */
-.parliament-wrapper {
-  width: 95%;
-  max-width: 600px;
-  margin-bottom: 10px;
-  flex-shrink: 0;
-}
-
-.parliament-container {
-  background: #e2e8f0;
-  height: 32px;
-  border-radius: 16px;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.seat-bar {
-  height: 100%;
-  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-.bar-gov {
-  background: var(--text-main);
-}
-.bar-allies {
-  background: var(--success);
-}
-.bar-opp {
-  background: var(--danger);
-}
-
-.majority-line {
-  position: absolute;
-  left: 50.2%; /* 251/500 is just over 50% */
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--accent);
-  z-index: 10;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-}
-
-.vote-count {
-  text-align: center;
-  font-size: 0.8rem;
-  margin-top: 4px;
-  font-weight: bold;
-  color: var(--text-light);
-}
+/* Handled by Bootstrap */
 
 /* --- GAME BOARD --- */
-.game-board {
-  /* Do not force the board to stretch to fill the viewport; let it size to content
-     This prevents large empty space when users zoom out or change viewport dimensions */
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  width: 95%;
-  max-width: 600px;
-  gap: 15px;
-  padding-bottom: 20px;
-  /* Keep internal scrolling only as needed */
-  overflow-y: visible;
-}
+/* Handled by Bootstrap */
 
-/* Law Card */
-.law-card {
-  background: var(--card-bg);
-  border: 2px solid var(--text-main);
-  border-radius: 10px;
-  padding: 1rem;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  flex-shrink: 0;
-}
-
-.law-title {
-  font-size: 1.1rem;
-  font-weight: 800;
-  margin-bottom: 6px;
-  color: var(--text-main);
-}
-.law-desc {
-  font-size: 0.95rem;
-  color: var(--text-light);
-  line-height: 1.4;
-}
-
-/* Party Grid */
-.parties-grid {
-  flex-shrink: 0;
-}
-
+/* --- PARTIES GRID --- */
 .party-card {
   background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 10px;
-  text-align: center;
-  transition: all 0.2s;
-  position: relative;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: transform 0.1s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .party-card.is-ally {
-  border: 2px solid var(--success);
-  background: #f0fff4;
+  border-left: 4px solid var(--success);
 }
 .party-card.is-opp {
-  border: 2px solid var(--danger);
-  background: #fff5f5;
+  border-left: 4px solid var(--danger);
 }
 
 .party-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
+
 .party-name {
   font-weight: 700;
-  font-size: 0.8rem;
-  text-align: left;
+  font-size: 0.85rem;
+  color: var(--text-main);
 }
+
 .party-seats {
-  font-size: 0.75rem;
-  background: #eee;
+  background: #e2e8f0;
   padding: 2px 6px;
   border-radius: 4px;
+  font-size: 0.75rem;
   font-weight: bold;
+  color: var(--text-light);
 }
 
 .stance-tag {
-  display: block;
-  padding: 4px;
-  border-radius: 4px;
+  display: inline-block;
   font-size: 0.7rem;
-  font-weight: bold;
+  font-weight: 800;
   text-transform: uppercase;
-  margin: 6px 0;
+  margin-bottom: 8px;
 }
 .tag-yes {
   color: var(--success);
-  background: rgba(39, 171, 131, 0.1);
 }
 .tag-no {
   color: var(--danger);
-  background: rgba(214, 69, 69, 0.1);
 }
 
 .negotiate-btn {
+  width: 100%;
   background: var(--text-main);
-  color: var(--accent);
+  color: white;
   border: none;
-  padding: 8px 0;
-  border-radius: 6px;
+  padding: 6px;
+  border-radius: 4px;
   font-size: 0.75rem;
   font-weight: bold;
   cursor: pointer;
-  width: 100%;
-  transition: opacity 0.2s;
+  margin-top: auto;
+  transition: background 0.2s;
 }
-.negotiate-btn:active {
-  transform: scale(0.98);
+.negotiate-btn:hover {
+  background: #1e293b;
 }
 
 /* --- ACTION BAR --- */
-.action-bar {
-  text-align: center;
-  margin-top: 12px;
-  padding: 10px 0;
-}
-
-.btn-vote {
-  background: var(--accent);
-  color: var(--text-main);
-  border: 2px solid var(--text-main);
-  padding: 12px 30px;
-  font-size: 1rem;
-  font-weight: 800;
-  border-radius: 50px;
-  cursor: pointer;
-  box-shadow: 0 4px 0 var(--text-main);
-  width: 100%;
-  max-width: 300px;
-  transition: transform 0.1s, box-shadow 0.1s;
-}
-
-.btn-vote:active {
-  transform: translateY(4px);
-  box-shadow: 0 0 0 var(--text-main);
-}
-.btn-vote:disabled {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.copyright {
-  margin-top: 10px;
-  font-size: 0.7rem;
-  color: var(--text-light);
-  text-align: center;
-  opacity: 0.6;
-  padding-bottom: 10px;
-}
+/* Handled by Bootstrap */
 
 /* --- MODAL --- */
 .modal {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  display: none;
-  flex-direction: column;
+  background: rgba(10, 35, 66, 0.95);
+  z-index: 1000;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
+  flex-direction: column;
   color: white;
   text-align: center;
   padding: 20px;
@@ -316,27 +140,16 @@ h1 {
 .modal.active {
   display: flex;
 }
-.modal h2 {
-  font-size: 2rem;
-  color: var(--accent);
-  margin-bottom: 1rem;
-}
-.modal p {
-  max-width: 500px;
-  line-height: 1.6;
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
-  color: #e2e8f0;
-}
 .btn-restart {
   background: var(--accent);
   color: var(--text-main);
-  padding: 1rem 2rem;
   border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
+  padding: 12px 24px;
   font-size: 1rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 20px;
 }
 
 /* Responsive tweaks */
