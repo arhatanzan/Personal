@@ -24,7 +24,6 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Dynamic height to fix mobile scroll issues */
   min-height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
@@ -36,13 +35,10 @@ header {
 }
 
 /* --- STATS BAR --- */
-/* Handled by Bootstrap */
 
 /* --- PARLIAMENT VIZ --- */
-/* Handled by Bootstrap */
 
 /* --- GAME BOARD --- */
-/* Handled by Bootstrap */
 
 /* --- PARTIES GRID --- */
 .party-card {

@@ -251,34 +251,4 @@ function finalizeBudget() {
 
 init();
 
-function sendHeight() {
-  const height = document.body.scrollHeight;
-  parent.postMessage({ type: "resizeIframe", height: height }, "*");
-}
 
-window.addEventListener("load", sendHeight);
-
-if ("ResizeObserver" in window) {
-  new ResizeObserver(sendHeight).observe(document.body);
-}
-
-window.addEventListener("message", function (e) {
-  try {
-    if (!e.data || e.data.type !== "resizeIframe") return;
-    var iframe = document.getElementById("games-carousel");
-    if (!iframe) return;
-    try { console.log('games-carousel message', e.data); } catch (err) {}
-    var requested = Number(e.data.height) || 0;
-    var MAX_H = 380;
-    var newH = Math.min(requested || 0, MAX_H);
-    if (newH <= 0) newH = 320;
-    var curr = parseInt(iframe.style.height, 10) || 0;
-    if (Math.abs(curr - newH) > 3) {
-      iframe.style.height = newH + "px";
-      iframe.style.maxHeight = MAX_H + "px";
-      iframe.style.display = 'block';
-    }
-  } catch (err) {
-    console.warn('Carousel iframe resize failed', err);
-  }
-}, false);

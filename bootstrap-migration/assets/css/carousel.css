@@ -15,7 +15,6 @@ body {
 }
 
 /* Carousel Track */
-/* Layout handled by Bootstrap (.row .flex-nowrap .overflow-auto) */
 .carousel-track {
   scroll-behavior: smooth;
   scrollbar-width: none; /* Firefox */
