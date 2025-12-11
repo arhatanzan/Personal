@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>The Coalition Builder</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/game_coalition_builder.css">
+  </head>
+  <body>
+    <header>
+      <h1>Coalition Builder</h1>
+      <div class="subtitle">Assemble 251 Seats. Pass 5 Laws. Survive.</div>
+    </header>
+
+    <div class="stats-bar">
+      <div class="stat-box">
+        <span class="stat-label">Pol. Capital</span>
+        <div class="stat-val gold" id="val-capital">80</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Weeks Left</span>
+        <div class="stat-val" id="val-weeks">10</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Passed</span>
+        <div class="stat-val" id="val-passed">0 / 5</div>
+      </div>
+    </div>
+
+    <div class="parliament-wrapper">
+      <div class="parliament-container">
+        <div class="majority-line" title="Majority Threshold (251)"></div>
+        <div class="seat-bar bar-gov" id="bar-gov" style="width: 30%"></div>
+        <div
+          class="seat-bar bar-allies"
+          id="bar-allies"
+          style="width: 0%"
+        ></div>
+        <div class="seat-bar bar-opp" id="bar-opp" style="width: 70%"></div>
+      </div>
+      <div class="vote-count">
+        Current Support: <span id="vote-total">150</span> / 500
+      </div>
+    </div>
+
+    <main class="game-board">
+      <div class="law-card">
+        <div class="law-title" id="law-title">Loading Law...</div>
+        <div class="law-desc" id="law-desc">...</div>
+      </div>
+
+      <div class="parties-grid" id="parties-grid"></div>
+
+      <div class="action-bar">
+        <button class="btn-vote" id="btn-vote" onclick="callVote()">
+          CALL VOTE
+        </button>
+        <div class="copyright">© 2025 Kaif Abbas</div>
+      </div>
+    </main>
+
+    <div class="modal" id="end-modal">
+      <h2 id="modal-title">Election Over</h2>
+      <p id="modal-desc">...</p>
+      <button class="btn-restart" onclick="initGame()">Start New Term</button>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Game Logic -->
+    <script src="../assets/js/game_coalition_builder.js"></script>
+
+    <script>
+      function sendHeight() {
+        const height = document.body.scrollHeight;
+        parent.postMessage({ type: "resizeIframe", height: height }, "*");
+      }
+
+      window.addEventListener("load", sendHeight);
+
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(sendHeight).observe(document.body);
+      }
+    </script>
+    <!-- Games carousel embed -->
+    <iframe id="games-carousel" src="../partials/carousel.html" style="width:100%;border:0;max-height:380px;height:320px;display:block;" scrolling="no" aria-label="Games carousel"></iframe>
+    <script>
+      window.addEventListener("message", function (e) {
+        try {
+          if (!e.data || e.data.type !== "resizeIframe") return;
+          var iframe = document.getElementById("games-carousel");
+          if (!iframe) return;
+          try { console.log('games-carousel message', e.data); } catch (err) {}
+          var requested = Number(e.data.height) || 0;
+          var MAX_H = 380;
+          var newH = Math.min(requested || 0, MAX_H);
+          if (newH <= 0) newH = 320;
+          var curr = parseInt(iframe.style.height, 10) || 0;
+          if (Math.abs(curr - newH) > 3) {
+            iframe.style.height = newH + "px";
+            iframe.style.maxHeight = MAX_H + "px";
+            iframe.style.display = 'block';
+          }
+        } catch (err) {
+          console.warn('Carousel iframe resize failed', err);
+        }
+      }, false);
+    </script>
+  </body>
+</html>
