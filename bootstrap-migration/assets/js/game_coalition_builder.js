@@ -157,7 +157,7 @@ function renderParties() {
                   Negotiate (${cost} Cap)
               </button>
           `
-              : '<div style="font-size:0.75rem; color:green; font-weight:bold; margin-top:auto;">SECURED</div>'
+              : '<div class="status-secured">SECURED</div>'
           }
       `;
     wrapper.appendChild(card);
@@ -175,13 +175,21 @@ function negotiate(partyIndex, cost) {
   } else {
     // Shake effect or simple alert
     const btn = document.getElementById("btn-vote");
+    
+    // Prevent interaction if button is busy
+    if (btn.disabled) return;
+
     btn.innerText = "NOT ENOUGH CAPITAL!";
+    btn.style.background = "var(--danger)";
     btn.style.borderColor = "var(--danger)";
-    btn.style.color = "var(--danger)";
+    btn.style.color = "white";
+    
     setTimeout(() => {
+      // Reset to CSS defaults
       btn.innerText = "CALL VOTE";
-      btn.style.borderColor = "var(--text-main)";
-      btn.style.color = "var(--text-main)";
+      btn.style.background = "";
+      btn.style.borderColor = "";
+      btn.style.color = "";
     }, 1000);
   }
 }
@@ -253,10 +261,11 @@ function showFeedback(success) {
 
   setTimeout(() => {
     btn.disabled = false;
-    btn.style.background = "var(--accent)";
+    // Reset to CSS defaults
+    btn.style.background = "";
     btn.innerText = "CALL VOTE";
-    btn.style.color = "var(--text-main)";
-    btn.style.borderColor = "var(--text-main)";
+    btn.style.color = "";
+    btn.style.borderColor = "";
 
     if (state.weeks > 0 && state.passed < TARGET_PASSED) {
       loadNextLaw();

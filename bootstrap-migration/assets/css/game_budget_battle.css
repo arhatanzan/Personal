@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
 :root {
-  --bg-color: #f0f2f5;
+  --bg-color: transparent;
   --card-bg: #ffffff;
   --primary: #0f172a;
   --color-success: #10b981;
@@ -359,12 +359,17 @@ input[type=range]::-moz-range-thumb {
 .btn-submit {
   background: var(--primary);
   color: white;
-  border: none;
+  border: 2px solid transparent; /* Match reaction-bar border */
   border-radius: var(--radius);
   font-size: 1rem;
   letter-spacing: 1px;
   box-shadow: var(--shadow-md);
   transition: all 0.2s;
+  min-height: 48px; /* Match reaction-bar height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 .btn-submit:hover:not(:disabled) {
   background: #1e293b;
