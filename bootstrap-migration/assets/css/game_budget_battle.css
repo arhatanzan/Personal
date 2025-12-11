@@ -1,13 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
 :root {
-  --bg-color: #f4f7f6;
+  --bg-color: #f0f2f5;
   --card-bg: #ffffff;
-  --text-main: #0a2342;
-  --text-light: #5a6673;
-  --accent: #d4a017;
-  --danger: #d64545;
-  --success: #27ab83;
-  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    sans-serif;
+  --primary: #0f172a;
+  --color-success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --text-main: #1e293b;
+  --text-light: #64748b;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --radius: 16px;
+  --font-main: 'Poppins', sans-serif;
 }
 
 * {
@@ -25,356 +30,441 @@ body {
   padding-bottom: 20px;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-main);
+  font-weight: 700;
+  color: var(--text-main);
+}
+
 .game-container {
   width: 95%;
-  max-width: 800px;
+  max-width: 600px;
 }
 
 /* --- HEADER --- */
 header {
   background: transparent;
+  margin-bottom: 0.5rem;
 }
 h1 {
-  margin: 0;
-  color: var(--text-main);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 800;
 }
 .subtitle {
   color: var(--text-light);
-  margin-top: 0.2rem;
+  font-weight: 400;
 }
 
 /* --- DASHBOARD --- */
 .stat-box {
   background: var(--card-bg);
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius);
+  border: 2px solid #e2e8f0; /* Full border, slightly thicker */
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  z-index: 10; /* Ensure stats stay on top of deal cards */
 }
+.stat-box:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-funds {
+  border-color: var(--primary);
+}
+
+.stat-approval {
+  border-color: var(--color-success);
+}
+
+.stat-risk {
+  border-color: var(--danger);
+}
+
 .stat-label {
-  text-transform: uppercase;
-  color: #94a3b8;
-  font-weight: 700;
-  margin-bottom: 0;
+  color: var(--text-light);
+  font-weight: 600;
   letter-spacing: 0.5px;
 }
 .stat-val {
-  font-weight: 800;
-  color: var(--text-main);
-  line-height: 1.2;
+  font-weight: 700;
+  color: var(--primary);
 }
 .val-funds.negative {
   color: var(--danger);
 }
 
 .progress {
-  height: 6px;
-  background-color: #f1f5f9;
-  margin-top: 4px;
-  border-radius: 3px;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
   overflow: hidden;
 }
-#risk-text {
-  font-size: 0.7rem;
-  margin-top: 2px;
+.progress-bar {
+  transition: width 0.5s ease;
 }
 
-/* --- DEALS SECTION (Fixed Alignment) --- */
-
-.deal-btn {
-  background: #0f172a;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  min-height: 50px;
-}
-.deal-btn:hover {
-  transform: translateY(-1px);
-  background: #1e293b;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-.deal-btn.taken {
-  background: #cbd5e1;
-  color: #94a3b8;
-  cursor: default;
-  transform: none;
-  box-shadow: none;
-}
-.deal-money {
-  color: #fbbf24;
-  font-weight: 800;
-  font-size: 0.9rem;
-  display: block;
-  line-height: 1;
-  margin-bottom: 2px;
-}
-.deal-btn.taken .deal-money {
-  color: #94a3b8;
-}
-
-/* --- SECTORS GRID (Fixed Spacing) --- */
-/* .game-area layout handled by bootstrap */
-
-/* .sectors-grid layout handled by bootstrap */
-
-.sector-card {
+/* --- SECTORS (Ledger Layout) --- */
+/* We style .sector-card to look like the requested .sector-row */
+.sector-card, .sector-row {
   background: var(--card-bg);
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  /* padding handled by bootstrap */
-  position: relative;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid transparent;
 }
 
-/* .sector-top layout handled by bootstrap */
-.sector-name {
-  font-weight: 700;
-  /* flex, gap handled by bootstrap */
-  color: #334155;
+.sector-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  border-color: #e2e8f0;
 }
-.sector-current {
-  font-family: monospace;
-  font-weight: 700;
+
+/* 
+   Layout Magic: 
+   The HTML structure groups Name and Value in a div.d-flex.
+   We use display: contents to unwrap them so they become direct children of the grid/flex parent.
+   !important is needed to override Bootstrap's .d-flex class.
+*/
+.sector-card > div:first-child {
+  display: contents !important;
+}
+
+/* Icon & Name Area */
+.sector-card > div:first-child > span:first-child {
+  order: 1;
+  width: 140px; /* Fixed width for alignment */
+  flex-shrink: 0;
+  font-weight: 600;
   color: var(--text-main);
+  font-size: 0.85rem;
 }
 
-/* Slider with Marker */
-.slider-wrap {
+/* Slider Area */
+.sector-card .slider-wrap {
+  order: 2;
+  flex-grow: 1;
   position: relative;
-  padding-top: 18px;
-  margin-top: 2px;
-  height: auto;
-  display: block;
+  display: flex;
+  align-items: center;
+  margin: 0; /* Reset margin */
 }
 
-input[type="range"] {
-  width: 100%;
+/* Value Display */
+.sector-card > div:first-child > span:last-child {
+  order: 3;
+  width: 60px;
+  text-align: right;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+}
+
+/* --- SLIDER STYLING --- */
+input[type=range] {
   -webkit-appearance: none;
-  appearance: none;
+  width: 100%;
   background: transparent;
+  margin: 0;
+  position: relative;
   z-index: 2;
   cursor: pointer;
 }
-input[type="range"]:focus {
+
+input[type=range]:focus {
   outline: none;
 }
 
-/* Thumb */
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  height: 16px;
-  width: 16px;
-  border-radius: 50%;
-  background: #eab308;
-  margin-top: -5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  border: 2px solid white;
-}
 /* Track */
-input[type="range"]::-webkit-slider-runnable-track {
+input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
   height: 6px;
-  background: #e2e8f0;
-  border-radius: 3px;
   cursor: pointer;
+  background: #e2e8f0;
+  border-radius: 4px;
 }
-/* Firefox styles for range */
 input[type=range]::-moz-range-track {
   width: 100%;
   height: 6px;
   cursor: pointer;
   background: #e2e8f0;
-  border-radius: 3px;
+  border-radius: 4px;
 }
+
+/* Thumb */
+input[type=range]::-webkit-slider-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -5px; /* Center on track */
+  transition: transform 0.1s;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
 input[type=range]::-moz-range-thumb {
   height: 16px;
   width: 16px;
-  border: 2px solid white;
+  border: 2px solid #fff;
   border-radius: 50%;
-  background: #eab308;
+  background: var(--primary);
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* The Visual Marker (Goal) */
+/* Demand Marker */
 .demand-marker {
   position: absolute;
-  top: 0;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none;
-  width: auto;
-  height: auto;
-  background: transparent;
-  z-index: 1;
-}
-/* The Red Triangle */
-.demand-marker::before {
-  content: '';
-  width: 0; 
-  height: 0; 
-  border-left: 3px solid transparent;
-  border-right: 3px solid transparent;
-  border-top: 4px solid #dc2626;
-  display: block;
-  margin-bottom: -1px;
-  position: static;
-}
-.demand-marker::after {
-  content: '';
+  top: -4px;
+  bottom: -4px;
   width: 2px;
-  height: 12px;
-  background: #dc2626;
-  display: block;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--danger),
+    var(--danger) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  z-index: 1;
+  pointer-events: none;
 }
-/* The "Goal: 40" Text */
 .demand-label {
-  position: static;
-  transform: none;
-  font-size: 0.6rem;
-  color: #dc2626;
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  color: var(--danger);
   font-weight: 700;
-  line-height: 1;
-  margin-bottom: 0;
   white-space: nowrap;
+  background: rgba(255,255,255,0.9);
+  padding: 1px 4px;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-/* --- FOOTER --- */
-/* .footer layout handled by bootstrap */
-.reaction-bar {
-  background: #f8fafc;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  color: #475569;
-  font-style: italic;
-  margin-bottom: 12px;
+/* --- DEALS SECTION --- */
+.deal-btn, .deal-card {
+  background: var(--card-bg);
+  color: var(--text-main);
   border: 1px solid #e2e8f0;
-  min-height: 40px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.deal-btn:hover {
+  transform: translateY(-2px); /* Reduced movement to prevent overlap */
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-success);
+}
+
+.deal-money {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-success);
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+/* Signed State */
+.deal-btn.taken, .deal-signed {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #94a3b8;
+  cursor: default;
+  transform: none !important;
+  box-shadow: none;
+}
+
+/* Stamped Effect */
+.deal-btn.taken::after {
+  content: 'SIGNED';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: rgba(15, 23, 42, 0.15);
+  border: 3px solid rgba(15, 23, 42, 0.15);
+  padding: 0.2rem 1rem;
+  border-radius: 8px;
+  text-transform: uppercase;
+  pointer-events: none;
+  animation: stamp-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes stamp-in {
+  from { transform: translate(-50%, -50%) scale(2) rotate(-15deg); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1) rotate(-15deg); opacity: 1; }
+}
+
+/* --- REACTION BAR --- */
+.reaction-bar {
+  background: #f1f5f9;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  font-weight: 700;
+  color: var(--text-light);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  min-height: 48px; /* Reduced height */
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
   text-align: center;
-}
-.reaction-bar.angry {
-  color: #dc2626;
-  background: #fef2f2;
-  border-color: #fecaca;
-  font-weight: normal;
-}
-.reaction-bar.happy {
-  color: #16a34a;
-  background: #f0fdf4;
-  border-color: #bbf7d0;
-  font-weight: normal;
+  font-size: 0.9rem;
 }
 
+.reaction-bar.angry {
+  background: #fef2f2;
+  color: var(--danger);
+  border-color: var(--danger);
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.15);
+  animation: none;
+}
+
+.reaction-bar.happy {
+  background: #ecfdf5;
+  color: var(--color-success);
+  border-color: var(--color-success);
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.15);
+}
+
+/* --- BUTTONS --- */
 .btn-submit {
-  /* width, padding handled by bootstrap */
-  background: #0f172a;
-  color: #fff;
+  background: var(--primary);
+  color: white;
   border: none;
-  border-radius: 6px;
-  font-weight: 800;
-  text-transform: uppercase;
+  border-radius: var(--radius);
   font-size: 1rem;
-  cursor: pointer;
   letter-spacing: 1px;
-  box-shadow: none;
-  transition: background 0.2s;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s;
 }
-.btn-submit:hover {
+.btn-submit:hover:not(:disabled) {
   background: #1e293b;
-}
-.btn-submit:active {
-  transform: none;
-  box-shadow: none;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 .btn-submit:disabled {
   background: #94a3b8;
   cursor: not-allowed;
-  box-shadow: none;
   transform: none;
 }
 
-.copyright {
-  margin-top: 10px;
-  font-size: 0.7rem;
-  color: #999;
+/* --- ANIMATIONS --- */
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
 }
 
-/* --- MODAL (Refactored for Bootstrap 5) --- */
-
-/* Custom Backdrop to match original design */
-.modal-backdrop {
-    --bs-backdrop-bg: #0a2342;
-    --bs-backdrop-opacity: 0.98;
-}
-
-/* We use a custom class to override/augment Bootstrap's .modal-content */
+/* Modal Styling Override */
 .battle-modal-content {
-  background: white;
-  color: var(--text-main);
-  padding: 2rem;
-  border-radius: 12px;
-  width: 100%;
-  border-top: none;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius);
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-md);
+  padding: 1.5rem;
   text-align: center;
-  border: none;
-}
-
-/* Ensure the modal dialog respects our custom width preference */
-.battle-modal-dialog {
+  background: var(--card-bg);
   max-width: 400px;
-  margin: 1.75rem auto;
-}
-.btn-restart {
-  background: #0f172a;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 1rem;
-  width: auto;
-  font-size: 1rem;
+  margin: 0 auto;
 }
 
-/* Mobile tweaks */
-@media (max-width: 500px) {
-  /* .deals-grid handled by bootstrap col classes */
-  .deal-btn {
-    min-height: 60px;
-  }
+#end-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
-/* Small-screen responsive fixes: reduce vertical gaps and stack stat boxes */
-@media (max-width: 600px) {
-  /* .dashboard grid handled by bootstrap */
-  .stats-bar { grid-template-columns: 1fr; }
-  /* Avoid large vertical centering on tall small-viewports */
-  .game-container, .game-layout, .deals-wrapper {
-    /* max-width: 100%; handled by game-container width: 95% */
-    padding-bottom: 1rem;
-    justify-content: flex-start !important;
-    padding-top: 0.25rem;
-    flex: 0 0 auto;
-    min-height: 0;
+
+#end-desc {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.btn-restart {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-restart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: #1e293b;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .sector-card, .sector-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 1rem;
   }
-  .card-stack { height: auto !important; margin-bottom: 8px; }
-  .card { position: relative !important; height: auto !important; top: auto !important; left: auto !important; padding: 1.25rem; }
-  body { min-height: auto !important; height: auto !important; }
-  .controls, .broadcast-slots, .deals-grid { gap: 8px; padding: 8px; justify-content: center; }
-  .btn, .btn-modal, .deal-btn { padding: 0.6rem; font-size: 0.95rem; }
-  header { padding: 0.6rem; }
-  .copyright { margin-top: 8px; font-size: 0.7rem; }
+  
+  .sector-card > div:first-child {
+    display: flex !important; /* Revert to flex for mobile */
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .sector-card > div:first-child > span:first-child {
+    width: auto;
+    order: unset;
+  }
+  
+  .sector-card > div:first-child > span:last-child {
+    width: auto;
+    order: unset;
+    text-align: right;
+  }
+  
+  .sector-card .slider-wrap {
+    order: unset;
+    margin-top: 0.5rem;
+  }
 }

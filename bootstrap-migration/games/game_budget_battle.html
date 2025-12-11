@@ -15,27 +15,27 @@
     <link rel="stylesheet" href="../assets/css/carousel.css" />
   </head>
   <body>
-    <div class="container-fluid d-flex flex-column align-items-center p-0 pb-3">
-        <header class="game-container p-2 mb-2 text-center">
+    <div class="container-fluid d-flex flex-column align-items-center p-0 pb-2 pt-2">
+        <header class="game-container p-2 mb-3 text-center">
         <h1 class="m-0 fs-5 text-uppercase fw-bold">Budget Battle</h1>
         <div class="subtitle small">Pick your winning allocations</div>
         </header>
 
-        <div class="game-container row g-2 mb-2">
+        <div class="game-container row g-2 mb-3">
         <div class="col-12 col-md-4">
-            <div class="stat-box h-100 p-2 text-center d-flex flex-column justify-content-center">
+            <div class="stat-box stat-funds h-100 p-2 text-center d-flex flex-column justify-content-center">
                 <span class="stat-label text-uppercase fw-bold small mb-1" style="font-size: 0.7rem;">Budget Left</span>
                 <div class="stat-val val-funds fs-4 fw-bold" id="val-funds">₹100 Cr</div>
             </div>
         </div>
         <div class="col-12 col-md-4">
-            <div class="stat-box h-100 p-2 text-center d-flex flex-column justify-content-center">
+            <div class="stat-box stat-approval h-100 p-2 text-center d-flex flex-column justify-content-center">
                 <span class="stat-label text-uppercase fw-bold small mb-1" style="font-size: 0.7rem;">Approval</span>
                 <div class="stat-val fs-4 fw-bold" id="val-approval">35%</div>
             </div>
         </div>
         <div class="col-12 col-md-4">
-            <div class="stat-box h-100 p-2 text-center d-flex flex-column justify-content-center">
+            <div class="stat-box stat-risk h-100 p-2 text-center d-flex flex-column justify-content-center">
                 <span class="stat-label text-uppercase fw-bold small mb-1" style="font-size: 0.7rem;">Corruption Risk</span>
                 <div class="progress mt-1" style="height: 6px;">
                     <div class="progress-bar bg-danger" id="val-risk" role="progressbar" style="width: 0%"></div>
@@ -55,14 +55,20 @@
         <div class="row g-2" id="sectors-grid"></div>
         </div>
 
-        <div class="game-container mt-auto p-2 d-flex flex-column gap-2 text-center">
-        <div class="reaction-bar p-2 d-flex align-items-center justify-content-center" id="reaction-box">
-            Media: 'City unsafe at night.'
-        </div>
-        <button class="btn-submit w-100 py-3 fw-bold text-uppercase" id="btn-submit" onclick="finalizeBudget()">
-            Finalize Budget
-        </button>
-        <div class="text-muted small mt-2 mb-1">© 2025 Kaif Abbas</div>
+        <div class="game-container mt-auto">
+            <div class="row g-2">
+                <div class="col-12">
+                    <div class="reaction-bar p-2 d-flex align-items-center justify-content-center" id="reaction-box">
+                        Media: 'City unsafe at night.'
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button class="btn-submit w-100 py-2 fw-bold text-uppercase" id="btn-submit" onclick="finalizeBudget()">
+                        Finalize Budget
+                    </button>
+                </div>
+            </div>
+            <div class="text-muted small mt-2 mb-1 text-center">© 2025 Kaif Abbas</div>
         </div>
     </div>
 
@@ -70,7 +76,7 @@
       <div class="modal-dialog modal-dialog-centered battle-modal-dialog">
         <div class="modal-content battle-modal-content">
           <h2 id="end-title">Result</h2>
-          <p id="end-desc" style="line-height: 1.6; font-size: 1rem; color: #555">
+          <p id="end-desc">
             ...
           </p>
           <button class="btn-restart" onclick="location.reload()">

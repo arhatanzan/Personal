@@ -98,7 +98,7 @@ function takeDeal(d) {
   currentBudget += d.gain;
   corruptionRisk += d.risk;
   btn.classList.add("taken");
-  btn.innerHTML = `<span style="font-size:1.2rem">🤝</span>Deal Signed`;
+  // Removed innerHTML overwrite to allow CSS ::after to handle the stamp
 
   const box = document.getElementById("reaction-box");
   box.innerText = `SECRET: Took money from ${d.title}. Risk up!`;
@@ -111,11 +111,7 @@ function renderSectors() {
   const grid = document.getElementById("sectors-grid");
   SECTORS.forEach((s, idx) => {
     const col = document.createElement("div");
-    if (idx === SECTORS.length - 1 && SECTORS.length % 2 !== 0) {
-        col.className = "col-12";
-    } else {
-        col.className = "col-12 col-md-6";
-    }
+    col.className = "col-12"; // Changed to col-12 for vertical list view
 
     const card = document.createElement("div");
     card.className = "sector-card h-100 p-2";
@@ -125,8 +121,8 @@ function renderSectors() {
 
     card.innerHTML = `
           <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="d-flex align-items-center gap-2 fw-bold small" style="color: var(--text-main)">${s.icon} ${s.name}</span>
-              <span class="fw-bold fs-6" style="font-family: monospace; color: var(--text-main)" id="disp-${idx}">₹${s.current} Cr</span>
+              <span class="d-flex align-items-center gap-2 fw-bold small">${s.icon} ${s.name}</span>
+              <span class="fw-bold fs-6" id="disp-${idx}">₹${s.current} Cr</span>
           </div>
           <div class="slider-wrap">
               <div class="demand-marker" style="left: ${markerPos}%">
@@ -250,5 +246,3 @@ function finalizeBudget() {
 }
 
 init();
-
-
