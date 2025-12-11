@@ -44,6 +44,7 @@ h1 {
   margin: 0;
   font-size: 1.4rem;
   color: var(--text-main);
+  font-weight: 800;
 }
 .subtitle {
   font-size: 0.85rem;
@@ -197,7 +198,8 @@ h1 {
   background: #f0fff4;
 }
 .party-card.is-opp {
-  border-bottom: 4px solid var(--danger);
+  border: 2px solid var(--danger);
+  background: #fff5f5;
 }
 
 .party-header {
