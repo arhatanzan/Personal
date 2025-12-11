@@ -78,10 +78,10 @@ function renderDeals() {
   const c = document.getElementById("deals-container");
   DEALS.forEach((d) => {
     const wrapper = document.createElement("div");
-    wrapper.className = "col-3";
+    wrapper.className = "col-6 col-md-3";
 
     const b = document.createElement("button");
-    b.className = "deal-btn w-100 h-100";
+    b.className = "deal-btn w-100 h-100 d-flex flex-column align-items-center justify-content-center p-2";
     b.id = `btn-${d.id}`;
     b.innerHTML = `<span class="deal-money">+₹${d.gain}Cr</span>${d.title}`;
     b.onclick = () => takeDeal(d);
@@ -110,16 +110,23 @@ function takeDeal(d) {
 function renderSectors() {
   const grid = document.getElementById("sectors-grid");
   SECTORS.forEach((s, idx) => {
+    const col = document.createElement("div");
+    if (idx === SECTORS.length - 1 && SECTORS.length % 2 !== 0) {
+        col.className = "col-12";
+    } else {
+        col.className = "col-12 col-md-6";
+    }
+
     const card = document.createElement("div");
-    card.className = "sector-card";
+    card.className = "sector-card h-100 p-2";
 
     // Calculate marker percentage
     const markerPos = (s.demand / MAX_SLIDER) * 100;
 
     card.innerHTML = `
-          <div class="sector-top">
-              <span class="sector-name">${s.icon} ${s.name}</span>
-              <span class="sector-current" id="disp-${idx}">₹${s.current} Cr</span>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="d-flex align-items-center gap-2 fw-bold small" style="color: var(--text-main)">${s.icon} ${s.name}</span>
+              <span class="fw-bold fs-6" style="font-family: monospace; color: var(--text-main)" id="disp-${idx}">₹${s.current} Cr</span>
           </div>
           <div class="slider-wrap">
               <div class="demand-marker" style="left: ${markerPos}%">
@@ -129,7 +136,8 @@ function renderSectors() {
                   oninput="updateSector(${idx}, this.value)">
           </div>
       `;
-    grid.appendChild(card);
+    col.appendChild(card);
+    grid.appendChild(col);
   });
 }
 

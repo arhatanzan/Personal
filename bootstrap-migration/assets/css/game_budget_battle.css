@@ -20,182 +20,145 @@ body {
   font-family: var(--font-main);
   background-color: var(--bg-color);
   color: var(--text-main);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  /* display: flex; flex-direction: column; align-items: center; handled by bootstrap classes */
   min-height: 100vh;
   /* Allow scrolling on body if content is tall */
   overflow-y: auto;
   padding-bottom: 20px;
 }
 
+.game-container {
+  width: 95%;
+  max-width: 800px;
+}
+
 /* --- HEADER --- */
 header {
-  width: 100%;
-  max-width: 800px;
-  padding: 1rem;
-  text-align: center;
   background: transparent;
 }
 h1 {
   margin: 0;
-  font-size: 1.2rem;
   color: var(--text-main);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.5px;
   font-weight: 800;
+}
+.subtitle {
+  color: var(--text-light);
+  margin-top: 0.2rem;
 }
 
 /* --- DASHBOARD --- */
-.dashboard {
-  width: 95%;
-  max-width: 800px;
-  margin-bottom: 15px;
-}
+/* .dashboard layout handled by bootstrap */
 .stat-box {
   background: var(--card-bg);
-  padding: 10px;
-  border-radius: 8px;
-  text-align: center;
+  /* padding, text-align, flex handled by bootstrap */
+  border-radius: 6px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 .stat-label {
-  font-size: 0.6rem;
   text-transform: uppercase;
-  color: var(--text-light);
-  font-weight: bold;
-  margin-bottom: 4px;
+  color: #94a3b8;
+  font-weight: 700;
+  margin-bottom: 0;
+  letter-spacing: 0.5px;
 }
 .stat-val {
-  font-size: 1.2rem;
   font-weight: 800;
   color: var(--text-main);
+  line-height: 1.2;
 }
 .val-funds.negative {
   color: var(--danger);
 }
 
-.risk-bar-bg {
-  width: 100%;
+/* Risk Bar handled by bootstrap progress */
+.progress {
   height: 6px;
-  background: #eee;
-  border-radius: 3px;
+  background-color: #f1f5f9;
   margin-top: 4px;
+  border-radius: 3px;
   overflow: hidden;
 }
-.risk-bar-fill {
-  height: 100%;
-  width: 0%;
-  background: var(--danger);
-  transition: width 0.3s;
+#risk-text {
+  font-size: 0.7rem;
+  margin-top: 2px;
 }
 
 /* --- DEALS SECTION (Fixed Alignment) --- */
-.deals-wrapper {
-  width: 95%;
-  max-width: 800px;
-  margin-bottom: 15px;
-}
-.deals-grid {
-  /* Grid properties removed for Bootstrap migration */
-}
+/* .deals-wrapper layout handled by bootstrap */
+/* .deals-grid layout handled by bootstrap */
 
 .deal-btn {
-  background: var(--text-main);
+  background: #0f172a;
   color: white;
   border: none;
-  padding: 10px 5px;
+  /* padding, flex handled by bootstrap */
   border-radius: 6px;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.1s, opacity 0.2s;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   min-height: 50px;
 }
 .deal-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+  background: #1e293b;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 .deal-btn.taken {
   background: #cbd5e1;
-  color: #64748b;
+  color: #94a3b8;
   cursor: default;
   transform: none;
   box-shadow: none;
 }
 .deal-money {
-  color: var(--accent);
+  color: #fbbf24;
   font-weight: 800;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  display: block;
+  line-height: 1;
   margin-bottom: 2px;
+}
+.deal-btn.taken .deal-money {
+  color: #94a3b8;
 }
 
 /* --- SECTORS GRID (Fixed Spacing) --- */
-.game-area {
-  width: 95%;
-  max-width: 800px;
-  margin-bottom: 20px;
-}
+/* .game-area layout handled by bootstrap */
 
-.sectors-grid {
-  display: grid;
-  grid-template-columns: 1fr; /* Mobile: 1 Col */
-  gap: 12px;
-}
-/* Desktop: 2 Cols */
-@media (min-width: 600px) {
-  .sectors-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  /* The FIX: Make the last item span 2 columns if it's odd */
-  .sector-card:last-child:nth-child(odd) {
-    grid-column: span 2;
-  }
-}
+/* .sectors-grid layout handled by bootstrap */
 
 .sector-card {
   background: var(--card-bg);
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 15px;
+  border-radius: 6px;
+  /* padding handled by bootstrap */
   position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.sector-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px; /* More space for the marker */
-}
+/* .sector-top layout handled by bootstrap */
 .sector-name {
   font-weight: 700;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-main);
+  /* flex, gap handled by bootstrap */
+  color: #334155;
 }
 .sector-current {
   font-family: monospace;
-  font-weight: bold;
-  font-size: 1rem;
+  font-weight: 700;
   color: var(--text-main);
 }
 
 /* Slider with Marker */
 .slider-wrap {
   position: relative;
-  height: 24px;
-  display: flex;
-  align-items: center;
+  padding-top: 18px;
+  margin-top: 2px;
+  height: auto;
+  display: block;
 }
 
 input[type="range"] {
@@ -213,13 +176,13 @@ input[type="range"]:focus {
 /* Thumb */
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 22px;
-  width: 22px;
+  height: 16px;
+  width: 16px;
   border-radius: 50%;
-  background: var(--accent);
-  margin-top: -9px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  border: 3px solid #fff;
+  background: #eab308;
+  margin-top: -5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  border: 2px solid white;
 }
 /* Track */
 input[type="range"]::-webkit-slider-runnable-track {
@@ -227,94 +190,124 @@ input[type="range"]::-webkit-slider-runnable-track {
   height: 6px;
   background: #e2e8f0;
   border-radius: 3px;
+  cursor: pointer;
+}
+/* Firefox styles for range */
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  background: #e2e8f0;
+  border-radius: 3px;
+}
+input[type=range]::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: #eab308;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 /* The Visual Marker (Goal) */
 .demand-marker {
   position: absolute;
-  top: -5px;
-  width: 2px;
-  height: 16px;
-  background: var(--danger);
-  z-index: 1;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   pointer-events: none;
+  width: auto;
+  height: auto;
+  background: transparent;
+  z-index: 1;
 }
 /* The Red Triangle */
 .demand-marker::before {
-  content: "▼";
-  position: absolute;
-  top: -10px;
-  left: -5px;
-  color: var(--danger);
-  font-size: 10px;
+  content: '';
+  width: 0; 
+  height: 0; 
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #dc2626;
+  display: block;
+  margin-bottom: -1px;
+  position: static;
+}
+.demand-marker::after {
+  content: '';
+  width: 2px;
+  height: 12px;
+  background: #dc2626;
+  display: block;
 }
 /* The "Goal: 40" Text */
 .demand-label {
-  position: absolute;
-  top: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.65rem;
-  color: var(--danger);
+  position: static;
+  transform: none;
+  font-size: 0.6rem;
+  color: #dc2626;
   font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0;
   white-space: nowrap;
 }
 
 /* --- FOOTER --- */
-.footer {
-  width: 95%;
-  max-width: 800px;
-  text-align: center;
-}
+/* .footer layout handled by bootstrap */
 .reaction-bar {
-  background: #f1f5f9;
-  padding: 10px;
+  background: #f8fafc;
   border-radius: 6px;
-  font-size: 0.85rem;
-  color: var(--text-light);
+  font-size: 0.9rem;
+  color: #475569;
   font-style: italic;
-  text-align: center;
   margin-bottom: 12px;
   border: 1px solid #e2e8f0;
   min-height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0.5rem;
+  text-align: center;
 }
 .reaction-bar.angry {
-  color: var(--danger);
-  background: #fff5f5;
-  border-color: #feb2b2;
-  font-weight: bold;
+  color: #dc2626;
+  background: #fef2f2;
+  border-color: #fecaca;
+  font-weight: normal;
 }
 .reaction-bar.happy {
-  color: var(--success);
+  color: #16a34a;
   background: #f0fdf4;
   border-color: #bbf7d0;
-  font-weight: bold;
+  font-weight: normal;
 }
 
 .btn-submit {
-  width: 100%;
-  padding: 15px;
-  background: var(--text-main);
+  /* width, padding handled by bootstrap */
+  background: #0f172a;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-weight: 800;
   text-transform: uppercase;
   font-size: 1rem;
   cursor: pointer;
   letter-spacing: 1px;
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
-  transition: transform 0.1s;
+  box-shadow: none;
+  transition: background 0.2s;
+}
+.btn-submit:hover {
+  background: #1e293b;
 }
 .btn-submit:active {
-  transform: translateY(2px);
+  transform: none;
   box-shadow: none;
 }
 .btn-submit:disabled {
-  background: #cbd5e1;
+  background: #94a3b8;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
@@ -324,14 +317,6 @@ input[type="range"]::-webkit-slider-runnable-track {
   margin-top: 10px;
   font-size: 0.7rem;
   color: #999;
-}
-
-.subtitle {
-  font-size: 0.85rem;
-  color: var(--text-light);
-  margin-top: 5px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
 }
 
 /* --- MODAL (Refactored for Bootstrap 5) --- */
@@ -346,53 +331,47 @@ input[type="range"]::-webkit-slider-runnable-track {
 .battle-modal-content {
   background: white;
   color: var(--text-main);
-  padding: 30px;
+  padding: 2rem;
   border-radius: 12px;
   width: 100%;
-  border-top: 6px solid var(--accent);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  border-top: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   text-align: center;
+  border: none;
 }
 
 /* Ensure the modal dialog respects our custom width preference */
 .battle-modal-dialog {
-  max-width: 450px;
+  max-width: 400px;
   margin: 1.75rem auto;
 }
 .btn-restart {
-  background: var(--accent);
-  color: var(--text-main);
-  padding: 12px 25px;
+  background: #0f172a;
+  color: white;
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-  margin-top: 20px;
-  width: 100%;
+  margin-top: 1rem;
+  width: auto;
   font-size: 1rem;
 }
 
 /* Mobile tweaks */
 @media (max-width: 500px) {
-  .deals-grid {
-    grid-template-columns: 1fr 1fr;
-  } /* 2x2 on small screens */
+  /* .deals-grid handled by bootstrap col classes */
   .deal-btn {
     min-height: 60px;
   }
 }
 /* Small-screen responsive fixes: reduce vertical gaps and stack stat boxes */
 @media (max-width: 600px) {
-  .dashboard {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    width: 95%;
-    margin: 0.5rem 0;
-  }
+  /* .dashboard grid handled by bootstrap */
   .stats-bar { grid-template-columns: 1fr; }
   /* Avoid large vertical centering on tall small-viewports */
   .game-container, .game-layout, .deals-wrapper {
-    max-width: 100%;
+    /* max-width: 100%; handled by game-container width: 95% */
     padding-bottom: 1rem;
     justify-content: flex-start !important;
     padding-top: 0.25rem;
