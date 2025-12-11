@@ -213,15 +213,14 @@ function calculateStats() {
 }
 
 function finalizeBudget() {
-  // Use Bootstrap 5 Modal API
+  // Use Custom Modal
   const modalEl = document.getElementById("end-modal");
-  const modal = new bootstrap.Modal(modalEl);
   
   const t = document.getElementById("end-title");
   const d = document.getElementById("end-desc");
   const app = document.getElementById("val-approval").innerText;
 
-  modal.show();
+  modalEl.classList.add("active");
 
   // Chance of Scandal based on Risk
   if (Math.random() * 100 < corruptionRisk) {
