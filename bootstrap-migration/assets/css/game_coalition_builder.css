@@ -120,8 +120,9 @@ header {
   color: var(--success);
   text-transform: uppercase;
   font-size: 0.9rem;
-  margin-top: auto;
+  /* margin-top: auto; Removed to rely on flex space-between consistency */
   letter-spacing: 0.5px;
+  padding: 0.5rem; /* Match button padding roughly */
 }
 
 .negotiate-btn {
@@ -213,12 +214,6 @@ header {
 }
 /* Small-screen responsive fixes: reduce vertical gaps and stack stat boxes */
 @media (max-width: 600px) {
-  .dashboard {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    width: 95%;
-    margin: 0.5rem 0;
-  }
   /* Avoid large vertical centering on tall small-viewports */
   .game-container, .game-layout, .game-board {
     max-width: 100%;

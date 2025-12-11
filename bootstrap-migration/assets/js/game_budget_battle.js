@@ -111,7 +111,7 @@ function renderSectors() {
   const grid = document.getElementById("sectors-grid");
   SECTORS.forEach((s, idx) => {
     const col = document.createElement("div");
-    col.className = "col-12"; // Changed to col-12 for vertical list view
+    col.className = "col-12"; 
 
     const card = document.createElement("div");
     card.className = "sector-card h-100 p-2";
@@ -119,17 +119,29 @@ function renderSectors() {
     // Calculate marker percentage
     const markerPos = (s.demand / MAX_SLIDER) * 100;
 
+    // Refactored to use Bootstrap Grid for responsiveness instead of custom flex/order hacks
     card.innerHTML = `
-          <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="d-flex align-items-center gap-2 fw-bold small">${s.icon} ${s.name}</span>
-              <span class="fw-bold fs-6" id="disp-${idx}">₹${s.current} Cr</span>
-          </div>
-          <div class="slider-wrap">
-              <div class="demand-marker" style="left: ${markerPos}%">
-                  <span class="demand-label">Demand: ${s.demand}</span>
+          <div class="row align-items-center g-2">
+              <!-- Name: Left on Desktop, Top-Left on Mobile -->
+              <div class="col-6 col-md-3 order-1 order-md-1 d-flex align-items-center gap-2 fw-bold small">
+                  ${s.icon} ${s.name}
               </div>
-              <input type="range" min="0" max="${MAX_SLIDER}" value="${s.current}" 
-                  oninput="updateSector(${idx}, this.value)">
+              
+              <!-- Value: Right on Desktop, Top-Right on Mobile -->
+              <div class="col-6 col-md-2 order-2 order-md-3 text-end fw-bold fs-6">
+                  <span id="disp-${idx}">₹${s.current} Cr</span>
+              </div>
+
+              <!-- Slider: Middle on Desktop, Bottom on Mobile -->
+              <div class="col-12 col-md-7 order-3 order-md-2">
+                  <div class="slider-wrap position-relative w-100">
+                      <div class="demand-marker" style="left: ${markerPos}%">
+                          <span class="demand-label">Demand: ${s.demand}</span>
+                      </div>
+                      <input type="range" min="0" max="${MAX_SLIDER}" value="${s.current}" 
+                          oninput="updateSector(${idx}, this.value)">
+                  </div>
+              </div>
           </div>
       `;
     col.appendChild(card);

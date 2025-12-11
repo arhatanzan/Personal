@@ -130,7 +130,7 @@ function renderParties() {
     }
 
     const wrapper = document.createElement("div");
-    wrapper.className = "col-6 col-md-3";
+    wrapper.className = "col-6"; // Fixed to 2 columns for better readability on 600px width
 
     const card = document.createElement("div");
     card.className = `party-card ${supports ? "is-ally" : "is-opp"} h-100`;
