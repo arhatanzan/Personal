@@ -6,80 +6,77 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>The Coalition Builder</title>
+    <title>Budget Battle</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../assets/css/game_coalition_builder.css">
+    <link rel="stylesheet" href="../assets/css/game_budget_battle.css">
     <!-- Carousel Component CSS -->
     <link rel="stylesheet" href="../assets/css/carousel.css" />
   </head>
-  <body class="d-flex flex-column align-items-center">
-    <div class="container-fluid p-0 d-flex flex-column align-items-center" style="max-width: 800px;">
-    <header>
-      <h1>Coalition Builder</h1>
-      <div class="subtitle">Assemble 251 Seats. Pass 5 Laws. Survive.</div>
-    </header>
+  <body>
+    <div class="container-fluid d-flex flex-column align-items-center p-0">
+        <header>
+        <h1>Budget Battle</h1>
+        <div class="subtitle">Pick your winning allocations</div>
+        </header>
 
-    <div class="stats-bar">
-      <div class="stat-box">
-        <span class="stat-label">Pol. Capital</span>
-        <div class="stat-val gold" id="val-capital">80</div>
-      </div>
-      <div class="stat-box">
-        <span class="stat-label">Weeks Left</span>
-        <div class="stat-val" id="val-weeks">10</div>
-      </div>
-      <div class="stat-box">
-        <span class="stat-label">Passed</span>
-        <div class="stat-val" id="val-passed">0 / 5</div>
-      </div>
-    </div>
+        <div class="dashboard">
+        <div class="stat-box">
+            <span class="stat-label">Budget Left</span>
+            <div class="stat-val val-funds" id="val-funds">₹100 Cr</div>
+        </div>
+        <div class="stat-box">
+            <span class="stat-label">Approval</span>
+            <div class="stat-val" id="val-approval">35%</div>
+        </div>
+        <div class="stat-box">
+            <span class="stat-label">Corruption Risk</span>
+            <div class="risk-bar-bg">
+            <div class="risk-bar-fill" id="val-risk"></div>
+            </div>
+            <div style="font-size: 0.65rem; margin-top: 4px" id="risk-text">
+            Safe
+            </div>
+        </div>
+        </div>
 
-    <div class="parliament-wrapper">
-      <div class="parliament-container">
-        <div class="majority-line" title="Majority Threshold (251)"></div>
-        <div class="seat-bar bar-gov" id="bar-gov" style="width: 30%"></div>
-        <div
-          class="seat-bar bar-allies"
-          id="bar-allies"
-          style="width: 0%"
-        ></div>
-        <div class="seat-bar bar-opp" id="bar-opp" style="width: 70%"></div>
-      </div>
-      <div class="vote-count">
-        Current Support: <span id="vote-total">150</span> / 500
-      </div>
-    </div>
+        <div class="deals-wrapper">
+        <div class="deals-grid" id="deals-container"></div>
+        </div>
 
-    <main class="game-board">
-      <div class="law-card">
-        <div class="law-title" id="law-title">Loading Law...</div>
-        <div class="law-desc" id="law-desc">...</div>
-      </div>
+        <div class="game-area">
+        <div class="sectors-grid" id="sectors-grid"></div>
+        </div>
 
-      <div class="parties-grid" id="parties-grid"></div>
-
-      <div class="action-bar">
-        <button class="btn-vote" id="btn-vote" onclick="callVote()">
-          CALL VOTE
+        <div class="footer">
+        <div class="reaction-bar" id="reaction-box">
+            Media: 'City unsafe at night.'
+        </div>
+        <button class="btn-submit" id="btn-submit" onclick="finalizeBudget()">
+            Finalize Budget
         </button>
         <div class="copyright">© 2025 Kaif Abbas</div>
-      </div>
-    </main>
+        </div>
     </div>
 
     <div class="modal" id="end-modal">
-      <h2 id="modal-title">Election Over</h2>
-      <p id="modal-desc">...</p>
-      <button class="btn-restart" onclick="initGame()">Start New Term</button>
+      <div class="modal-content">
+        <h2 id="end-title">Result</h2>
+        <p id="end-desc" style="line-height: 1.6; font-size: 1rem; color: #555">
+          ...
+        </p>
+        <button class="btn-restart" onclick="location.reload()">
+          Play Again
+        </button>
+      </div>
     </div>
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Game Logic -->
-    <script src="../assets/js/game_coalition_builder.js"></script>
-
+    <!-- Custom JS -->
+    <script src="../assets/js/game_budget_battle.js"></script>
+    
     <!-- Games carousel container (Content loaded dynamically) -->
     <div id="games-carousel-container" class="container-fluid w-100 mt-2 p-0"></div>
 

@@ -1,0 +1,419 @@
+:root {
+  --bg-color: #f4f7f6;
+  --card-bg: #ffffff;
+  --text-main: #0a2342;
+  --text-light: #5a6673;
+  --accent: #d4a017;
+  --danger: #d64545;
+  --success: #27ab83;
+  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  /* Allow scrolling on body if content is tall */
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+
+/* --- HEADER --- */
+header {
+  width: 100%;
+  max-width: 800px;
+  padding: 1rem;
+  text-align: center;
+  background: transparent;
+}
+h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+}
+
+/* --- DASHBOARD --- */
+.dashboard {
+  width: 95%;
+  max-width: 800px;
+  margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+}
+.stat-box {
+  background: var(--card-bg);
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+  flex: 1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.stat-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  color: var(--text-light);
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.stat-val {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+.val-funds.negative {
+  color: var(--danger);
+}
+
+.risk-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+.risk-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--danger);
+  transition: width 0.3s;
+}
+
+/* --- DEALS SECTION (Fixed Alignment) --- */
+.deals-wrapper {
+  width: 95%;
+  max-width: 800px;
+  margin-bottom: 15px;
+}
+.deals-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Force 4 equal columns */
+  gap: 10px;
+}
+
+.deal-btn {
+  background: var(--text-main);
+  color: white;
+  border: none;
+  padding: 10px 5px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s, opacity 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  min-height: 50px;
+}
+.deal-btn:hover {
+  transform: translateY(-2px);
+}
+.deal-btn.taken {
+  background: #cbd5e1;
+  color: #64748b;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+.deal-money {
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: 2px;
+}
+
+/* --- SECTORS GRID (Fixed Spacing) --- */
+.game-area {
+  width: 95%;
+  max-width: 800px;
+  margin-bottom: 20px;
+}
+
+.sectors-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* Mobile: 1 Col */
+  gap: 12px;
+}
+/* Desktop: 2 Cols */
+@media (min-width: 600px) {
+  .sectors-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  /* The FIX: Make the last item span 2 columns if it's odd */
+  .sector-card:last-child:nth-child(odd) {
+    grid-column: span 2;
+  }
+}
+
+.sector-card {
+  background: var(--card-bg);
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 15px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.sector-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px; /* More space for the marker */
+}
+.sector-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-main);
+}
+.sector-current {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+
+/* Slider with Marker */
+.slider-wrap {
+  position: relative;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+input[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  z-index: 2;
+  cursor: pointer;
+}
+input[type="range"]:focus {
+  outline: none;
+}
+
+/* Thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: -9px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 3px solid #fff;
+}
+/* Track */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+}
+
+/* The Visual Marker (Goal) */
+.demand-marker {
+  position: absolute;
+  top: -5px;
+  width: 2px;
+  height: 16px;
+  background: var(--danger);
+  z-index: 1;
+  pointer-events: none;
+}
+/* The Red Triangle */
+.demand-marker::before {
+  content: "▼";
+  position: absolute;
+  top: -10px;
+  left: -5px;
+  color: var(--danger);
+  font-size: 10px;
+}
+/* The "Goal: 40" Text */
+.demand-label {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  color: var(--danger);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* --- FOOTER --- */
+.footer {
+  width: 95%;
+  max-width: 800px;
+  text-align: center;
+}
+.reaction-bar {
+  background: #f1f5f9;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 12px;
+  border: 1px solid #e2e8f0;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.reaction-bar.angry {
+  color: var(--danger);
+  background: #fff5f5;
+  border-color: #feb2b2;
+  font-weight: bold;
+}
+.reaction-bar.happy {
+  color: var(--success);
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  font-weight: bold;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 15px;
+  background: var(--text-main);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 1rem;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s;
+}
+.btn-submit:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+.btn-submit:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.copyright {
+  margin-top: 10px;
+  font-size: 0.7rem;
+  color: #999;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-top: 5px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 35, 66, 0.98);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+.modal.active {
+  display: flex;
+}
+.modal-content {
+  background: white;
+  color: var(--text-main);
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 450px;
+  width: 100%;
+  border-top: 6px solid var(--accent);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+.btn-restart {
+  background: var(--accent);
+  color: var(--text-main);
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  width: 100%;
+  font-size: 1rem;
+}
+
+/* Mobile tweaks */
+@media (max-width: 500px) {
+  .deals-grid {
+    grid-template-columns: 1fr 1fr;
+  } /* 2x2 on small screens */
+  .deal-btn {
+    min-height: 60px;
+  }
+}
+/* Small-screen responsive fixes: reduce vertical gaps and stack stat boxes */
+@media (max-width: 600px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: 95%;
+    margin: 0.5rem 0;
+  }
+  .stats-bar { grid-template-columns: 1fr; }
+  /* Avoid large vertical centering on tall small-viewports */
+  .game-container, .game-layout, .deals-wrapper {
+    max-width: 100%;
+    padding-bottom: 1rem;
+    justify-content: flex-start !important;
+    padding-top: 0.25rem;
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+  .card-stack { height: auto !important; margin-bottom: 8px; }
+  .card { position: relative !important; height: auto !important; top: auto !important; left: auto !important; padding: 1.25rem; }
+  body { min-height: auto !important; height: auto !important; }
+  .controls, .broadcast-slots, .deals-grid { gap: 8px; padding: 8px; justify-content: center; }
+  .btn, .btn-modal, .deal-btn { padding: 0.6rem; font-size: 0.95rem; }
+  header { padding: 0.6rem; }
+  .copyright { margin-top: 8px; font-size: 0.7rem; }
+}

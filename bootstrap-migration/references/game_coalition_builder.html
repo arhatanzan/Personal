@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>The Coalition Builder</title>
+    <style>
+      :root {
+        --bg-color: #f8f6f2;
+        --card-bg: #ffffff;
+        --text-main: #0a2342; /* Navy */
+        --text-light: #5a6673; /* Slate */
+        --accent: #d4a017; /* Gold */
+        --danger: #7a2e2e; /* Red */
+        --success: #27ab83; /* Green */
+        --border-color: rgba(10, 35, 66, 0.1);
+        --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: var(--font-main);
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* Dynamic height to fix mobile scroll issues */
+        min-height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      /* --- HEADER --- */
+      header {
+        width: 100%;
+        max-width: 800px;
+        padding: 1rem 1rem 0.5rem 1rem;
+        text-align: center;
+        background: var(--bg-color);
+        flex-shrink: 0;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.4rem;
+        color: var(--text-main);
+      }
+      .subtitle {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-top: 0.2rem;
+      }
+
+      /* --- STATS BAR --- */
+      .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        width: 95%;
+        max-width: 600px;
+        margin: 0.5rem 0;
+        flex-shrink: 0;
+      }
+
+      .stat-box {
+        background: var(--card-bg);
+        padding: 8px;
+        border-radius: 8px;
+        text-align: center;
+        border: 2px solid var(--border-color);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .stat-label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        color: var(--text-light);
+        font-weight: bold;
+        letter-spacing: 0.5px;
+      }
+      .stat-val {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-top: 2px;
+      }
+      .stat-val.gold {
+        color: var(--accent);
+      }
+
+      /* --- PARLIAMENT VIZ --- */
+      .parliament-wrapper {
+        width: 95%;
+        max-width: 600px;
+        margin-bottom: 10px;
+        flex-shrink: 0;
+      }
+
+      .parliament-container {
+        background: #e2e8f0;
+        height: 32px;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .seat-bar {
+        height: 100%;
+        transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .bar-gov {
+        background: var(--text-main);
+      }
+      .bar-allies {
+        background: var(--success);
+      }
+      .bar-opp {
+        background: var(--danger);
+      }
+
+      .majority-line {
+        position: absolute;
+        left: 50.2%; /* 251/500 is just over 50% */
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--accent);
+        z-index: 10;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .vote-count {
+        text-align: center;
+        font-size: 0.8rem;
+        margin-top: 4px;
+        font-weight: bold;
+        color: var(--text-light);
+      }
+
+      /* --- GAME BOARD --- */
+      .game-board {
+        /* Do not force the board to stretch to fill the viewport; let it size to content
+           This prevents large empty space when users zoom out or change viewport dimensions */
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        width: 95%;
+        max-width: 600px;
+        gap: 15px;
+        padding-bottom: 20px;
+        /* Keep internal scrolling only as needed */
+        overflow-y: visible;
+      }
+
+      /* Law Card */
+      .law-card {
+        background: var(--card-bg);
+        border: 2px solid var(--text-main);
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        flex-shrink: 0;
+      }
+
+      .law-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+        color: var(--text-main);
+      }
+      .law-desc {
+        font-size: 0.95rem;
+        color: var(--text-light);
+        line-height: 1.4;
+      }
+
+      /* Party Grid */
+      .parties-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+
+      .party-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        transition: all 0.2s;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .party-card.is-ally {
+        border: 2px solid var(--success);
+        background: #f0fff4;
+      }
+      .party-card.is-opp {
+        border-bottom: 4px solid var(--danger);
+      }
+
+      .party-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+      .party-name {
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-align: left;
+      }
+      .party-seats {
+        font-size: 0.75rem;
+        background: #eee;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .stance-tag {
+        display: block;
+        padding: 4px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin: 6px 0;
+      }
+      .tag-yes {
+        color: var(--success);
+        background: rgba(39, 171, 131, 0.1);
+      }
+      .tag-no {
+        color: var(--danger);
+        background: rgba(214, 69, 69, 0.1);
+      }
+
+      .negotiate-btn {
+        background: var(--text-main);
+        color: var(--accent);
+        border: none;
+        padding: 8px 0;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+        transition: opacity 0.2s;
+      }
+      .negotiate-btn:active {
+        transform: scale(0.98);
+      }
+
+      /* --- ACTION BAR --- */
+      .action-bar {
+        text-align: center;
+        margin-top: 12px;
+        padding: 10px 0;
+      }
+
+      .btn-vote {
+        background: var(--accent);
+        color: var(--text-main);
+        border: 2px solid var(--text-main);
+        padding: 12px 30px;
+        font-size: 1rem;
+        font-weight: 800;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 4px 0 var(--text-main);
+        width: 100%;
+        max-width: 300px;
+        transition: transform 0.1s, box-shadow 0.1s;
+      }
+
+      .btn-vote:active {
+        transform: translateY(4px);
+        box-shadow: 0 0 0 var(--text-main);
+      }
+      .btn-vote:disabled {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      .copyright {
+        margin-top: 10px;
+        font-size: 0.7rem;
+        color: var(--text-light);
+        text-align: center;
+        opacity: 0.6;
+        padding-bottom: 10px;
+      }
+
+      /* --- MODAL --- */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 35, 66, 0.98);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        color: white;
+        text-align: center;
+        padding: 20px;
+      }
+      .modal.active {
+        display: flex;
+      }
+      .modal h2 {
+        font-size: 2rem;
+        color: var(--accent);
+        margin-bottom: 1rem;
+      }
+      .modal p {
+        max-width: 500px;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        color: #e2e8f0;
+      }
+      .btn-restart {
+        background: var(--accent);
+        color: var(--text-main);
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+
+      /* Responsive tweaks */
+      @media (min-height: 700px) {
+        .game-board {
+          justify-content: center;
+        }
+      }
+      /* Small-screen responsive fixes: reduce vertical gaps and stack stat boxes */
+      @media (max-width: 600px) {
+        .stats-bar, .dashboard {
+          grid-template-columns: 1fr;
+          gap: 8px;
+          width: 95%;
+          margin: 0.5rem 0;
+        }
+        /* Avoid large vertical centering on tall small-viewports */
+        .game-container, .game-layout, .game-board {
+          max-width: 100%;
+          padding-bottom: 1rem;
+          justify-content: flex-start !important;
+          padding-top: 0.25rem;
+          flex: 0 0 auto;
+          min-height: 0;
+        }
+        .card-stack { height: auto !important; margin-bottom: 8px; }
+        .card { position: relative !important; height: auto !important; top: auto !important; left: auto !important; padding: 1.25rem; }
+        body { min-height: auto !important; height: auto !important; }
+        .controls, .broadcast-slots { gap: 8px; padding: 8px; justify-content: center; }
+        header { padding: 0.6rem; }
+        .copyright { margin-top: 8px; font-size: 0.7rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Coalition Builder</h1>
+      <div class="subtitle">Assemble 251 Seats. Pass 5 Laws. Survive.</div>
+    </header>
+
+    <div class="stats-bar">
+      <div class="stat-box">
+        <span class="stat-label">Pol. Capital</span>
+        <div class="stat-val gold" id="val-capital">80</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Weeks Left</span>
+        <div class="stat-val" id="val-weeks">10</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Passed</span>
+        <div class="stat-val" id="val-passed">0 / 5</div>
+      </div>
+    </div>
+
+    <div class="parliament-wrapper">
+      <div class="parliament-container">
+        <div class="majority-line" title="Majority Threshold (251)"></div>
+        <div class="seat-bar bar-gov" id="bar-gov" style="width: 30%"></div>
+        <div
+          class="seat-bar bar-allies"
+          id="bar-allies"
+          style="width: 0%"
+        ></div>
+        <div class="seat-bar bar-opp" id="bar-opp" style="width: 70%"></div>
+      </div>
+      <div class="vote-count">
+        Current Support: <span id="vote-total">150</span> / 500
+      </div>
+    </div>
+
+    <main class="game-board">
+      <div class="law-card">
+        <div class="law-title" id="law-title">Loading Law...</div>
+        <div class="law-desc" id="law-desc">...</div>
+      </div>
+
+      <div class="parties-grid" id="parties-grid"></div>
+
+      <div class="action-bar">
+        <button class="btn-vote" id="btn-vote" onclick="callVote()">
+          CALL VOTE
+        </button>
+        <div class="copyright">© 2025 Kaif Abbas</div>
+      </div>
+    </main>
+
+    <div class="modal" id="end-modal">
+      <h2 id="modal-title">Election Over</h2>
+      <p id="modal-desc">...</p>
+      <button class="btn-restart" onclick="initGame()">Start New Term</button>
+    </div>
+
+    <script>
+      // --- GAME CONFIG ---
+      const TARGET_PASSED = 5;
+      const MAX_SEATS = 500;
+      const MY_SEATS = 150;
+      const THRESHOLD = 251;
+      const INITIAL_CAPITAL = 75; // Decreased from 100 for difficulty
+      const INITIAL_WEEKS = 10;
+      const WIN_REWARD = 10; // Decreased reward
+
+      // Party Archetypes
+      const PARTIES = [
+        { id: 0, name: "Farmers Front", seats: 80 },
+        { id: 1, name: "Corp Alliance", seats: 90 },
+        { id: 2, name: "Sanskriti Dal", seats: 70 },
+        { id: 3, name: "Youth Bloc", seats: 110 },
+      ];
+
+      // Laws Deck (Harder affinities)
+      // 0 = Neutral, -1 = Dislike, -2 = Hate, 1 = Support, 2 = Love
+      const LAWS = [
+        {
+          title: "Green Energy Subsidy",
+          desc: "Tax cuts for solar farms. Reduces diesel subsidies.",
+          affinities: [-2, 1, -1, 2], // Farmers hate it (diesel)
+        },
+        {
+          title: "Labor Code Reform",
+          desc: "12-hour work shifts allowed. Easier hiring/firing.",
+          affinities: [-1, 2, -1, 0], // Unions hate it, Corp loves it
+        },
+        {
+          title: "Heritage Protection Act",
+          desc: "Funds ancient sites but bans construction near them.",
+          affinities: [-1, -2, 2, -1], // Corp hates land ban
+        },
+        {
+          title: "Digital Privacy Bill",
+          desc: "Strict data localization. Good for users, bad for big tech.",
+          affinities: [0, -2, 0, 2], // Corp hates compliance costs
+        },
+        {
+          title: "MSP Guarantee Act",
+          desc: "Guarantees minimum crop prices. Huge cost to exchequer.",
+          affinities: [2, -2, 0, -1], // Corp hates taxes, Youth worries about debt
+        },
+        {
+          title: "Urban Infra Overhaul",
+          desc: "Demolish old structures for flyovers.",
+          affinities: [-1, 1, -2, 1], // Traditionalists hate demolition
+        },
+        {
+          title: "University Autonomy",
+          desc: "Reduces govt control over syllabus.",
+          affinities: [0, 0, -2, 2], // Youth wants freedom, Trad wants control
+        },
+        {
+          title: "Defense Budget Hike",
+          desc: "Increases military spending by cutting social welfare.",
+          affinities: [-1, 1, 2, -2], // Youth hates welfare cuts
+        },
+      ];
+
+      // --- STATE ---
+      let state = {
+        capital: INITIAL_CAPITAL,
+        weeks: INITIAL_WEEKS,
+        passed: 0,
+        currentLaw: null,
+        partyStances: [],
+        deckIndex: 0,
+      };
+
+      function initGame() {
+        LAWS.sort(() => Math.random() - 0.5);
+
+        state = {
+          capital: INITIAL_CAPITAL,
+          weeks: INITIAL_WEEKS,
+          passed: 0,
+          currentLaw: null,
+          deckIndex: 0,
+          partyStances: [false, false, false, false],
+        };
+
+        document.getElementById("end-modal").classList.remove("active");
+        loadNextLaw();
+        updateUI();
+      }
+
+      function loadNextLaw() {
+        if (state.deckIndex >= LAWS.length) {
+          state.deckIndex = 0;
+          LAWS.sort(() => Math.random() - 0.5);
+        }
+
+        state.currentLaw = LAWS[state.deckIndex];
+        state.deckIndex++;
+
+        // Default stances based on affinity > 0
+        state.partyStances = PARTIES.map((p, index) => {
+          return state.currentLaw.affinities[index] > 0;
+        });
+
+        renderLawCard();
+        renderParties();
+        updateViz();
+      }
+
+      function renderLawCard() {
+        document.getElementById("law-title").innerText = state.currentLaw.title;
+        document.getElementById("law-desc").innerText = state.currentLaw.desc;
+      }
+
+      function renderParties() {
+        const grid = document.getElementById("parties-grid");
+        grid.innerHTML = "";
+
+        PARTIES.forEach((p, index) => {
+          const supports = state.partyStances[index];
+          const affinity = state.currentLaw.affinities[index];
+
+          // INCREASED DIFFICULTY COST FORMULA
+          // Base cost 20. +15 for each level of disagreement.
+          // Neutral (0) = 20. Dislike (-1) = 35. Hate (-2) = 50.
+          let cost = 0;
+          if (!supports) {
+            // If affinity is positive but currently false (unlikely in this logic but possible if we add events), treat as 10
+            if (affinity > 0) cost = 10;
+            else cost = 20 + Math.abs(affinity) * 15;
+          }
+
+          const card = document.createElement("div");
+          card.className = `party-card ${supports ? "is-ally" : "is-opp"}`;
+
+          // Check if player can afford
+          const canAfford = state.capital >= cost;
+
+          card.innerHTML = `
+                <div class="party-header">
+                    <span class="party-name">${p.name}</span>
+                    <span class="party-seats">${p.seats}</span>
+                </div>
+                
+                <span class="stance-tag ${supports ? "tag-yes" : "tag-no"}">
+                    ${supports ? "SUPPORTS" : "OPPOSES"}
+                </span>
+
+                ${
+                  !supports
+                    ? `
+                    <button class="negotiate-btn" 
+                        style="${!canAfford ? "opacity:0.5" : ""}"
+                        onclick="negotiate(${index}, ${cost})">
+                        Negotiate (${cost} Cap)
+                    </button>
+                `
+                    : '<div style="font-size:0.75rem; color:green; font-weight:bold; margin-top:auto;">SECURED</div>'
+                }
+            `;
+          grid.appendChild(card);
+        });
+      }
+
+      function negotiate(partyIndex, cost) {
+        if (state.capital >= cost) {
+          state.capital -= cost;
+          state.partyStances[partyIndex] = true;
+          renderParties();
+          updateUI();
+          updateViz();
+        } else {
+          // Shake effect or simple alert
+          const btn = document.getElementById("btn-vote");
+          btn.innerText = "NOT ENOUGH CAPITAL!";
+          btn.style.borderColor = "var(--danger)";
+          btn.style.color = "var(--danger)";
+          setTimeout(() => {
+            btn.innerText = "CALL VOTE";
+            btn.style.borderColor = "var(--text-main)";
+            btn.style.color = "var(--text-main)";
+          }, 1000);
+        }
+      }
+
+      function updateViz() {
+        let currentVotes = MY_SEATS;
+        PARTIES.forEach((p, idx) => {
+          if (state.partyStances[idx]) currentVotes += p.seats;
+        });
+
+        const myPercent = (MY_SEATS / MAX_SEATS) * 100;
+        let allySeats = 0;
+        PARTIES.forEach((p, idx) => {
+          if (state.partyStances[idx]) allySeats += p.seats;
+        });
+        const allyPercent = (allySeats / MAX_SEATS) * 100;
+
+        document.getElementById("bar-gov").style.width = myPercent + "%";
+        document.getElementById("bar-allies").style.width = allyPercent + "%";
+        document.getElementById("bar-opp").style.width =
+          100 - myPercent - allyPercent + "%";
+
+        const voteEl = document.getElementById("vote-total");
+        voteEl.innerText = currentVotes;
+        voteEl.style.color =
+          currentVotes >= THRESHOLD ? "var(--success)" : "var(--danger)";
+      }
+
+      function updateUI() {
+        document.getElementById("val-capital").innerText = state.capital;
+        document.getElementById("val-weeks").innerText = state.weeks;
+        document.getElementById(
+          "val-passed"
+        ).innerText = `${state.passed} / ${TARGET_PASSED}`;
+        document.getElementById("val-capital").style.color =
+          state.capital < 20 ? "var(--danger)" : "var(--accent)";
+      }
+
+      function callVote() {
+        let currentVotes = MY_SEATS;
+        PARTIES.forEach((p, idx) => {
+          if (state.partyStances[idx]) currentVotes += p.seats;
+        });
+
+        if (currentVotes >= THRESHOLD) {
+          // Success
+          state.passed++;
+          state.weeks--;
+          state.capital += WIN_REWARD;
+          showFeedback(true);
+        } else {
+          // Fail
+          state.weeks -= 2; // Punishment
+          state.capital -= 5; // Punishment
+          showFeedback(false);
+        }
+
+        setTimeout(checkEndGame, 1000);
+      }
+
+      function showFeedback(success) {
+        const btn = document.getElementById("btn-vote");
+
+        btn.disabled = true;
+        btn.style.background = success ? "var(--success)" : "var(--danger)";
+        btn.innerText = success ? "PASSED!" : "REJECTED!";
+        btn.style.color = "white";
+        btn.style.borderColor = success ? "var(--success)" : "var(--danger)";
+
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.style.background = "var(--accent)";
+          btn.innerText = "CALL VOTE";
+          btn.style.color = "var(--text-main)";
+          btn.style.borderColor = "var(--text-main)";
+
+          if (state.weeks > 0 && state.passed < TARGET_PASSED) {
+            loadNextLaw();
+            updateUI();
+          }
+        }, 1000);
+      }
+
+      function checkEndGame() {
+        if (state.passed >= TARGET_PASSED) {
+          endGame(
+            true,
+            "Coalition Victorious! You managed to pass your agenda. The government is stable."
+          );
+        } else if (state.weeks <= 0) {
+          endGame(
+            false,
+            "Term Ended. You ran out of time before passing enough laws. The coalition has collapsed."
+          );
+        }
+      }
+
+      function endGame(win, msg) {
+        const modal = document.getElementById("end-modal");
+        const title = document.getElementById("modal-title");
+        const desc = document.getElementById("modal-desc");
+
+        title.innerText = win ? "Victory!" : "Defeat";
+        title.style.color = win ? "var(--success)" : "var(--danger)";
+        desc.innerText = msg;
+        modal.classList.add("active");
+      }
+
+      initGame();
+
+      function sendHeight() {
+        const height = document.body.scrollHeight;
+        parent.postMessage({ type: "resizeIframe", height: height }, "*");
+      }
+
+      window.addEventListener("load", sendHeight);
+
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(sendHeight).observe(document.body);
+      }
+    </script>
+    <!-- Games carousel embed -->
+    <iframe id="games-carousel" src="carousel.html" style="width:100%;border:0;max-height:380px;height:320px;display:block;" scrolling="no" aria-label="Games carousel"></iframe>
+    <script>
+      window.addEventListener("message", function (e) {
+        try {
+          if (!e.data || e.data.type !== "resizeIframe") return;
+          var iframe = document.getElementById("games-carousel");
+          if (!iframe) return;
+          try { console.log('games-carousel message', e.data); } catch (err) {}
+          var requested = Number(e.data.height) || 0;
+          var MAX_H = 380;
+          var newH = Math.min(requested || 0, MAX_H);
+          if (newH <= 0) newH = 320;
+          var curr = parseInt(iframe.style.height, 10) || 0;
+          if (Math.abs(curr - newH) > 3) {
+            iframe.style.height = newH + "px";
+            iframe.style.maxHeight = MAX_H + "px";
+            iframe.style.display = 'block';
+          }
+        } catch (err) {
+          console.warn('Carousel iframe resize failed', err);
+        }
+      }, false);
+    </script>
+  </body>
+</html>
