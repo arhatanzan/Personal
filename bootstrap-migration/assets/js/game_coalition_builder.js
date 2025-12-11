@@ -129,8 +129,11 @@ function renderParties() {
       else cost = 20 + Math.abs(affinity) * 15;
     }
 
+    const wrapper = document.createElement("div");
+    wrapper.className = "col-6";
+
     const card = document.createElement("div");
-    card.className = `party-card ${supports ? "is-ally" : "is-opp"}`;
+    card.className = `party-card ${supports ? "is-ally" : "is-opp"} h-100`;
 
     // Check if player can afford
     const canAfford = state.capital >= cost;
@@ -157,7 +160,8 @@ function renderParties() {
               : '<div style="font-size:0.75rem; color:green; font-weight:bold; margin-top:auto;">SECURED</div>'
           }
       `;
-    grid.appendChild(card);
+    wrapper.appendChild(card);
+    grid.appendChild(wrapper);
   });
 }
 

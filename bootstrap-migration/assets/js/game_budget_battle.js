@@ -77,12 +77,17 @@ function init() {
 function renderDeals() {
   const c = document.getElementById("deals-container");
   DEALS.forEach((d) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "col-3";
+
     const b = document.createElement("button");
-    b.className = "deal-btn";
+    b.className = "deal-btn w-100 h-100";
     b.id = `btn-${d.id}`;
     b.innerHTML = `<span class="deal-money">+₹${d.gain}Cr</span>${d.title}`;
     b.onclick = () => takeDeal(d);
-    c.appendChild(b);
+    
+    wrapper.appendChild(b);
+    c.appendChild(wrapper);
   });
 }
 

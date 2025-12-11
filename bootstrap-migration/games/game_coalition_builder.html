@@ -21,18 +21,24 @@
       <div class="subtitle">Assemble 251 Seats. Pass 5 Laws. Survive.</div>
     </header>
 
-    <div class="stats-bar">
-      <div class="stat-box">
-        <span class="stat-label">Pol. Capital</span>
-        <div class="stat-val gold" id="val-capital">80</div>
+    <div class="stats-bar row g-2">
+      <div class="col-4">
+        <div class="stat-box h-100">
+          <span class="stat-label">Pol. Capital</span>
+          <div class="stat-val gold" id="val-capital">80</div>
+        </div>
       </div>
-      <div class="stat-box">
-        <span class="stat-label">Weeks Left</span>
-        <div class="stat-val" id="val-weeks">10</div>
+      <div class="col-4">
+        <div class="stat-box h-100">
+          <span class="stat-label">Weeks Left</span>
+          <div class="stat-val" id="val-weeks">10</div>
+        </div>
       </div>
-      <div class="stat-box">
-        <span class="stat-label">Passed</span>
-        <div class="stat-val" id="val-passed">0 / 5</div>
+      <div class="col-4">
+        <div class="stat-box h-100">
+          <span class="stat-label">Passed</span>
+          <div class="stat-val" id="val-passed">0 / 5</div>
+        </div>
       </div>
     </div>
 
@@ -58,7 +64,7 @@
         <div class="law-desc" id="law-desc">...</div>
       </div>
 
-      <div class="parties-grid" id="parties-grid"></div>
+      <div class="parties-grid row g-2" id="parties-grid"></div>
 
       <div class="action-bar">
         <button class="btn-vote" id="btn-vote" onclick="callVote()">

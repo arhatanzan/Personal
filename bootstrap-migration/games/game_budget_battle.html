@@ -21,28 +21,34 @@
         <div class="subtitle">Pick your winning allocations</div>
         </header>
 
-        <div class="dashboard">
-        <div class="stat-box">
-            <span class="stat-label">Budget Left</span>
-            <div class="stat-val val-funds" id="val-funds">₹100 Cr</div>
-        </div>
-        <div class="stat-box">
-            <span class="stat-label">Approval</span>
-            <div class="stat-val" id="val-approval">35%</div>
-        </div>
-        <div class="stat-box">
-            <span class="stat-label">Corruption Risk</span>
-            <div class="risk-bar-bg">
-            <div class="risk-bar-fill" id="val-risk"></div>
+        <div class="dashboard row g-2">
+        <div class="col-4">
+            <div class="stat-box h-100">
+                <span class="stat-label">Budget Left</span>
+                <div class="stat-val val-funds" id="val-funds">₹100 Cr</div>
             </div>
-            <div style="font-size: 0.65rem; margin-top: 4px" id="risk-text">
-            Safe
+        </div>
+        <div class="col-4">
+            <div class="stat-box h-100">
+                <span class="stat-label">Approval</span>
+                <div class="stat-val" id="val-approval">35%</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="stat-box h-100">
+                <span class="stat-label">Corruption Risk</span>
+                <div class="risk-bar-bg">
+                <div class="risk-bar-fill" id="val-risk"></div>
+                </div>
+                <div style="font-size: 0.65rem; margin-top: 4px" id="risk-text">
+                Safe
+                </div>
             </div>
         </div>
         </div>
 
         <div class="deals-wrapper">
-        <div class="deals-grid" id="deals-container"></div>
+        <div class="deals-grid row g-2" id="deals-container"></div>
         </div>
 
         <div class="game-area">
