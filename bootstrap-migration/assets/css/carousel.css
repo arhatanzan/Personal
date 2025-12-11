@@ -7,11 +7,18 @@
   --border: rgba(0, 0, 0, 0.06);
   --radius: 10px;
   --gap: 20px;
+  --font-heading: 'Quicksand', sans-serif;
+  --font-body: 'Calibri', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
   background: transparent;
   color: var(--navy);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
 }
 
 /* Carousel Track */
@@ -93,7 +100,7 @@ body {
 }
 
 .c-card:hover .c-btn {
-  background: var(--accent);
+  background: #7a2e2e;
   color: #fff;
 }
 
