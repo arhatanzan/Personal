@@ -315,7 +315,6 @@ let state = {
 };
 
 let currentCard = null;
-let gameOverModal;
 
 function initGame() {
   state = {
@@ -336,15 +335,10 @@ function initGame() {
     cardCounts: new Map(),
   };
   
-  // Initialize Bootstrap modal if available
+  // Reset Custom Modal
   const modalEl = document.getElementById("game-over-modal");
-  if (modalEl && window.bootstrap) {
-    gameOverModal = new bootstrap.Modal(modalEl);
-    gameOverModal.hide();
-  } else if (modalEl) {
-      // Fallback for non-bootstrap or if bootstrap not loaded yet
-      modalEl.classList.remove("show");
-      modalEl.style.display = "none";
+  if (modalEl) {
+    modalEl.classList.remove("active");
   }
 
   updateStatsUI();
@@ -484,28 +478,14 @@ function updateStatsUI() {
   if(infEl) infEl.innerText = Math.round(state.info) + "%";
 
   // Color Logic
-  if(boxPol) setBoxState(boxPol, state.polarization, true);
-  if(boxInf) setBoxState(boxInf, state.info, false);
-  if(boxEng) setBoxState(boxEng, state.engagement, false);
+  if(boxPol) setBoxState(boxPol, state.polarization, true, "rgba(239, 68, 68, 0.15)"); // Red
+  if(boxInf) setBoxState(boxInf, state.info, false, "rgba(16, 185, 129, 0.15)"); // Green
+  if(boxEng) setBoxState(boxEng, state.engagement, false, "rgba(15, 23, 42, 0.1)"); // Primary
 }
 
-function setBoxState(element, value, reverse) {
-  element.classList.remove(
-    "state-good",
-    "state-warning",
-    "state-critical",
-    "state-neutral"
-  );
-
-  if (reverse) {
-    if (value > 75) element.classList.add("state-critical");
-    else if (value > 40) element.classList.add("state-warning");
-    else element.classList.add("state-good");
-  } else {
-    if (value < 25) element.classList.add("state-critical");
-    else if (value < 50) element.classList.add("state-warning");
-    else element.classList.add("state-good");
-  }
+function setBoxState(element, value, reverse, color) {
+  // Apply linear gradient fill
+  element.style.background = `linear-gradient(to top, ${color} ${value}%, #ffffff ${value}%)`;
 }
 
 function endGame(titleOverride = null, descOverride = null) {
@@ -541,14 +521,9 @@ function endGame(titleOverride = null, descOverride = null) {
   if(title) title.innerText = finalTitle;
   if(desc) desc.innerText = finalDesc;
 
-  if (gameOverModal) {
-      gameOverModal.show();
-  } else {
-      const modalEl = document.getElementById("game-over-modal");
-      if(modalEl) {
-          modalEl.style.display = "flex";
-          modalEl.classList.add("show");
-      }
+  const modalEl = document.getElementById("game-over-modal");
+  if (modalEl) {
+    modalEl.classList.add("active");
   }
 }
 
