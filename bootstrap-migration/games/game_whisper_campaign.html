@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>The Whisper Campaign</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/game_whisper_campaign.css">
+    <!-- Carousel Component CSS -->
+    <link rel="stylesheet" href="../assets/css/carousel.css" />
+  </head>
+  <body>
+    <div class="game-container">
+      <header>
+        <h1>The Whisper Campaign</h1>
+        <div class="subtitle">Scenario: Total Opposition</div>
+      </header>
+
+      <div class="row g-2">
+        <div class="col-4">
+          <div class="stat-box">
+            <span class="stat-label">Total Loyalty</span>
+            <div class="stat-val" id="val-opinion">15%</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="stat-box">
+            <span class="stat-label">Influence</span>
+            <div class="stat-val accent" id="val-influence">180</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="stat-box">
+            <span class="stat-label">Days Left</span>
+            <div class="stat-val" id="val-days">14</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Headlines Section -->
+      <div class="headlines-area">
+        <div class="section-header">
+          <span>1. Today's Headlines</span>
+          <span style="font-size: 0.6rem; opacity: 0.7">Cycles Daily</span>
+        </div>
+        <div class="narrative-list" id="narrative-list"></div>
+      </div>
+
+      <!-- Visualization Section -->
+      <div class="viz-section">
+          <div class="viz-wrapper" id="viz-wrapper">
+            <canvas id="networkCanvas"></canvas>
+          </div>
+      </div>
+
+      <div class="action-area">
+        <div class="section-header">2. Injection Point</div>
+        <div class="action-row">
+          <select class="target-select" id="target-select"></select>
+          <button class="btn-plant" id="btn-plant" disabled>
+            Launch
+          </button>
+        </div>
+      </div>
+
+      <div class="viz-legend" aria-hidden="false" style="margin-top: 0.5rem;">
+        <div class="legend-item">
+          <div class="dot" style="background: var(--danger)"></div>
+          Hostile
+        </div>
+        <div class="legend-item">
+          <div class="dot" style="background: var(--text-light)"></div>
+          Neutral
+        </div>
+        <div class="legend-item">
+          <div class="dot" style="background: var(--primary)"></div>
+          Loyal
+        </div>
+        <div class="legend-item">
+          <div style="width: 18px; height: 3px; background: var(--accent); border-radius:2px"></div>
+          Active Spread
+        </div>
+      </div>
+
+      <div class="copyright">© 2025 Kaif Abbas</div>
+    </div>
+
+    <!-- Start Modal -->
+    <div class="modal-overlay active" id="start-modal">
+      <div class="modal-card">
+        <h2>Situation Critical</h2>
+        <p>
+          You are the opposition strategist. The incumbent has
+          <strong>total control</strong>. Every district starts hostile (Red).
+          Your goal: Hijack the election.
+        </p>
+
+        <div class="tutorial-step">
+          <strong>1. Everyone Hates You</strong>
+          Starting Support is ~15%. "Truths" will fail. You must use cheap
+          "Rumors" or "Scandals" to break the initial wall.
+        </div>
+        <div class="tutorial-step">
+          <strong>2. Establish a Beachhead</strong>
+          Target low-resistance groups first (Students or Slums). Do not attack
+          the Country Club yet.
+        </div>
+        <div class="tutorial-step">
+          <strong>3. The Dictator Strategy</strong>
+          Once you flip a node, their neighbors will soften due to "Peer
+          Pressure." Convert the poor to pressure the rich.
+        </div>
+
+        <button class="btn-modal" onclick="startGame()">
+          Start Insurgency
+        </button>
+      </div>
+    </div>
+
+    <!-- End Modal -->
+    <div class="modal-overlay" id="end-modal">
+      <div class="modal-card">
+        <h2 id="end-title">Campaign Over</h2>
+        <p id="end-desc">...</p>
+        <button class="btn-modal" onclick="location.reload()">
+          New Election
+        </button>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/game_whisper_campaign.js"></script>
+    
+    <!-- Games carousel embed -->
+    <iframe id="games-carousel" src="carousel.html" style="width:100%;border:0;max-height:380px;height:320px;display:block;" scrolling="no" aria-label="Games carousel"></iframe>
+    <script>
+      window.addEventListener("message", function (e) {
+        try {
+          if (!e.data || e.data.type !== "resizeIframe") return;
+          var iframe = document.getElementById("games-carousel");
+          if (!iframe) return;
+          var requested = Number(e.data.height) || 0;
+          var MAX_H = 380;
+          var newH = Math.min(requested || 0, MAX_H);
+          if (newH <= 0) newH = 320;
+          var curr = parseInt(iframe.style.height, 10) || 0;
+          if (Math.abs(curr - newH) > 3) {
+            iframe.style.height = newH + "px";
+            iframe.style.maxHeight = MAX_H + "px";
+            iframe.style.display = 'block';
+          }
+        } catch (err) {
+          console.warn('Carousel iframe resize failed', err);
+        }
+      }, false);
+    </script>
+  </body>
+</html>
