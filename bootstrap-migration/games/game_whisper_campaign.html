@@ -140,28 +140,30 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/game_whisper_campaign.js"></script>
     
-    <!-- Games carousel embed -->
-    <iframe id="games-carousel" src="carousel.html" style="width:100%;border:0;max-height:380px;height:320px;display:block;" scrolling="no" aria-label="Games carousel"></iframe>
+    <!-- Games carousel container (Content loaded dynamically) -->
+    <div id="games-carousel-container" class="container-fluid w-100 mt-1 p-0"></div>
+
+    <!-- Component Loader Logic -->
     <script>
-      window.addEventListener("message", function (e) {
-        try {
-          if (!e.data || e.data.type !== "resizeIframe") return;
-          var iframe = document.getElementById("games-carousel");
-          if (!iframe) return;
-          var requested = Number(e.data.height) || 0;
-          var MAX_H = 380;
-          var newH = Math.min(requested || 0, MAX_H);
-          if (newH <= 0) newH = 320;
-          var curr = parseInt(iframe.style.height, 10) || 0;
-          if (Math.abs(curr - newH) > 3) {
-            iframe.style.height = newH + "px";
-            iframe.style.maxHeight = MAX_H + "px";
-            iframe.style.display = 'block';
-          }
-        } catch (err) {
-          console.warn('Carousel iframe resize failed', err);
-        }
-      }, false);
+      // Best Practice: Fetch and inject the partial HTML instead of using an iframe.
+      fetch('../partials/carousel.html')
+        .then(response => response.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          document.getElementById('games-carousel-container').innerHTML = doc.body.innerHTML;
+
+          // Load carousel JS
+          const script = document.createElement('script');
+          script.src = "../assets/js/carousel.js";
+          script.onload = function() {
+            if (window.initCarousel) {
+              window.initCarousel();
+            }
+          };
+          document.body.appendChild(script);
+        })
+        .catch(err => console.error('Error loading carousel:', err));
     </script>
   </body>
 </html>
