@@ -123,7 +123,7 @@ let NODES = [
     id: "rwa",
     label: "RWA Uncles",
     x: 0.2,
-    y: 0.25,
+    y: 0.17,
     opinion: 15,
     resist: 0.6,
   },
@@ -131,7 +131,7 @@ let NODES = [
     id: "kitty",
     label: "Kitty Party",
     x: 0.8,
-    y: 0.25,
+    y: 0.17,
     opinion: 20,
     resist: 0.4,
   },
@@ -139,7 +139,7 @@ let NODES = [
     id: "students",
     label: "Student Union",
     x: 0.2,
-    y: 0.75,
+    y: 0.67,
     opinion: 25,
     resist: 0.15,
   }, // Beachhead opportunity
@@ -147,7 +147,7 @@ let NODES = [
     id: "traders",
     label: "Traders Assoc",
     x: 0.8,
-    y: 0.75,
+    y: 0.67,
     opinion: 10,
     resist: 0.7,
   },
@@ -155,7 +155,7 @@ let NODES = [
     id: "slum",
     label: "Slum Leaders",
     x: 0.5,
-    y: 0.85,
+    y: 0.77,
     opinion: 20,
     resist: 0.1,
   }, // Beachhead opportunity
@@ -163,7 +163,7 @@ let NODES = [
     id: "auto",
     label: "Auto Union",
     x: 0.5,
-    y: 0.55,
+    y: 0.47,
     opinion: 15,
     resist: 0.3,
   },
@@ -171,7 +171,7 @@ let NODES = [
     id: "whatsapp",
     label: "WhatsApp Grp",
     x: 0.5,
-    y: 0.25,
+    y: 0.17,
     opinion: 15,
     resist: 0.1,
   },
@@ -198,134 +198,150 @@ let state = {
   activeSpreading: false,
 };
 
-// --- CANVAS ENGINE ---
-let canvas, ctx;
+// --- SVG ENGINE ---
+function initViz() {
+  const linkLayer = document.getElementById('link-layer');
+  const nodeLayer = document.getElementById('node-layer');
+  
+  // Clear existing
+  linkLayer.innerHTML = '';
+  nodeLayer.innerHTML = '';
+
+  // 1. Draw Links
+  // We use a fixed coordinate system (800x450) defined in viewBox
+  const width = 800;
+  const height = 450;
+
+  // Helper to scale 0-1 coords to SVG coords
+  const getX = (val) => val * width;
+  const getY = (val) => val * height;
+
+  // Draw connections
+  LINKS.forEach((l) => {
+    const s = NODES.find((n) => n.id === l.src);
+    const t = NODES.find((n) => n.id === l.tgt);
+    
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", getX(s.x));
+    line.setAttribute("y1", getY(s.y));
+    line.setAttribute("x2", getX(t.x));
+    line.setAttribute("y2", getY(t.y));
+    line.setAttribute("class", "link");
+    // Store IDs for easy access during updates if needed, or just redraw
+    // For simple updates, we can just re-render or update attributes. 
+    // Let's give them IDs based on source-target
+    line.id = `link-${l.src}-${l.tgt}`;
+    linkLayer.appendChild(line);
+  });
+
+  // 2. Draw Nodes
+  NODES.forEach((node, i) => {
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    
+    // Circle
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", getX(node.x));
+    circle.setAttribute("cy", getY(node.y));
+    circle.setAttribute("r", 45); // Fixed radius in SVG units
+    circle.setAttribute("class", "node-circle");
+    circle.setAttribute("id", `node-circle-${node.id}`);
+    g.appendChild(circle);
+
+    // Label (Name)
+    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("x", getX(node.x));
+    label.setAttribute("y", getY(node.y)); // Center
+    label.setAttribute("class", "node-label");
+    
+    // Simple text wrapping logic for SVG
+    const words = node.label.split(' ');
+    if(words.length > 1) {
+        const tspan1 = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+        tspan1.textContent = words[0];
+        tspan1.setAttribute("x", getX(node.x));
+        tspan1.setAttribute("dy", "-0.4em");
+        
+        const tspan2 = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+        tspan2.textContent = words.slice(1).join(' ');
+        tspan2.setAttribute("x", getX(node.x));
+        tspan2.setAttribute("dy", "1.2em");
+        
+        label.appendChild(tspan1);
+        label.appendChild(tspan2);
+    } else {
+        label.textContent = node.label;
+    }
+    g.appendChild(label);
+
+    // Percentage Text (Below node)
+    const percent = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    percent.setAttribute("x", getX(node.x));
+    percent.setAttribute("y", getY(node.y) + 65); // Offset below circle
+    percent.setAttribute("class", "node-percent");
+    percent.setAttribute("id", `node-percent-${node.id}`);
+    percent.textContent = Math.round(node.opinion) + "%";
+    g.appendChild(percent);
+
+    nodeLayer.appendChild(g);
+  });
+}
+
+function updateViz() {
+  // Update Links (Active Flow)
+  LINKS.forEach((l) => {
+    const s = NODES.find((n) => n.id === l.src);
+    const t = NODES.find((n) => n.id === l.tgt);
+    const line = document.getElementById(`link-${l.src}-${l.tgt}`);
+    
+    if (line) {
+      if (s.infected && t.infected) {
+        line.style.stroke = "#d4a017"; // Active Flow (Gold)
+        line.style.strokeDasharray = "5, 5";
+      } else {
+        line.style.stroke = "#cbd5e1"; // Slate 300
+        line.style.strokeDasharray = "none";
+      }
+    }
+  });
+
+  // Update Nodes
+  NODES.forEach((node) => {
+    const circle = document.getElementById(`node-circle-${node.id}`);
+    const percent = document.getElementById(`node-percent-${node.id}`);
+    
+    if (circle && percent) {
+      // Update Color
+      circle.style.fill = getOpinionColor(node.opinion);
+      
+      // Border for infected
+      if (node.infected) {
+        circle.style.stroke = "#d4a017";
+        circle.style.strokeWidth = "4px";
+      } else {
+        circle.style.stroke = "#fff";
+        circle.style.strokeWidth = "2px";
+      }
+
+      // Update Text
+      percent.textContent = Math.round(node.opinion) + "%";
+    }
+  });
+}
 
 function initGame() {
-    canvas = document.getElementById("networkCanvas");
-    ctx = canvas.getContext("2d");
-    
     // Initial render
     rollDailyNarratives();
     renderTargets();
     updateStats();
-    resize();
-    draw();
+    initViz();
+    updateViz();
 
     // Event Listeners
-    window.addEventListener("resize", resize);
     document.getElementById("btn-plant").addEventListener("click", plantNarrative);
 }
 
 function startGame() {
   document.getElementById("start-modal").classList.remove("active");
-  // Re-draw to ensure everything is fresh
-  resize();
-}
-
-function resize() {
-  const wrap = document.getElementById("viz-wrapper");
-  if (!wrap || !canvas) return;
-
-  const dpr = window.devicePixelRatio || 1;
-  const rect = wrap.getBoundingClientRect();
-  
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.scale(dpr, dpr);
-  
-  draw();
-}
-
-function draw() {
-  if (!canvas || !ctx) return;
-  
-  const width = canvas.width / (window.devicePixelRatio || 1);
-  const height = canvas.height / (window.devicePixelRatio || 1);
-  
-  ctx.clearRect(0, 0, width, height);
-
-  // Draw Links
-  ctx.lineWidth = 2;
-  LINKS.forEach((l) => {
-    const s = NODES.find((n) => n.id === l.src);
-    const t = NODES.find((n) => n.id === l.tgt);
-
-    ctx.beginPath();
-    ctx.moveTo(s.x * width, s.y * height);
-    ctx.lineTo(t.x * width, t.y * height);
-
-    if (s.infected && t.infected) {
-      ctx.strokeStyle = "#d4a017"; // Active Flow (Gold)
-      ctx.setLineDash([5, 5]);
-    } else {
-      ctx.strokeStyle = "#cbd5e1"; // Slate 300
-      ctx.setLineDash([]);
-    }
-    ctx.stroke();
-  });
-
-  // Draw Nodes
-  NODES.forEach((n) => {
-    const nx = n.x * width;
-    const ny = n.y * height;
-    
-    // Dynamic radius: 12% of min dimension, clamped between 25 and 45
-    const minDim = Math.min(width, height);
-    const r = Math.max(25, Math.min(45, minDim * 0.12));
-
-    // Fill Color
-    ctx.beginPath();
-    ctx.arc(nx, ny, r, 0, Math.PI * 2);
-    ctx.fillStyle = getOpinionColor(n.opinion);
-    ctx.fill();
-
-    // Border
-    ctx.lineWidth = n.infected ? 4 : 2;
-    ctx.strokeStyle = n.infected ? "#d4a017" : "#fff";
-    ctx.stroke();
-
-    // Text
-    ctx.fillStyle = "#fff";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    
-    // Dynamic font size based on radius
-    const fontSize = Math.max(10, r * 0.28);
-    ctx.font = `600 ${fontSize}px Poppins, sans-serif`;
-
-    drawText(ctx, n.label, nx, ny, r * 1.8, fontSize * 1.1);
-
-    // Value
-    ctx.fillStyle = "#0f172a"; // Slate 900
-    ctx.font = `700 ${fontSize}px Poppins, sans-serif`;
-    ctx.fillText(`${Math.round(n.opinion)}%`, nx, ny + r + fontSize * 1.4);
-  });
-}
-
-function drawText(ctx, text, x, y, maxWidth, lineHeight) {
-  const words = text.split(" ");
-  let lines = [];
-  let currentLine = words[0];
-
-  for (let i = 1; i < words.length; i++) {
-    let word = words[i];
-    let width = ctx.measureText(currentLine + " " + word).width;
-    if (width < maxWidth) {
-      currentLine += " " + word;
-    } else {
-      lines.push(currentLine);
-      currentLine = word;
-    }
-  }
-  lines.push(currentLine);
-
-  let startY = y - ((lines.length - 1) * lineHeight) / 2;
-  lines.forEach((line, i) => {
-    ctx.fillText(line, x, startY + i * lineHeight);
-  });
 }
 
 function getOpinionColor(val) {
@@ -433,7 +449,7 @@ function startSimulation() {
       }
     });
 
-    draw();
+    updateViz();
     updateStats();
 
     if (ticks >= maxTicks) {
@@ -449,7 +465,7 @@ function endTurn() {
     n.infected = false;
     n.virus = null;
   });
-  draw();
+  updateViz();
 
   checkWinLoss();
   rollDailyNarratives();
