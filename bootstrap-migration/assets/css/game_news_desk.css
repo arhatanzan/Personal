@@ -100,6 +100,18 @@ header h1 {
   align-items: center;
 }
 
+.stat-timer {
+  border-color: #0f172a;
+}
+
+.stat-trp {
+  border-color: var(--warning);
+}
+
+.stat-info {
+  border-color: var(--success);
+}
+
 .stat-label {
   font-size: 0.65rem;
   font-weight: 700;
@@ -205,13 +217,14 @@ header h1 {
 .broadcast-slots {
   display: flex;
   gap: 0.5rem;
-  justify-content: center;
   margin-top: 0.5rem;
+  width: 100%;
 }
 
 .slot {
-  width: 40px;
-  height: 40px;
+  flex: 1 1 0;
+  width: 0; /* Ensure flex-basis works correctly */
+  height: 50px;
   background: var(--card-bg);
   border: 2px dashed var(--border-color);
   border-radius: 8px;
@@ -231,6 +244,26 @@ header h1 {
   border-color: var(--primary);
   font-size: 0.6rem;
   text-transform: uppercase;
+}
+
+.slot.filled.slot-scandal {
+  background: #991b1b;
+  border-color: #991b1b;
+}
+
+.slot.filled.slot-policy {
+  background: #0f172a;
+  border-color: #0f172a;
+}
+
+.slot.filled.slot-fluff {
+  background: #92400e;
+  border-color: #92400e;
+}
+
+.slot.filled.slot-news {
+  background: #166534;
+  border-color: #166534;
 }
 
 /* --- MODALS --- */

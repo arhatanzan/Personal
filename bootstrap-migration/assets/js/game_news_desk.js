@@ -240,6 +240,7 @@ function airStory(data, id) {
   const slot = document.querySelectorAll(".slot")[state.storiesAired - 1];
   if (slot) {
     slot.classList.add("filled");
+    slot.classList.add("slot-" + data.type.toLowerCase());
     slot.innerText = data.type; // Show type in slot
   }
 
