@@ -22,8 +22,8 @@ This folder contains the current stable version of the games.
 *   **Recent Updates**: Iframe resizing logic has been backported here.
 
 ### 3. `hostinger/` (🚀 Deployment)
-This directory contains files specifically formatted for the **Hostinger** hosting environment.
-*   **Constraint**: Hostinger's file manager or existing permalinks require specific naming conventions.
+This directory contains files specifically formatted for embedding in **Hostinger** hosting environment.
+*   **Constraint**: Existing permalinks require specific naming conventions.
 *   **Naming Convention**: `snake_case` (e.g., `game_news_desk.html`).
 *   **Content**: Includes standalone layout templates (`layouts/`) for the site builder.
 
