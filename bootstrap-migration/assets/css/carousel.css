@@ -67,6 +67,10 @@ body {
   font-weight: 600;
 }
 
+.c-card .card-title {
+  font-size: 1rem;
+}
+
 .c-desc {
   font-size: 13px;
   color: var(--muted);
@@ -87,7 +91,7 @@ body {
 }
 
 .c-card:hover .c-btn {
-  background: var(--accent);
+  background: #7a2e2e;
   color: #fff;
 }
 

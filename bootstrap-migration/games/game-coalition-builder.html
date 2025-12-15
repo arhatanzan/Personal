@@ -89,31 +89,15 @@
 
     <!-- Component Loader Logic -->
     <script>
-      // Best Practice: Fetch and inject the partial HTML instead of using an iframe.
-      // This eliminates the need for complex height resizing scripts.
       fetch('../partials/carousel.html')
         .then(response => response.text())
         .then(html => {
-          // Parse the HTML file to extract just the body content
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          
-          // Inject the content into the container
-          document.getElementById('games-carousel-container').innerHTML = doc.body.innerHTML;
-
-          // Dynamically load the carousel's JavaScript after the HTML is present
+          document.getElementById('games-carousel-container').innerHTML = html;
           const script = document.createElement('script');
           script.src = "../assets/js/carousel.js";
-          script.onload = function() {
-            if (window.initCarousel) {
-              window.initCarousel();
-            } else {
-              console.error("initCarousel not found on window");
-            }
-          };
+          script.onload = () => window.initCarousel && window.initCarousel();
           document.body.appendChild(script);
-        })
-        .catch(err => console.error('Error loading carousel component:', err));
+        });
     </script>
   </body>
 </html>

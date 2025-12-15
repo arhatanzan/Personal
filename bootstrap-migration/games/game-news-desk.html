@@ -113,25 +113,15 @@
 
     <!-- Component Loader Logic -->
     <script>
-      // Best Practice: Fetch and inject the partial HTML instead of using an iframe.
       fetch('../partials/carousel.html')
         .then(response => response.text())
         .then(html => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          document.getElementById('games-carousel-container').innerHTML = doc.body.innerHTML;
-
-          // Load carousel JS
+          document.getElementById('games-carousel-container').innerHTML = html;
           const script = document.createElement('script');
           script.src = "../assets/js/carousel.js";
-          script.onload = function() {
-            if (window.initCarousel) {
-              window.initCarousel();
-            }
-          };
+          script.onload = () => window.initCarousel && window.initCarousel();
           document.body.appendChild(script);
-        })
-        .catch(err => console.error('Error loading carousel:', err));
+        });
     </script>
   </body>
 </html>
