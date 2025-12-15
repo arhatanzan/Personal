@@ -3,9 +3,13 @@ window.initCarousel = async function() {
   const urlParams = new URLSearchParams(window.location.search);
   const HOST_URL = urlParams.get('base') || "https://kaifabbas.com";
 
+  // Detect if we are running from within the /games/ subdirectory or the root
+  const isGamesFolder = window.location.pathname.includes('/games/');
+  const dbPath = isGamesFolder ? '../db/products.json' : 'db/products.json';
+
   let PRODUCTS = [];
   try {
-    const response = await fetch('../db/products.json');
+    const response = await fetch(dbPath);
     if (!response.ok) throw new Error('Failed to load products');
     const data = await response.json();
     PRODUCTS = data.map(item => ({
@@ -38,15 +42,19 @@ window.initCarousel = async function() {
     return '/' + p;
   }
 
-  function toOriginal(path) {
-    // Since files are now renamed to kebab-case, we just ensure the .html extension
+  function toLocalPath(path) {
     if (!path) return path;
     let p = path.replace(/^\//, '');
     // Ensure we don't double add .html
     if (!p.match(/\.html?$/i)) {
         p += '.html';
     }
-    return '/' + p;
+    
+    if (isGamesFolder) {
+        return p;
+    } else {
+        return 'games/' + p;
+    }
   }
 
   function shouldUseKebab() {
@@ -61,7 +69,7 @@ window.initCarousel = async function() {
     if (useKebab) {
       return (HOST_URL.replace(/\/$/, '') || '') + toKebab(p.url);
     }
-    return toOriginal(p.url);
+    return toLocalPath(p.url);
   }
 
   function renderCarousel() {

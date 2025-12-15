@@ -1,0 +1,28 @@
+:root {
+    --navy: #0a2342;
+    --accent: #d4a017;
+    --page-bg: #f8f6f2;
+}
+body {
+    background-color: var(--page-bg);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.navbar {
+    background-color: var(--navy);
+}
+.hero-section {
+    background-color: var(--navy);
+    color: white;
+    padding: 4rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 5px solid var(--accent);
+}
+.hero-section h1 {
+    font-weight: 700;
+}
+.footer {
+    background-color: var(--navy);
+    color: rgba(255,255,255,0.7);
+    padding: 2rem 0;
+    margin-top: 4rem;
+}
