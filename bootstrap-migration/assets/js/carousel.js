@@ -73,14 +73,15 @@ window.initCarousel = async function() {
   }
 
   function renderCarousel() {
-    const loopFactor = 6;
-    let infiniteList = [];
-    for (let i = 0; i < loopFactor; i++) {
-      infiniteList = infiniteList.concat(PRODUCTS);
+    // Simplified: No infinite loop, just render the products once
+    const linkTarget = useKebab ? '_top' : '_self';
+    
+    if (PRODUCTS.length === 0) {
+        track.innerHTML = '<div class="col-12 text-center text-muted">No games found.</div>';
+        return;
     }
 
-    const linkTarget = useKebab ? '_top' : '_self';
-    track.innerHTML = infiniteList.map(p => `
+    track.innerHTML = PRODUCTS.map(p => `
       <div class="col-auto">
         <a href="${buildHref(p)}" class="card c-card text-decoration-none h-100 p-3" target="${linkTarget}">
           <div class="c-thumb mb-3">
@@ -103,23 +104,23 @@ window.initCarousel = async function() {
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
 
+  const getScrollAmount = () => {
+      const item = track.firstElementChild;
+      if (!item) return 300; // fallback
+      const style = window.getComputedStyle(track);
+      const gap = parseFloat(style.gap) || 0;
+      return item.offsetWidth + gap;
+  };
+
   if (prevBtn) {
     prevBtn.addEventListener('click', () => {
-      const card = track.querySelector('.c-card');
-      if (!card) return;
-      const gap = 20;
-      const scrollAmount = card.offsetWidth + gap;
-      track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
     });
   }
 
   if (nextBtn) {
     nextBtn.addEventListener('click', () => {
-      const card = track.querySelector('.c-card');
-      if (!card) return;
-      const gap = 20;
-      const scrollAmount = card.offsetWidth + gap;
-      track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      track.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
     });
   }
 };
