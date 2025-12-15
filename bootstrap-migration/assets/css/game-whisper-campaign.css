@@ -449,11 +449,10 @@ header h1 {
 
 .tutorial-step {
   background: #f8fafc;
-  border-left: 4px solid var(--accent);
-  padding: 0.5rem;
+  padding: 0.5rem 0.75rem;
   margin-bottom: 0.25rem;
   text-align: left;
-  border-radius: 0 8px 8px 0;
+  border-radius: 8px;
   font-size: 0.85rem;
 }
 

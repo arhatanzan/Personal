@@ -33,16 +33,20 @@ window.initCarousel = async function() {
     if (!path) return path;
     let p = path.replace(/^\//, '');
     p = p.replace(/\.html?$/i, '');
+    // Ensure kebab-case
     p = p.replace(/[_\s]+/g, '-').replace(/-+/g, '-').toLowerCase();
     return '/' + p;
   }
 
   function toOriginal(path) {
+    // Since files are now renamed to kebab-case, we just ensure the .html extension
     if (!path) return path;
     let p = path.replace(/^\//, '');
-    p = p.replace(/\.html?$/i, '');
-    p = p.replace(/[-\s]+/g, '_').replace(/_+/g, '_').toLowerCase();
-    return '/' + p + '.html';
+    // Ensure we don't double add .html
+    if (!p.match(/\.html?$/i)) {
+        p += '.html';
+    }
+    return '/' + p;
   }
 
   function shouldUseKebab() {

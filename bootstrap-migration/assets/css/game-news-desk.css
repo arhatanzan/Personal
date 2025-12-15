@@ -288,7 +288,7 @@ header h1 {
 
 .custom-modal-content {
   background: var(--card-bg);
-  padding: 1.5rem;
+  padding: 1.25rem;
   border-radius: 24px;
   max-width: 400px;
   width: 100%;
@@ -314,17 +314,16 @@ header h1 {
 .custom-modal p {
   color: var(--text-light);
   font-size: 0.9rem;
-  line-height: 1.5;
-  margin-bottom: 1.5rem;
+  line-height: 1.4;
+  margin-bottom: 1rem;
 }
 
 .tutorial-step {
   background: #f8fafc;
-  border-left: 4px solid var(--accent);
-  padding: 0.75rem;
+  padding: 0.5rem 0.75rem;
   margin-bottom: 0.5rem;
   text-align: left;
-  border-radius: 0 8px 8px 0;
+  border-radius: 8px;
   font-size: 0.85rem;
 }
 
