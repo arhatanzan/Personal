@@ -1,0 +1,232 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+  --bg-color: transparent;
+  --card-bg: #ffffff;
+  --text-main: #0f172a; /* Slate 900 */
+  --text-light: #64748b; /* Slate 500 */
+  --accent: #d4a017; /* Gold */
+  --danger: #dc3545; /* Bootstrap Danger Red */
+  --success: #198754; /* Bootstrap Success Green */
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --radius: 16px;
+  --font-main: 'Poppins', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* --- HEADER --- */
+header {
+  background: transparent;
+}
+
+/* --- STATS BAR --- */
+
+/* --- PARLIAMENT VIZ --- */
+
+/* --- GAME BOARD --- */
+
+/* --- PARTIES GRID --- */
+.party-card {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.party-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.party-card.is-ally {
+  border-color: var(--success);
+  background-color: #ecfdf5; /* Light emerald bg */
+}
+.party-card.is-opp {
+  border-color: var(--danger);
+  background-color: #fef2f2; /* Light red bg */
+}
+
+.party-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.party-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.party-seats {
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  border: none;
+}
+
+.stance-tag {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 6px 0;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.tag-yes {
+  background-color: #d1fae5; /* Darker mint for contrast */
+  color: var(--success);
+}
+.tag-no {
+  background-color: #fee2e2; /* Darker red for contrast */
+  color: var(--danger);
+}
+
+.status-secured {
+  text-align: center;
+  font-weight: 800;
+  color: var(--success);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  /* margin-top: auto; Removed to rely on flex space-between consistency */
+  letter-spacing: 0.5px;
+  padding: 0.5rem; /* Match button padding roughly */
+}
+
+.negotiate-btn {
+  width: 100%;
+  background: var(--text-main);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.negotiate-btn:hover {
+  background: #334155;
+  transform: translateY(-1px);
+}
+
+/* --- ACTION BAR --- */
+.btn-vote {
+  background: var(--text-main);
+  color: white;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  letter-spacing: 1px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.btn-vote:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-vote:disabled {
+  opacity: 1 !important; /* Override Bootstrap disabled opacity */
+  cursor: default;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* --- MODAL --- */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 35, 66, 0.95);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+.modal.active {
+  display: flex;
+}
+.btn-restart {
+  background: var(--accent);
+  color: var(--text-main);
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* Responsive tweaks */
+@media (min-height: 700px) {
+  .game-board {
+    justify-content: center;
+  }
+}
+/* Small-screen responsive fixes: reduce vertical gaps and stack stat boxes */
+@media (max-width: 600px) {
+  /* Avoid large vertical centering on tall small-viewports */
+  .game-container, .game-layout, .game-board {
+    max-width: 100%;
+    padding-bottom: 1rem;
+    justify-content: flex-start !important;
+    padding-top: 0.25rem;
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+  .card-stack { height: auto !important; margin-bottom: 8px; }
+  .card { position: relative !important; height: auto !important; top: auto !important; left: auto !important; padding: 1.25rem; }
+  body { min-height: auto !important; height: auto !important; }
+  .controls, .broadcast-slots { gap: 8px; padding: 8px; justify-content: center; }
+  header { padding: 0.6rem; }
+  .copyright { margin-top: 8px; font-size: 0.7rem; }
+}

@@ -1,0 +1,355 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+  --bg-color: transparent;
+  --card-bg: #ffffff;
+  --primary: #0f172a;
+  --secondary: #334155;
+  --accent: #d4a017;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --text-main: #1e293b;
+  --text-light: #64748b;
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --radius: 16px;
+  --font-main: 'Poppins', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-y: auto;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* --- LAYOUT --- */
+.game-container {
+  width: 95%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* --- HEADER --- */
+header {
+  text-align: center;
+  padding: 0.5rem 0 0 0;
+}
+
+header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--primary);
+}
+
+.subtitle {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+}
+
+.live-badge {
+  background: var(--danger);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  animation: pulse 1.5s infinite;
+  display: inline-block;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* --- STATS --- */
+.stat-box {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.stat-timer {
+  border-color: #0f172a;
+}
+
+.stat-trp {
+  border-color: var(--warning);
+}
+
+.stat-info {
+  border-color: var(--success);
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-light);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.stat-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.progress {
+  height: 6px;
+  background-color: #e2e8f0;
+  border-radius: 3px;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.progress-bar {
+  transition: width 0.3s ease;
+}
+
+/* --- GAME BOARD --- */
+.news-feed {
+  background: #f1f5f9; /* Slate 100 */
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius);
+  height: 350px; /* Fixed height for gameplay area */
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  touch-action: none; /* Prevent scrolling while tapping cards */
+}
+
+/* --- STORY CARDS --- */
+.story-card {
+  position: absolute;
+  width: 140px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.1s, opacity 0.3s;
+  user-select: none;
+  z-index: 10;
+}
+
+.story-card:active {
+  transform: scale(0.95);
+}
+
+.story-card.expiring {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+@keyframes popIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.story-tag {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+.tag-scandal { background: #fee2e2; color: #991b1b; }
+.tag-policy { background: #e2e8f0; color: #0f172a; }
+.tag-fluff { background: #fef3c7; color: #92400e; }
+.tag-news { background: #dcfce7; color: #166534; }
+
+.story-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
+  color: var(--text-main);
+}
+
+.story-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+/* --- BROADCAST SLOTS --- */
+.broadcast-slots {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.slot {
+  flex: 1 1 0;
+  width: 0; /* Ensure flex-basis works correctly */
+  height: 50px;
+  background: var(--card-bg);
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.slot.filled {
+  background: var(--primary);
+  color: white;
+  border-style: solid;
+  border-color: var(--primary);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+}
+
+.slot.filled.slot-scandal {
+  background: #991b1b;
+  border-color: #991b1b;
+}
+
+.slot.filled.slot-policy {
+  background: #0f172a;
+  border-color: #0f172a;
+}
+
+.slot.filled.slot-fluff {
+  background: #92400e;
+  border-color: #92400e;
+}
+
+.slot.filled.slot-news {
+  background: #166534;
+  border-color: #166534;
+}
+
+/* --- MODALS --- */
+.custom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.custom-modal.active {
+  display: flex;
+}
+
+.custom-modal-content {
+  background: var(--card-bg);
+  padding: 1.25rem;
+  border-radius: 24px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.custom-modal h2 {
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.custom-modal p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.tutorial-step {
+  background: #f8fafc;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  text-align: left;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.btn-modal {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.2s;
+}
+
+.btn-modal:hover {
+  transform: scale(1.02);
+  background: var(--secondary);
+}
+
+.copyright {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  text-align: center;
+  margin-top: 0.5rem;
+  opacity: 0.7;
+}

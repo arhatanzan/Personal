@@ -1,0 +1,450 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+  --bg-color: transparent;
+  --card-bg: #ffffff;
+  --primary: #0f172a;
+  --color-success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --text-main: #1e293b;
+  --text-light: #64748b;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --radius: 16px;
+  --font-main: 'Poppins', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-main);
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.game-container {
+  width: 95%;
+  max-width: 600px;
+}
+
+/* --- HEADER --- */
+header {
+  background: transparent;
+  margin-bottom: 0.5rem;
+}
+h1 {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 800;
+}
+.subtitle {
+  color: var(--text-light);
+  font-weight: 400;
+}
+
+/* --- DASHBOARD --- */
+.stat-box {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 2px solid #e2e8f0; /* Full border, slightly thicker */
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  z-index: 10; /* Ensure stats stay on top of deal cards */
+}
+.stat-box:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-funds {
+  border-color: var(--primary);
+}
+
+.stat-approval {
+  border-color: var(--color-success);
+}
+
+.stat-risk {
+  border-color: var(--danger);
+}
+
+.stat-label {
+  color: var(--text-light);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.stat-val {
+  font-weight: 700;
+  color: var(--primary);
+}
+.val-funds.negative {
+  color: var(--danger);
+}
+
+.progress {
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-bar {
+  transition: width 0.5s ease;
+}
+
+/* --- SECTORS (Ledger Layout) --- */
+/* We style .sector-card to look like the requested .sector-row */
+.sector-card, .sector-row {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 0.5rem 0.75rem;
+  /* Removed flex display as we now use Bootstrap Grid inside */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.sector-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  border-color: #e2e8f0;
+}
+
+/* Slider Area */
+.sector-card .slider-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+/* --- SLIDER STYLING --- */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+input[type=range]:focus {
+  outline: none;
+}
+
+/* Track */
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+
+/* Thumb */
+input[type=range]::-webkit-slider-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -5px; /* Center on track */
+  transition: transform 0.1s;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+input[type=range]::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Demand Marker */
+.demand-marker {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--danger),
+    var(--danger) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+.demand-label {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  color: var(--danger);
+  font-weight: 700;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.9);
+  padding: 1px 4px;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* --- DEALS SECTION --- */
+.deal-btn, .deal-card {
+  background: var(--card-bg);
+  color: var(--text-main);
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  min-height: 60px; /* Reduced from 70px */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.25rem; /* Reduced padding */
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.deal-btn:hover {
+  transform: translateY(-2px); /* Reduced movement to prevent overlap */
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-success);
+}
+
+.deal-money {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-success);
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+/* Signed State */
+.deal-btn.taken, .deal-signed {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #94a3b8;
+  cursor: default;
+  transform: none !important;
+  box-shadow: none;
+}
+
+/* Stamped Effect */
+.deal-btn.taken::after {
+  content: 'SIGNED';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: rgba(15, 23, 42, 0.15);
+  border: 3px solid rgba(15, 23, 42, 0.15);
+  padding: 0.2rem 1rem;
+  border-radius: 8px;
+  text-transform: uppercase;
+  pointer-events: none;
+  animation: stamp-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes stamp-in {
+  from { transform: translate(-50%, -50%) scale(2) rotate(-15deg); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1) rotate(-15deg); opacity: 1; }
+}
+
+/* --- REACTION BAR --- */
+.reaction-bar {
+  background: #f1f5f9;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  font-weight: 700;
+  color: var(--text-light);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  min-height: 48px; /* Reduced height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.reaction-bar.angry {
+  background: #fef2f2;
+  color: var(--danger);
+  border-color: var(--danger);
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.15);
+  animation: none;
+}
+
+.reaction-bar.happy {
+  background: #ecfdf5;
+  color: var(--color-success);
+  border-color: var(--color-success);
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.15);
+}
+
+/* --- BUTTONS --- */
+.btn-submit {
+  background: var(--primary);
+  color: white;
+  border: 2px solid transparent; /* Match reaction-bar border */
+  border-radius: var(--radius);
+  font-size: 1rem;
+  letter-spacing: 1px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s;
+  min-height: 48px; /* Match reaction-bar height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.btn-submit:hover:not(:disabled) {
+  background: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+.btn-submit:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* --- ANIMATIONS --- */
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* Modal Styling Override */
+.battle-modal-content {
+  border-radius: var(--radius);
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-md);
+  padding: 1.5rem;
+  text-align: center;
+  background: var(--card-bg);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+#end-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#end-desc {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.btn-restart {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-restart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: #1e293b;
+}
+
+/* --- CUSTOM MODAL --- */
+.custom-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.95);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.custom-modal.active {
+  display: flex;
+}
+
+.custom-modal-content {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+  border: 1px solid #e2e8f0;
+  animation: modal-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modal-pop {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  /* Bootstrap Grid handles layout changes now. */
+}

@@ -1,0 +1,16 @@
+<!-- 
+  Partial: Games Carousel 
+  Dependencies: Bootstrap 5 CSS/JS, carousel.css, carousel.js (loaded by parent)
+-->
+<div class="container-fluid carousel-wrapper py-2">
+  <div class="d-flex justify-content-end align-items-center mb-2 pe-1">
+    <div class="btn-group">
+      <button id="prevBtn" class="btn btn-outline-dark rounded-circle d-flex align-items-center justify-content-center p-0 me-2" style="width: 36px; height: 36px;" aria-label="Previous">←</button>
+      <button id="nextBtn" class="btn btn-outline-dark rounded-circle d-flex align-items-center justify-content-center p-0" style="width: 36px; height: 36px;" aria-label="Next">→</button>
+    </div>
+  </div>
+
+  <div id="track" class="d-flex flex-nowrap overflow-auto gap-2 px-5 py-3 carousel-track">
+    <!-- Cards injected by JS as .col-auto items -->
+  </div>
+</div>

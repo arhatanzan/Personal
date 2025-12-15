@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Budget Battle</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/game-budget-battle.css">
+    <!-- Carousel Component CSS -->
+    <link rel="stylesheet" href="../assets/css/carousel.css" />
+  </head>
+  <body>
+    <div class="container-fluid d-flex flex-column align-items-center p-0 pb-1 pt-1">
+        <header class="game-container p-1 mb-1 text-center">
+        <h1 class="m-0 fs-5 text-uppercase fw-bold">Budget Battle</h1>
+        <div class="subtitle small">Pick your winning allocations</div>
+        </header>
+
+        <div class="game-container row g-2 mb-2">
+        <div class="col-4">
+            <div class="stat-box stat-funds h-100 p-1 text-center d-flex flex-column justify-content-center">
+                <span class="stat-label text-uppercase fw-bold small mb-0" style="font-size: 0.65rem;">Budget Left</span>
+                <div class="stat-val val-funds fs-5 fw-bold" id="val-funds">₹100 Cr</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="stat-box stat-approval h-100 p-1 text-center d-flex flex-column justify-content-center">
+                <span class="stat-label text-uppercase fw-bold small mb-0" style="font-size: 0.65rem;">Approval</span>
+                <div class="stat-val fs-5 fw-bold" id="val-approval">35%</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="stat-box stat-risk h-100 p-1 text-center d-flex flex-column justify-content-center">
+                <span class="stat-label text-uppercase fw-bold small mb-0" style="font-size: 0.65rem;">Corruption Risk</span>
+                <div class="progress mt-1" style="height: 4px;">
+                    <div class="progress-bar bg-danger" id="val-risk" role="progressbar" style="width: 0%"></div>
+                </div>
+                <div class="small mt-0" id="risk-text" style="font-size: 0.7rem;">
+                Safe
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <div class="game-container mb-2">
+        <div class="row g-2" id="deals-container"></div>
+        </div>
+
+        <div class="game-container mb-2">
+        <div class="row g-2" id="sectors-grid"></div>
+        </div>
+
+        <div class="game-container mt-auto">
+            <div class="row g-2">
+                <div class="col-12">
+                    <div class="reaction-bar p-1 d-flex align-items-center justify-content-center small" id="reaction-box" style="min-height: 40px;">
+                        Media: 'City unsafe at night.'
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button class="btn-submit w-100 py-2 fw-bold text-uppercase" id="btn-submit" onclick="finalizeBudget()">
+                        Finalize Budget
+                    </button>
+                </div>
+            </div>
+            <div class="text-muted small mt-1 mb-0 text-center" style="font-size: 0.7rem;">© 2025 Kaif Abbas</div>
+        </div>
+    </div>
+
+    <div class="custom-modal" id="end-modal">
+      <div class="custom-modal-content">
+        <h2 id="end-title">Result</h2>
+        <p id="end-desc">...</p>
+        <button class="btn-restart" onclick="location.reload()">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="../assets/js/game-budget-battle.js"></script>
+    
+    <!-- Games carousel container (Content loaded dynamically) -->
+    <div id="games-carousel-container" class="container-fluid w-100 mt-1 p-0"></div>
+
+    <!-- Component Loader Logic -->
+    <script>
+      fetch('../partials/carousel.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('games-carousel-container').innerHTML = html;
+          const script = document.createElement('script');
+          script.src = "../assets/js/carousel.js";
+          script.onload = () => window.initCarousel && window.initCarousel();
+          document.body.appendChild(script);
+        });
+    </script>
+  </body>
+</html>

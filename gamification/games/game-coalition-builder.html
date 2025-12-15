@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>The Coalition Builder</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/game-coalition-builder.css">
+    <!-- Carousel Component CSS -->
+    <link rel="stylesheet" href="../assets/css/carousel.css" />
+  </head>
+  <body class="d-flex flex-column align-items-center bg-light">
+    <div class="container-fluid p-0 pt-1 d-flex flex-column align-items-center" style="max-width: 600px;">
+    <header class="w-100 p-1 text-center">
+      <h1 class="m-0 fs-5 text-uppercase fw-bold text-dark">Coalition Builder</h1>
+      <div class="subtitle small text-muted" style="font-size: 0.75rem;">Assemble 251 Seats. Pass 5 Laws. Survive.</div>
+    </header>
+
+    <div class="stats-bar row g-2 w-100 px-2 mb-1">
+      <div class="col-4">
+        <div class="stat-box h-100 p-1 text-center border rounded bg-white shadow-sm">
+          <span class="stat-label d-block small fw-bold text-uppercase text-muted" style="font-size: 0.65rem;">Pol. Capital</span>
+          <div class="stat-val fs-5 fw-bold text-warning" id="val-capital">80</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="stat-box h-100 p-1 text-center border rounded bg-white shadow-sm">
+          <span class="stat-label d-block small fw-bold text-uppercase text-muted" style="font-size: 0.65rem;">Weeks Left</span>
+          <div class="stat-val fs-5 fw-bold text-dark" id="val-weeks">10</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="stat-box h-100 p-1 text-center border rounded bg-white shadow-sm">
+          <span class="stat-label d-block small fw-bold text-uppercase text-muted" style="font-size: 0.65rem;">Passed</span>
+          <div class="stat-val fs-5 fw-bold text-dark" id="val-passed">0 / 5</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="parliament-wrapper w-100 px-2 mb-2">
+      <div class="parliament-container position-relative bg-secondary-subtle rounded-pill overflow-hidden mb-1" style="height: 24px;">
+        <div class="majority-line position-absolute top-0 bottom-0 bg-dark" style="left: 50.2%; width: 2px; z-index: 10;" title="Majority Threshold (251)"></div>
+        <div class="d-flex h-100 w-100">
+            <div class="seat-bar bar-gov bg-success" id="bar-gov" style="width: 30%"></div>
+            <div class="seat-bar bar-allies bg-warning" id="bar-allies" style="width: 0%"></div>
+            <div class="seat-bar bar-opp bg-danger" id="bar-opp" style="width: 70%"></div>
+        </div>
+      </div>
+      <div class="vote-count text-center small fw-bold text-muted" style="font-size: 0.75rem;">
+        Current Support: <span id="vote-total" class="text-dark">150</span> / 500
+      </div>
+    </div>
+
+    <main class="game-board w-100 px-2 d-flex flex-column flex-grow-1">
+      <div class="law-card p-2 mb-2 border rounded bg-white shadow-sm text-center">
+        <div class="law-title fs-6 fw-bold mb-1 text-dark" id="law-title">Loading Law...</div>
+        <div class="law-desc text-muted fst-italic small" id="law-desc">...</div>
+      </div>
+
+      <div class="parties-grid row g-2 mb-2" id="parties-grid"></div>
+
+      <div class="action-bar mt-auto pb-1">
+        <button class="btn-vote w-100 py-2 fw-bold text-uppercase btn btn-dark" id="btn-vote" onclick="callVote()">
+          CALL VOTE
+        </button>
+        <div class="text-center text-muted small mt-1 mb-0" style="font-size: 0.7rem;">© 2025 Kaif Abbas</div>
+      </div>
+    </main>
+    </div>
+
+    <div class="modal" id="end-modal">
+      <h2 id="modal-title">Election Over</h2>
+      <p id="modal-desc">...</p>
+      <button class="btn-restart" onclick="initGame()">Start New Term</button>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Game Logic -->
+    <script src="../assets/js/game-coalition-builder.js"></script>
+
+    <!-- Games carousel container (Content loaded dynamically) -->
+    <div id="games-carousel-container" class="container-fluid w-100 mt-1 p-0"></div>
+
+    <!-- Component Loader Logic -->
+    <script>
+      fetch('../partials/carousel.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('games-carousel-container').innerHTML = html;
+          const script = document.createElement('script');
+          script.src = "../assets/js/carousel.js";
+          script.onload = () => window.initCarousel && window.initCarousel();
+          document.body.appendChild(script);
+        });
+    </script>
+  </body>
+</html>

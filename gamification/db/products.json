@@ -1,0 +1,72 @@
+[
+  {
+    "id": "g1",
+    "summary": "Control a social media algorithm and balance truth, attention, and polarization.",
+    "buttonLabel": "Play Now",
+    "category": "Simulation",
+    "difficulty": "Low",
+    "description": "You control a social media algorithm. For each turn, decide which posts to boost and which to bury as citizens scroll their feeds.\n\nProblem: We blindly trust feeds that are optimized for profit, not truth.\nKey Learning: Algorithms naturally prioritize emotional content, especially anger, because it drives engagement more than nuanced facts.\nOutcome: Players practice spotting 'rage-bait' and engagement traps.\nNeed: Citizens need to understand how their attention is monetized and weaponized.\nGoal: Maintain high Public Info (>60%) while keeping Polarization low (<40%) before the turns run out.",
+    "imageUrl": "https://openmoji.org/data/color/svg/1F4ED.svg",
+    "productUrl": "/game-civic-feed.html",
+    "seoUrl": "/game/the-civic-feed",
+    "thumbText": "📱",
+    "title": "The Civic Feed",
+    "type": "external"
+  },
+  {
+    "id": "g2",
+    "summary": "Negotiate with rival parties to assemble a governing majority in a fractured parliament.",
+    "buttonLabel": "Play Now",
+    "category": "Strategy",
+    "difficulty": "High",
+    "description": "You are tasked with building a governing coalition in a fractured parliament. Negotiate with 4 rival political parties to secure enough seats to govern.\n\nProblem: Voters often struggle to understand messy post-election compromises and alliances.\nKey Learning: Ideological purity often dies in coalition math; power requires trade-offs.\nOutcome: Players grasp government instability and why alliances shift.\nNeed: Demystifying why politicians make seemingly contradictory alliances after elections.\nGoal: Secure 251+ seats (votes) and pass 5 Laws within 10 Weeks without running out of Political Capital.",
+    "imageUrl": "https://openmoji.org/data/color/svg/1F91D.svg",
+    "productUrl": "/game-coalition-builder.html",
+    "seoUrl": "/game/coalition-builder",
+    "thumbText": "🤝",
+    "title": "Coalition Builder",
+    "type": "external"
+  },
+  {
+    "id": "g3",
+    "summary": "Run the 9 PM news and juggle scandals vs. policy while keeping ratings and civic duty alive.",
+    "buttonLabel": "Play Now",
+    "category": "Management",
+    "difficulty": "Medium",
+    "description": "You control a 9 PM news bulletin. Each round, you have 15 seconds to pick stories (Scandals vs Policy) to fill 5 broadcast slots.\n\nProblem: Media businesses rely on capturing attention to survive, often at the cost of quality.\nKey Learning: The attention economy pushes sensationalism over substance.\nOutcome: Players learn to critically consume headlines and question why certain stories are chosen.\nNeed: Understanding the commercial pressures behind editorial choices.\nGoal: Keep both Ratings (Profit) and Civic Info (Duty) above zero for 5 full hours (rounds).",
+    "imageUrl": "https://openmoji.org/data/color/svg/1F4FA.svg",
+    "productUrl": "/game-news-desk.html",
+    "seoUrl": "/game/the-news-desk",
+    "thumbText": "📺",
+    "title": "The News Desk",
+    "type": "external"
+  },
+  {
+    "id": "g4",
+    "summary": "Allocate a strained city budget under pressure from angry sectors and tempting bribes.",
+    "buttonLabel": "Play Now",
+    "category": "Puzzle",
+    "difficulty": "High",
+    "description": "You are in charge of a city budget. You have ₹100 Cr but the city demands ₹160 Cr across 5 angry sectors (Roads, Schools, Health, Housing, etc.).\n\nProblem: Citizens demand world-class services but often ignore fiscal limits.\nKey Learning: Budgeting is a zero-sum game; every 'Yes' to one sector forces a 'No' to another.\nOutcome: Players understand policy trade-offs and populist pressure on representatives.\nNeed: Realizing that 'efficiency' isn't magic; resources are finite sand require hard choices.\nGoal: Achieve a Re-election Approval rating of 60%+ without being exposed for corruption (if you took bribes).",
+    "imageUrl": "https://openmoji.org/data/color/svg/1F4B0.svg",
+    "productUrl": "/game-budget-battle.html",
+    "seoUrl": "/game/budget-battle",
+    "thumbText": "💰",
+    "title": "Budget Battle",
+    "type": "external"
+  },
+  {
+    "id": "g5",
+    "summary": "Seed and track rumors through a network to tilt an election using limited influence.",
+    "buttonLabel": "Play Now",
+    "category": "Simulation",
+    "difficulty": "High",
+    "description": "You operate a whisper campaign during an election. Map how rumors spread through a network and choose which groups (nodes) to target.\n\nProblem: Disinformation thrives in insulated echo chambers where facts cannot penetrate.\nKey Learning: Information bubbles insulate voters from reality and can be engineered.\nOutcome: Players develop inoculation against network-based propaganda.\nNeed: Recognizing that misinformation is often designed to exploit social fault lines.\nGoal: Flip District Support to 60%+ (or higher for Dictatorship mode) within 14 Days using limited Influence.",
+    "imageUrl": "https://openmoji.org/data/color/svg/1F4E3.svg",
+    "productUrl": "/game-whisper-campaign.html",
+    "seoUrl": "/game/the-whisper-campaign",
+    "thumbText": "📢",
+    "title": "The Whisper Campaign",
+    "type": "external"
+  }
+]

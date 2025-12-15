@@ -1,0 +1,100 @@
+:root {
+  --page-bg: #f8f6f2;
+  --card-bg: #ffffff;
+  --accent: #d4a017;
+  --navy: #0a2342;
+  --muted: #5a6673;
+  --border: rgba(0, 0, 0, 0.06);
+  --radius: 10px;
+  --gap: 20px;
+}
+
+body {
+  background: transparent;
+  color: var(--navy);
+}
+
+/* Carousel Track */
+.carousel-track {
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE/Edge */
+  scroll-snap-type: x mandatory;
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Card Styling */
+.c-card {
+  width: 260px; /* Reduced width to fit 4 cards comfortably */
+  background: var(--card-bg);
+  border: 4px solid var(--accent);
+  border-radius: var(--radius);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  scroll-snap-align: start;
+}
+
+.c-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(10, 34, 66, 0.15);
+  color: inherit;
+}
+
+.c-thumb {
+  height: 110px; /* Adjusted height for narrower card */
+  background: #ececec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.c-thumb img {
+  width: 60%; /* Balanced icon size */
+  height: 60%;
+  object-fit: contain;
+}
+
+.c-cat {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.c-card .card-title {
+  font-size: 1rem;
+}
+
+.c-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.c-btn {
+  background: var(--navy);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.c-card:hover .c-btn {
+  background: #7a2e2e;
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .c-card { width: 85vw; }
+}

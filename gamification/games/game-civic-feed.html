@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Civic Feed: India Edition</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/game-civic-feed.css" />
+    <!-- Carousel Component CSS -->
+    <link rel="stylesheet" href="../assets/css/carousel.css" />
+
+    <!-- Scripts (Deferred for performance) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script defer src="../assets/js/game-civic-feed.js"></script>
+  </head>
+  <body>
+    
+    <header class="game-container p-2 mb-2 text-center">
+      <h1 class="m-0 fs-5 text-uppercase fw-bold">The Civic Feed</h1>
+      <div class="subtitle small">India Edition | Target: Maximize Info, Minimize Hate</div>
+    </header>
+
+    <!-- Dashboard Stats -->
+    <div class="game-container row g-2 mb-2">
+      <div class="col-4">
+        <div class="stat-box stat-eng" id="box-eng">
+          <span class="stat-label">Engagement</span>
+          <span class="stat-value" id="stat-engagement">50%</span>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="stat-box stat-pol" id="box-pol">
+          <span class="stat-label">Polarization</span>
+          <span class="stat-value" id="stat-polarization">20%</span>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="stat-box stat-inf" id="box-inf">
+          <span class="stat-label">Civic Info</span>
+          <span class="stat-value" id="stat-info">30%</span>
+        </div>
+      </div>
+    </div>
+
+    <main class="game-container d-flex flex-column align-items-center flex-grow-1">
+      <div class="card-stack">
+        <div class="game-card" id="active-card">
+          <div class="card-tag" id="card-tag">System Ready</div>
+          <div class="card-content" id="card-text">
+            Initializing Indian Democracy Algorithm...<br /><br />Swipe RIGHT
+            (Boost) to show users.<br />Swipe LEFT (Bury) to hide.
+          </div>
+          <div class="card-source" id="card-source">Server</div>
+        </div>
+      </div>
+
+      <div class="controls d-flex gap-2 w-100 justify-content-center mb-2 mt-auto">
+        <button class="btn-action btn-bury flex-grow-1" onclick="handleChoice('bury')">
+          BURY (Left)
+          <span class="btn-subtext">Suppress Post</span>
+        </button>
+        <button class="btn-action btn-boost flex-grow-1" onclick="handleChoice('boost')">
+          BOOST (Right)
+          <span class="btn-subtext">Make Viral</span>
+        </button>
+      </div>
+      
+      <div class="text-center text-muted small mt-1 mb-2" style="font-size: 0.7rem;">© 2025 Kaif Abbas</div>
+      <div class="visually-hidden" id="live-feedback" aria-live="polite"></div>
+    </main>
+
+    <!-- Games carousel container (Content loaded dynamically) -->
+    <div id="games-carousel-container" class="container-fluid w-100 mt-1 p-0"></div>
+
+    <!-- Custom End Screen Modal -->
+    <div class="custom-modal" id="game-over-modal">
+      <div class="custom-modal-content">
+        <h2 id="end-title">Simulation Ended</h2>
+        <p id="end-desc">Results loading...</p>
+        <button class="btn-restart" onclick="initGame()">Restart Simulation</button>
+      </div>
+    </div>
+
+    <!-- Scripts moved to head with defer -->
+
+    <!-- Component Loader Logic -->
+    <script>
+      fetch('../partials/carousel.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('games-carousel-container').innerHTML = html;
+          const script = document.createElement('script');
+          script.src = "../assets/js/carousel.js";
+          script.onload = () => window.initCarousel && window.initCarousel();
+          document.body.appendChild(script);
+        });
+    </script>
+  </body>
+</html>
