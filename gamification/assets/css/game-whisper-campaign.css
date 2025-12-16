@@ -494,4 +494,8 @@ header h1 {
   .narrative-list {
     flex-direction: column;
   }
+
+  .action-row {
+    flex-direction: column;
+  }
 }
