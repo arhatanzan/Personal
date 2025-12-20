@@ -82,232 +82,7 @@ It updates CSS custom properties on :root and keeps the file self-contained.
   }
 
   /* --- SEO & METADATA --- */
-
-  /**
-   * Ensures a <meta> tag exists in the <head> with the specified name/property and value.
-   * Creates the tag if it doesn't exist, otherwise updates it.
-   * @param {string} nameOrProp - The meta tag's `name` or `property` attribute.
-   * @param {string} value - The value for the `content` attribute.
-   * @param {boolean} isProperty - Set to true if `nameOrProp` is a `property` (e.g., 'og:title').
-   */
-  function ensureMetaTag(nameOrProp, value, isProperty = false) {
-    let selector = isProperty
-      ? `meta[property="${nameOrProp}"]`
-      : `meta[name="${nameOrProp}"]`;
-    let m = document.head.querySelector(selector);
-    if (!m) {
-      m = document.createElement("meta");
-      if (isProperty) m.setAttribute("property", nameOrProp);
-      else m.setAttribute("name", nameOrProp);
-      document.head.appendChild(m);
-    }
-    m.setAttribute("content", value || "");
-  }
-
-  /**
-   * Ensures a <link> tag with a given `rel` attribute exists and sets its `href`.
-   * @param {string} rel - The `rel` attribute value (e.g., 'canonical').
-   * @param {string} href - The `href` attribute value.
-   */
-  function ensureLinkRel(rel, href) {
-    let el = document.head.querySelector(`link[rel="${rel}"]`);
-    if (!el) {
-      el = document.createElement("link");
-      el.setAttribute("rel", rel);
-      document.head.appendChild(el);
-    }
-    el.setAttribute("href", href || "");
-  }
-
-  /**
-   * Updates the page title and meta tags based on current filters and search query.
-   * This makes the page SEO-friendly and improves user context.
-   */
-  function updateTitleAndMeta() {
-    const parts = [];
-    const cat = refs.categorySelect.value;
-    const price = refs.priceSelect.value;
-    const q = refs.searchInput.value.trim();
-
-    if (q) parts.push(`"${q}"`);
-    if (cat) parts.push(cap(cat));
-    if (price) parts.push(cap(price));
-    parts.push("Digital & Physical Products");
-    const title = parts.join(" | ");
-    document.title = title;
-
-    const descParts = [];
-    if (cat) descParts.push(`${cap(cat)} products`);
-    if (price) descParts.push(`${cap(price)} items`);
-    if (q) descParts.push(`Search results for "${q}"`);
-    descParts.push("Instant downloads, external store links, and templates.");
-    const description = descParts.join(" • ");
-
-    // Update standard and social media meta tags for SEO.
-    ensureMetaTag("description", description);
-    ensureMetaTag("robots", "index,follow");
-    ensureMetaTag("twitter:card", "summary_large_image");
-    ensureMetaTag("twitter:title", title);
-    ensureMetaTag("twitter:description", description);
-    ensureMetaTag("og:title", title, true);
-    ensureMetaTag("og:description", description, true);
-    ensureMetaTag("og:type", "website", true);
-    ensureMetaTag(
-      "og:site_name",
-      document.location.hostname || SITE_BASE,
-      true
-    );
-    // Set a fallback Open Graph/Twitter image.
-    ensureMetaTag("og:image", `${SITE_BASE}/assets/og-products.jpg`, true);
-    ensureMetaTag("twitter:image", `${SITE_BASE}/assets/og-products.jpg`);
-  }
-
-  /**
-   * Updates canonical, prev, and next link tags for paginated results.
-   * This helps search engines understand the paginated structure of the content.
-   */
-  function updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize) {
-    const urlBase =
-      SITE_BASE +
-      (LISTING_PATH.startsWith("/") ? LISTING_PATH : "/" + LISTING_PATH);
-    const params = new URLSearchParams();
-    if (pageNum && pageNum > 1) params.set("page", pageNum);
-    if (pageSize && pageSize !== "all") params.set("pageSize", pageSize);
-    const canonicalHref = params.toString()
-      ? `${urlBase}?${params.toString()}`
-      : urlBase;
-
-    ensureLinkRel("canonical", canonicalHref);
-
-    // Set or remove 'prev' link
-    if (pageNum > 1) {
-      const prevParams = new URLSearchParams();
-      const prevPage = pageNum - 1;
-      if (prevPage > 1) prevParams.set("page", prevPage);
-      if (pageSize && pageSize !== "all")
-        prevParams.set("pageSize", pageSize);
-      ensureLinkRel(
-        "prev",
-        prevParams.toString()
-          ? `${urlBase}?${prevParams.toString()}`
-          : urlBase
-      );
-    } else {
-      const prevEl = document.head.querySelector('link[rel="prev"]');
-      if (prevEl) prevEl.remove();
-    }
-
-    // Set or remove 'next' link
-    if (pageNum < totalPages) {
-      const nextParams = new URLSearchParams();
-      const nextPage = pageNum + 1;
-      if (nextPage > 1) nextParams.set("page", nextPage);
-      if (pageSize && pageSize !== "all")
-        nextParams.set("pageSize", pageSize);
-      ensureLinkRel(
-        "next",
-        nextParams.toString()
-          ? `${urlBase}?${nextParams.toString()}`
-          : urlBase
-      );
-    } else {
-      const nextEl = document.head.querySelector('link[rel="next"]');
-      if (nextEl) nextEl.remove();
-    }
-  }
-
-  /**
-   * Injects JSON-LD structured data for products into the page header.
-   * This helps search engines understand product details like name, price, and offers.
-   */
-  function injectStructuredData() {
-    const items = PRODUCTS.map((p) => {
-      const node = {
-        "@type": "Product",
-        name: p.title,
-        description: p.description,
-      };
-
-      // Use the SEO-friendly URL if available.
-      const urlSource = p.seoUrl || p.productUrl;
-      if (urlSource) {
-        node.url = urlSource.startsWith("http")
-          ? urlSource
-          : SITE_BASE +
-            (urlSource.startsWith("/") ? urlSource : "/" + urlSource);
-      }
-      if (p.imageUrl)
-        node.image = p.imageUrl.startsWith("http")
-          ? p.imageUrl
-          : SITE_BASE +
-            (p.imageUrl.startsWith("/") ? p.imageUrl : "/" + p.imageUrl);
-
-      // Safely parse price and discount to generate structured data for offers.
-      function toNumber(s) {
-        if (s === undefined || s === null || s === "") return NaN;
-        const n = Number(String(s).replace(/,/g, ""));
-        return isNaN(n) ? NaN : n;
-      }
-      const origNum = toNumber(p.originalPrice);
-      const disc =
-        typeof p.discountPercent === "number"
-          ? p.discountPercent
-          : p.discountPercent
-          ? Number(p.discountPercent)
-          : NaN;
-
-      if (!isNaN(origNum)) {
-        const curr = p.priceCurrency || "INR";
-        if (!isNaN(disc)) {
-          const safeDisc = Math.max(0, Math.min(100, disc));
-          const priceNowNum = +(origNum * (1 - safeDisc / 100)).toFixed(2);
-          node.offers = {
-            "@type": "Offer",
-            price: priceNowNum.toFixed(2),
-            priceCurrency: p.priceCurrency || "INR",
-            availability: "https://schema.org/InStock",
-          };
-          // Also include the original price for context.
-          node.priceSpecification = {
-            "@type": "PriceSpecification",
-            priceCurrency: p.priceCurrency || "INR",
-            price: origNum.toFixed(2),
-          };
-        } else {
-          node.offers = {
-            "@type": "Offer",
-            price: origNum.toFixed(2),
-            priceCurrency: p.priceCurrency || "INR",
-            availability: "https://schema.org/InStock",
-          };
-          node.priceSpecification = {
-            "@type": "PriceSpecification",
-            priceCurrency: p.priceCurrency || "INR",
-            price: origNum.toFixed(2),
-          };
-        }
-      } else {
-        // If no price, still include an Offer to indicate availability.
-        node.offers = {
-          "@type": "Offer",
-          availability: "https://schema.org/InStock",
-        };
-      }
-
-      return node;
-    });
-
-    const graph = { "@context": "https://schema.org", "@graph": items };
-    let existing = document.getElementById("__products_jsonld");
-    if (existing) existing.textContent = JSON.stringify(graph);
-    else {
-      const s = document.createElement("script");
-      s.type = "application/ld+json";
-      s.id = "__products_jsonld";
-      s.textContent = JSON.stringify(graph);
-      document.head.appendChild(s);
-    }
-  }
+  // SEO functions moved to seo.js
 
   /* --- UI RENDERING & INTERACTIONS --- */
 
@@ -324,7 +99,7 @@ It updates CSS custom properties on :root and keeps the file self-contained.
   }
   function renderPrimaryButton(prod) {
     if (prod.type === "download") {
-      return `<a class="download-btn" data-id="${
+      return `<a class="btn btn-primary btn-sm w-100 download-btn" data-id="${
         prod.id
       }" href="#" aria-label="Download ${escapeHtml(
         prod.title
@@ -333,7 +108,7 @@ It updates CSS custom properties on :root and keeps the file self-contained.
     if (prod.type === "external") {
       const label = prod.buttonLabel || "Buy Now";
       const href = prod.productUrl || "#";
-      return `<a class="download-btn" href="${escapeHtml(
+      return `<a class="btn btn-primary btn-sm w-100 download-btn" href="${escapeHtml(
         href
       )}" target="_blank" rel="noopener" aria-label="${escapeHtml(
         label
@@ -377,9 +152,9 @@ It updates CSS custom properties on :root and keeps the file self-contained.
    */
   function renderPriceLabel(prod) {
     const txt = getPriceLabelText(prod);
-    if (txt === "FREE") return `<span class="label-free">FREE</span>`;
-    if (txt === "PAID") return `<span class="label-paid">PAID</span>`;
-    if (txt) return `<span class="tag">${escapeHtml(txt)}</span>`;
+    if (txt === "FREE") return `<span class="badge bg-dark">FREE</span>`;
+    if (txt === "PAID") return `<span class="badge bg-danger">PAID</span>`;
+    if (txt) return `<span class="badge bg-light text-dark border">${escapeHtml(txt)}</span>`;
     return "";
   }
 
@@ -444,24 +219,24 @@ It updates CSS custom properties on :root and keeps the file self-contained.
       const priceNowNum = +(origNum * (1 - safeDisc / 100)).toFixed(2);
       // If 100% off, show as FREE.
       if (safeDisc === 100) {
-        const origHtml = `<span class="price-old">${escapeHtml(
+        const origHtml = `<span class="text-decoration-line-through text-muted me-2">${escapeHtml(
           formatCurrency(origNum, curr)
         )}</span>`;
-        return `<div class="price-row">${origHtml}<span class="price-now">FREE</span><span class="discount-badge">${safeDisc}% OFF</span></div>`;
+        return `<div class="d-flex align-items-center small">${origHtml}<span class="fw-bold text-navy me-2">FREE</span><span class="badge bg-danger">${safeDisc}% OFF</span></div>`;
       }
       // Otherwise, show discounted price.
-      const origHtml = `<span class="price-old">${escapeHtml(
+      const origHtml = `<span class="text-decoration-line-through text-muted me-2">${escapeHtml(
         formatCurrency(origNum, curr)
       )}</span>`;
-      const nowHtml = `<span class="price-now">${escapeHtml(
+      const nowHtml = `<span class="fw-bold text-navy me-2">${escapeHtml(
         formatCurrency(priceNowNum, curr)
       )}</span>`;
-      return `<div class="price-row">${origHtml}${nowHtml}<span class="discount-badge">${safeDisc}% OFF</span></div>`;
+      return `<div class="d-flex align-items-center small">${origHtml}${nowHtml}<span class="badge bg-danger">${safeDisc}% OFF</span></div>`;
     }
 
     // Case 2: Valid original price but no discount.
     if (!isNaN(origNum) && (isNaN(disc) || disc === 0)) {
-      return `<div class="price-row"><span class="price-now">${escapeHtml(
+      return `<div class="d-flex align-items-center small"><span class="fw-bold text-navy">${escapeHtml(
         formatCurrency(origNum, curr)
       )}</span></div>`;
     }
@@ -479,9 +254,22 @@ It updates CSS custom properties on :root and keeps the file self-contained.
     if (!list.length) {
       refs.empty.style.display = "block";
       refs.paginationWrap.style.display = "none";
-      updateTitleAndMeta();
-      injectStructuredData();
-      updateCanonicalAndPaginationLinks(1, 1, "all");
+      const siteBase = SITE_BASE;
+      const listingPath = LISTING_PATH || LISTING_PATH || window.location.pathname;
+      const currentFilters = {
+        query: refs.searchInput.value,
+        category: refs.categorySelect.value,
+        price: refs.priceSelect.value,
+      };
+      window.SEO.updateTitleAndMeta(siteBase, currentFilters);
+      window.SEO.injectStructuredData(siteBase, []);
+      window.SEO.updateCanonicalAndPaginationLinks(
+        siteBase,
+        listingPath,
+        1,
+        1,
+        "all"
+      );
       return;
     }
     refs.empty.style.display = "none";
@@ -498,16 +286,19 @@ It updates CSS custom properties on :root and keeps the file self-contained.
     const slice = list.slice(start, end);
 
     slice.forEach((p) => {
+      const col = document.createElement("div");
+      col.className = "col";
+
       const card = document.createElement("div");
-      card.className = "card";
+      card.className = "card h-100 border-0 bg-transparent";
 
       // Image fallback: use `imageUrl` if present, otherwise show `thumbText`.
-      let thumbHtml = `<div class="thumb" aria-hidden="true">${escapeHtml(
+      let thumbHtml = `<div class="thumb mb-3" aria-hidden="true">${escapeHtml(
         p.thumbText
       )}</div>`;
       if (p.imageUrl) {
         const imgSrc = escapeHtml(p.imageUrl);
-        thumbHtml = `<div class="thumb" data-thumb-text="${escapeHtml(
+        thumbHtml = `<div class="thumb mb-3" data-thumb-text="${escapeHtml(
           p.thumbText
         )}"><img src="${imgSrc}" alt="${escapeHtml(
           p.title
@@ -516,45 +307,49 @@ It updates CSS custom properties on :root and keeps the file self-contained.
 
       const titleHref = p.seoUrl || p.productUrl || "";
       const titleLink = titleHref
-        ? `<a href="${escapeHtml(titleHref)}">${escapeHtml(p.title)}</a>`
-        : `<span>${escapeHtml(p.title)}</span>`;
+        ? `<a href="${escapeHtml(titleHref)}" class="text-decoration-none text-navy">${escapeHtml(p.title)}</a>`
+        : `<span class="text-navy">${escapeHtml(p.title)}</span>`;
 
       const priceLabel = getPriceLabelText(p);
 
       // The card's inner structure contains front and back faces for the flip effect.
       card.innerHTML = `
     <div class="card-inner">
-      <div class="card-front">
+      <div class="card-front shadow-sm">
         ${thumbHtml}
-        <h3 class="title">${titleLink}</h3>
-        <div class="tags">
-          <span class="tag">${escapeHtml(p.category)}</span>
-          <span class="tag">${escapeHtml(getFileType(p))}</span>
+        <h6 class="card-title fw-bold mb-2">${titleLink}</h6>
+        <div class="d-flex flex-wrap gap-1 mb-2">
+          <span class="badge bg-light text-dark border fw-normal">${escapeHtml(p.category)}</span>
+          <span class="badge bg-light text-dark border fw-normal">${escapeHtml(getFileType(p))}</span>
           ${renderPriceLabel(p)}
         </div>
         ${renderPriceBlock(p)}
-        <p class="desc">${escapeHtml(getSummary(p))}</p>
-        <div class="card-footer">
-          <div class="primary-wrap">${renderPrimaryButton(p)}</div>
-          <div class="actions"><button class="details-btn" data-id="${
+        <p class="card-text text-muted small mt-2 mb-3 flex-grow-1" style="font-size: 0.85rem;">${escapeHtml(getSummary(p))}</p>
+        <div class="mt-auto d-flex gap-2 align-items-center w-100">
+          <div class="flex-grow-1">${renderPrimaryButton(p)}</div>
+          <div><button class="btn btn-outline-secondary btn-sm details-btn" style="font-size: 0.8rem;" data-id="${
             p.id
           }" aria-label="Details for ${escapeHtml(
         p.title
       )}">Details</button></div>
         </div>
       </div>
-      <div class="card-back" aria-hidden="true">
-        <p class="desc">${escapeHtml(p.description)}</p>
-        <div class="card-footer" style="margin-top:auto;">
-          <div class="primary-wrap">${renderPrimaryButton(p)}</div>
-          <div class="actions"><button class="back-btn" data-id="${
+      <div class="card-back shadow-sm">
+        <h6 class="card-title fw-bold text-navy mb-3">Description</h6>
+        <div class="card-text small flex-grow-1 overflow-auto custom-scrollbar" style="font-size: 0.85rem;">
+            ${escapeHtml(p.description)}
+        </div>
+        <div class="mt-3 d-flex gap-2 align-items-center w-100">
+          <div class="flex-grow-1">${renderPrimaryButton(p)}</div>
+          <div><button class="btn btn-outline-secondary btn-sm back-btn" style="font-size: 0.8rem;" data-id="${
             p.id
           }" aria-label="Back to product">Back</button></div>
         </div>
       </div>
     </div>
   `;
-      refs.grid.appendChild(card);
+      col.appendChild(card);
+      refs.grid.appendChild(col);
 
       // Handle broken image links gracefully by showing the thumb text.
       const img = card.querySelector(".thumb img");
@@ -573,9 +368,22 @@ It updates CSS custom properties on :root and keeps the file self-contained.
     renderPagination(totalItems, pageNum, totalPages, pageSize);
 
     // Update all SEO and metadata after rendering.
-    updateTitleAndMeta();
-    injectStructuredData();
-    updateCanonicalAndPaginationLinks(pageNum, totalPages, pageSize);
+    const siteBase = window.location.origin;
+    const listingPath = window.location.pathname;
+    const currentFilters = {
+      query: refs.searchInput.value,
+      category: refs.categorySelect.value,
+      price: refs.priceSelect.value,
+    };
+    window.SEO.updateTitleAndMeta(siteBase, currentFilters);
+    window.SEO.injectStructuredData(siteBase, slice);
+    window.SEO.updateCanonicalAndPaginationLinks(
+      siteBase,
+      listingPath,
+      pageNum,
+      totalPages,
+      pageSize
+    );
 
     // Update the visible H1 and description only if auto-update is enabled.
     // To enable, set `data-auto="true"` on the respective element.
@@ -609,123 +417,63 @@ It updates CSS custom properties on :root and keeps the file self-contained.
       return;
     }
     refs.paginationWrap.style.display = "flex";
+    refs.paginationWrap.className = "d-flex justify-content-center align-items-center flex-wrap gap-3 mt-5";
     refs.paginationWrap.innerHTML = "";
 
-    const prev = document.createElement("button");
-    prev.className = "page-btn";
-    prev.textContent = "Prev";
-    prev.disabled = current <= 1;
-    prev.addEventListener("click", () => {
-      if (current > 1) {
-        currentPage--;
-        refreshPage();
-      }
-    });
-    refs.paginationWrap.appendChild(prev);
+    const ul = document.createElement("ul");
+    ul.className = "pagination mb-0";
 
-    // Smart pagination: show all pages or use ellipses for large page counts.
+    // Helper to create page item
+    const createItem = (text, page, disabled = false, active = false) => {
+        const li = document.createElement("li");
+        li.className = `page-item ${disabled ? "disabled" : ""} ${active ? "active" : ""}`;
+        const a = document.createElement("button");
+        a.className = "page-link";
+        a.textContent = text;
+        if (!disabled && !active) {
+            a.addEventListener("click", () => {
+                currentPage = page;
+                refreshPage();
+            });
+        }
+        li.appendChild(a);
+        return li;
+    };
+
+    ul.appendChild(createItem("Prev", current - 1, current <= 1));
+
     if (totalPages <= 10) {
       for (let i = 1; i <= totalPages; i++) {
-        const b = document.createElement("button");
-        b.className = "page-btn" + (i === current ? " active" : "");
-        b.textContent = i;
-        b.addEventListener("click", () => {
-          currentPage = i;
-          refreshPage();
-        });
-        refs.paginationWrap.appendChild(b);
+        ul.appendChild(createItem(i, i, false, i === current));
       }
     } else {
-      const first = document.createElement("button");
-      first.className = "page-btn";
-      first.textContent = "1";
-      first.addEventListener("click", () => {
-        currentPage = 1;
-        refreshPage();
-      });
-      refs.paginationWrap.appendChild(first);
-
+      ul.appendChild(createItem(1, 1, false, 1 === current));
       if (current > 4) {
-        const dots = document.createElement("span");
-        dots.textContent = "...";
-        refs.paginationWrap.appendChild(dots);
+         const li = document.createElement("li");
+         li.className = "page-item disabled";
+         li.innerHTML = '<span class="page-link">...</span>';
+         ul.appendChild(li);
       }
-
       const start = Math.max(2, current - 2);
       const end = Math.min(totalPages - 1, current + 2);
       for (let i = start; i <= end; i++) {
-        const b = document.createElement("button");
-        b.className = "page-btn" + (i === current ? " active" : "");
-        b.textContent = i;
-        b.addEventListener("click", () => {
-          currentPage = i;
-          refreshPage();
-        });
-        refs.paginationWrap.appendChild(b);
+        ul.appendChild(createItem(i, i, false, i === current));
       }
-
       if (current < totalPages - 3) {
-        const dots2 = document.createElement("span");
-        dots2.textContent = "...";
-        refs.paginationWrap.appendChild(dots2);
+         const li = document.createElement("li");
+         li.className = "page-item disabled";
+         li.innerHTML = '<span class="page-link">...</span>';
+         ul.appendChild(li);
       }
-
-      const last = document.createElement("button");
-      last.className = "page-btn";
-      last.textContent = totalPages;
-      last.addEventListener("click", () => {
-        currentPage = totalPages;
-        refreshPage();
-      });
-      refs.paginationWrap.appendChild(last);
+      ul.appendChild(createItem(totalPages, totalPages, false, totalPages === current));
     }
-    const next = document.createElement("button");
-    next.className = "page-btn";
-    next.textContent = "Next";
-    next.disabled = current >= totalPages;
-    next.addEventListener("click", () => {
-      if (current < totalPages) {
-        currentPage++;
-        refreshPage();
-      }
-    });
-    refs.paginationWrap.appendChild(next);
 
-    // "Go to page" input for quick navigation.
-    const goWrap = document.createElement("div");
-    goWrap.className = "go-page";
-    const goLabel = document.createElement("span");
-    goLabel.style.color = "var(--muted)";
-    goLabel.textContent = "Go to";
-    const goInput = document.createElement("input");
-    goInput.type = "number";
-    goInput.min = 1;
-    goInput.max = totalPages;
-    goInput.value = current;
-    goInput.setAttribute("aria-label", "Page number to go to");
-    const goBtn = document.createElement("button");
-    goBtn.className = "page-btn";
-    goBtn.textContent = "Go";
-    goBtn.addEventListener("click", () => {
-      let v = parseInt(goInput.value, 10);
-      if (isNaN(v)) return;
-      if (v < 1) v = 1;
-      if (v > totalPages) v = totalPages;
-      currentPage = v;
-      refreshPage();
-      goBtn.blur();
-    });
-    goInput.addEventListener("keydown", (ev) => {
-      if (ev.key === "Enter") goBtn.click();
-    });
-    goWrap.appendChild(goLabel);
-    goWrap.appendChild(goInput);
-    goWrap.appendChild(goBtn);
-    refs.paginationWrap.appendChild(goWrap);
+    ul.appendChild(createItem("Next", current + 1, current >= totalPages));
+    refs.paginationWrap.appendChild(ul);
 
+    // Info text
     const info = document.createElement("div");
-    info.style.marginLeft = "8px";
-    info.style.color = "var(--muted)";
+    info.className = "text-muted small";
     info.textContent = `Page ${current} of ${totalPages} • ${totalItems} items`;
     refs.paginationWrap.appendChild(info);
   }
@@ -886,38 +634,12 @@ It updates CSS custom properties on :root and keeps the file self-contained.
 
   /* --- UTILITIES --- */
 
-  /**
-   * Generates a sitemap.xml string from the product data.
-   */
-  function buildSitemapXml() {
-    const domain = window.location.origin;
 
-    const urls = PRODUCTS.map((p) => {
-      const loc = p.seoUrl || p.productUrl || `${domain}/product/${p.id}`;
-      return `
-    <url>
-      <loc>${loc}</loc>
-      <changefreq>weekly</changefreq>
-      <priority>0.8</priority>
-    </url>
-  `;
-    }).join("");
-
-    return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${domain}</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  ${urls}
-</urlset>`;
-  }
 
   /* Keyboard shortcut: CTRL + SHIFT + S to generate and show the sitemap. */
   document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
-      const xml = buildSitemapXml();
+      const xml = window.SEO.buildSitemapXml(SITE_BASE, PRODUCTS);
       const blob = new Blob([xml], { type: "application/xml" });
       const url = URL.createObjectURL(blob);
 
@@ -939,44 +661,7 @@ It updates CSS custom properties on :root and keeps the file self-contained.
    * IIFE to set up initial state: populates filters and ensures data integrity.
    */
   function setupFilters() {
-    /**
-     * Ensures each product has a unique, SEO-friendly URL (`seoUrl`).
-     * Auto-generates a slug from the title if `seoUrl` is missing.
-     */
-    function ensureSeoUrls() {
-      function slugify(s) {
-        return (s || "")
-          .toString()
-          .trim()
-          .toLowerCase()
-          .replace(/["'`]/g, "")
-          .replace(/[^a-z0-9\s-]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/-+/g, "-")
-          .replace(/^[-]+|[-]+$/g, "");
-      }
-      const seen = new Set();
-      // Pre-seed with any existing seoUrls to avoid duplicates.
-      PRODUCTS.forEach((p) => {
-        if (p.seoUrl) seen.add(p.seoUrl);
-      });
-      PRODUCTS.forEach((p) => {
-        if (!p.seoUrl || !String(p.seoUrl).trim()) {
-          const base =
-            "/product/" + (slugify(p.title || p.id) || "product-" + p.id);
-          let candidate = base;
-          let i = 1;
-          // Append a number if the slug already exists.
-          while (seen.has(candidate)) {
-            candidate = base + "-" + i;
-            i++;
-          }
-          p.seoUrl = candidate;
-          seen.add(candidate);
-        }
-      });
-    }
-    ensureSeoUrls();
+    window.SEO.ensureSeoUrls(PRODUCTS);
     const cats = [...new Set(PRODUCTS.map((p) => p.category))].sort();
     cats.forEach((c) => {
       const op = document.createElement("option");
@@ -999,9 +684,7 @@ It updates CSS custom properties on :root and keeps the file self-contained.
       refs.priceSelect.appendChild(op);
     });
 
-    // Perform initial SEO and structured data injection on load.
-    updateTitleAndMeta();
-    injectStructuredData();
+
   }
 
   /* INITIAL RENDER */
@@ -1016,30 +699,38 @@ It updates CSS custom properties on :root and keeps the file self-contained.
   function adjustCardHeights() {
     const cards = Array.from(document.querySelectorAll(".card"));
     if (!cards.length) return;
+    
     // Reset inline heights to re-measure accurately.
     cards.forEach((c) => {
       c.style.height = "";
       const inner = c.querySelector(".card-inner");
       if (inner) inner.style.height = "";
     });
+
     let max = 0;
+    
     // Measure the front face in-place by disabling transform temporarily.
     cards.forEach((card) => {
       const inner = card.querySelector(".card-inner");
       const front = card.querySelector(".card-front");
       if (!inner || !front) return;
-      const prevTransform = inner.style.transform;
-      inner.style.transform = "none";
-      // Ensure not flipped while measuring front
-      const wasFlipped = card.classList.contains("is-flipped");
-      if (wasFlipped) card.classList.remove("is-flipped");
+
+      // Temporarily make front relative to measure its natural height
+      const prevPos = front.style.position;
+      const prevHeight = front.style.height;
+      front.style.position = "relative";
+      front.style.height = "auto";
+
       const h = front.scrollHeight;
       if (h > max) max = h;
-      // Restore state
-      if (wasFlipped) card.classList.add("is-flipped");
-      inner.style.transform = prevTransform || "";
+
+      // Restore
+      front.style.position = prevPos;
+      front.style.height = prevHeight;
     });
-    if (max <= 0) return;
+
+    if (max <= 0) max = 400; // Fallback min height
+
     // Apply uniform height to all cards and their inner containers.
     cards.forEach((card) => {
       card.style.height = max + "px";

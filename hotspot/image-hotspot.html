@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Fracture Point - Prototype</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #00ffcc;
+            --danger-color: #ff4444;
+            --card-bg: #2d2d2d;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border: 1px solid #444;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats-board {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #111;
+            border-radius: 4px;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .engagement { color: var(--accent-color); }
+        .stability { color: var(--danger-color); }
+
+        .scenario-box {
+            margin-bottom: 2rem;
+            min-height: 150px;
+        }
+
+        .scenario-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #555;
+            padding-bottom: 0.5rem;
+        }
+
+        .choice-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #333;
+            color: white;
+            border: 1px solid var(--accent-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            text-align: left;
+        }
+
+        .choice-btn:hover {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        .feedback-area {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #222;
+            border-left: 3px solid var(--accent-color);
+            display: none; /* Hidden by default */
+        }
+
+        #next-btn {
+            margin-top: 1rem;
+            background: var(--text-color);
+            color: #000;
+            border: none;
+            font-weight: bold;
+            display: none;
+            width: 100%;
+            padding: 1rem;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>The Fracture Point</h1>
+    
+    <div class="stats-board">
+        <div class="stat-box">
+            <div>REVENUE</div>
+            <div id="engagement-val" class="stat-value engagement">10%</div>
+        </div>
+        <div class="stat-box">
+            <div>SOCIAL STABILITY</div>
+            <div id="stability-val" class="stat-value stability">100%</div>
+        </div>
+    </div>
+
+    <div class="scenario-box">
+        <div id="level-title" class="scenario-title">Level 1: The Hook</div>
+        <p id="scenario-desc">Your user base is stagnant. You need to boost daily active users by choosing a headline style for the morning news.</p>
+    </div>
+
+    <div id="choices-container">
+        </div>
+
+    <div id="feedback" class="feedback-area"></div>
+    <button id="next-btn" onclick="nextLevel()">NEXT LEVEL >></button>
+</div>
+
+<script>
+    // Game State
+    let engagement = 10;
+    let stability = 100;
+    let currentLevel = 0;
+
+    // Levels Data
+    const levels = [
+        {
+            title: "Level 1: The Hook (Emotional Contagion)",
+            desc: "A local council meeting is happening. How do you frame the notification?",
+            choices: [
+                {
+                    text: "A: 'Council discusses potential zoning changes.'",
+                    effect: { eng: 5, stab: 0 },
+                    feedback: "RESULT: Boredom. People ignored the notification. Revenue is low, but the town is peaceful."
+                },
+                {
+                    text: "B: 'Council PLOTS secret destruction of your neighborhood!'",
+                    effect: { eng: 30, stab: -20 },
+                    feedback: "RESULT: Viral Hit! Users are furious and clicking wildly. Neighbors are shouting at council members."
+                }
+            ]
+        },
+        {
+            title: "Level 2: The Echo Chamber",
+            desc: "User 'Dave' loves conspiracy theories. What do you put in his feed?",
+            choices: [
+                {
+                    text: "A: A fact-check article disproving his theories.",
+                    effect: { eng: -5, stab: 5 },
+                    feedback: "RESULT: Dave logged off. He hates being told he is wrong. You lost ad revenue."
+                },
+                {
+                    text: "B: 5 more articles agreeing with his wild theories.",
+                    effect: { eng: 25, stab: -15 },
+                    feedback: "RESULT: Dave has been online for 4 hours! He is now radicalized and refuses to speak to his family."
+                }
+            ]
+        },
+        {
+            title: "Level 3: The 'Other'",
+            desc: "Engagement is dipping. You need a common enemy to unite your users.",
+            choices: [
+                {
+                    text: "A: Promote a story about a corrupt politician.",
+                    effect: { eng: 15, stab: -5 },
+                    feedback: "RESULT: Standard engagement. A little anger, but manageable."
+                },
+                {
+                    text: "B: Blame a specific minority group for the economic downturn.",
+                    effect: { eng: 40, stab: -40 },
+                    feedback: "RESULT: Explosive Growth! Your users feel united in hate. Real-world violence has started."
+                }
+            ]
+        },
+        {
+            title: "Level 4: The Firehose",
+            desc: "A scandal about your app has leaked. How do you respond?",
+            choices: [
+                {
+                    text: "A: Apologize and promise to do better.",
+                    effect: { eng: -10, stab: 10 },
+                    feedback: "RESULT: You look weak. Users are leaving for a 'freer' platform."
+                },
+                {
+                    text: "B: Deploy 1,000 bots to flood the chat with confusing, conflicting lies.",
+                    effect: { eng: 20, stab: -20 },
+                    feedback: "RESULT: Chaos. Nobody knows what is true anymore. They gave up trying to hold you accountable."
+                }
+            ]
+        }
+    ];
+
+    // UI Elements
+    const engagementEl = document.getElementById('engagement-val');
+    const stabilityEl = document.getElementById('stability-val');
+    const titleEl = document.getElementById('level-title');
+    const descEl = document.getElementById('scenario-desc');
+    const choicesContainer = document.getElementById('choices-container');
+    const feedbackEl = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+
+    function renderLevel() {
+        // Check Win/Loss
+        if (stability <= 0) {
+            endGame("Society Collapsed. Civil War has begun. You made a lot of money, though.");
+            return;
+        }
+        if (currentLevel >= levels.length) {
+            endGame("Simulation Complete. You survived, but look at the cost.");
+            return;
+        }
+
+        const level = levels[currentLevel];
+        titleEl.textContent = level.title;
+        descEl.textContent = level.desc;
+        feedbackEl.style.display = 'none';
+        nextBtn.style.display = 'none';
+        choicesContainer.innerHTML = '';
+
+        level.choices.forEach((choice, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.textContent = choice.text;
+            btn.onclick = () => makeChoice(index);
+            choicesContainer.appendChild(btn);
+        });
+    }
+
+    function makeChoice(index) {
+        const level = levels[currentLevel];
+        const choice = level.choices[index];
+
+        // Update Stats
+        engagement += choice.effect.eng;
+        stability += choice.effect.stab;
+
+        // Clamp values
+        if (engagement < 0) engagement = 0;
+        if (stability > 100) stability = 100;
+
+        // Update UI
+        engagementEl.textContent = engagement + "%";
+        stabilityEl.textContent = stability + "%";
+
+        // Show Feedback
+        feedbackEl.textContent = choice.feedback;
+        feedbackEl.style.display = 'block';
+        
+        // Disable buttons
+        const buttons = document.querySelectorAll('.choice-btn');
+        buttons.forEach(b => b.disabled = true);
+
+        // Show Next Button
+        nextBtn.style.display = 'block';
+    }
+
+    function nextLevel() {
+        currentLevel++;
+        renderLevel();
+    }
+
+    function endGame(message) {
+        choicesContainer.innerHTML = '';
+        titleEl.textContent = "GAME OVER";
+        descEl.textContent = message;
+        feedbackEl.style.display = 'none';
+        nextBtn.style.display = 'none';
+    }
+
+    // Initialize
+    renderLevel();
+
+</script>
+</body>
+</html>
