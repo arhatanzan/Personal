@@ -74,24 +74,37 @@ const siteData = {
         }
     ],
     "footer": "Learn about updates @ /changelog",
-    "customSections": [
-        {
-            "title": "New Section",
-            "links": [
-                {
-                    "text": "New Link",
-                    "url": "#"
-                }
-            ]
-        }
-    ],
+    "custom_1": {
+        "title": "New Section",
+        "links": [
+            {
+                "text": "New Link",
+                "url": "#"
+            }
+        ]
+    },
     "sectionOrder": [
         "profile",
         "socialLinks",
         "workLinks",
         "publications",
-        "customSections",
+        "custom_1",
         "connectLinks",
         "footer"
-    ]
+    ],
+    "sectionSettings": {
+        "socialLinks": { "showDivider": true },
+        "workLinks": { "showDivider": true },
+        "publications": { "showDivider": true },
+        "custom_1": { "showDivider": true },
+        "connectLinks": { "showDivider": true }
+    },
+    "theme": {
+        "buttonColors": [
+            "#80d6ff",
+            "#3DCD49",
+            "#ffd300",
+            "#ff5852"
+        ]
+    }
 };

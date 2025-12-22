@@ -35,12 +35,24 @@
     </div>
 
     <div class="action-bar row g-2">
-        <div class="col-6">
+        <div class="col-md-3">
+            <button type="button" class="btn btn-warning w-100" onclick="resetData()">Reset Changes</button>
+        </div>
+        <div class="col-md-3">
             <button type="button" class="btn btn-secondary w-100" onclick="previewData()">Preview Data</button>
         </div>
-        <div class="col-6">
-            <button type="button" class="btn btn-primary w-100" onclick="downloadData()">Download Data File</button>
+        <div class="col-md-3">
+            <button type="button" class="btn btn-primary w-100" onclick="downloadData()">Download File</button>
         </div>
+        <div class="col-md-3">
+            <button type="button" class="btn btn-success w-100" id="saveBtn" onclick="saveDataDirectly()">Save Directly</button>
+        </div>
+    </div>
+    <div class="text-center mt-2">
+        <small class="text-muted">
+            <strong>Local:</strong> Run <code>python server.py</code> | 
+            <strong>Netlify:</strong> Ensure <code>GITHUB_TOKEN</code> is set in Site Settings.
+        </small>
     </div>
 </div>
 

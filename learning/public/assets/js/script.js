@@ -45,54 +45,79 @@ function renderSite() {
         let isProfile = key === 'profile';
         let isFooter = key === 'footer';
 
-        switch(key) {
-            case 'profile':
-                sectionHtml = renderProfile();
-                break;
-            case 'socialLinks':
-                sectionHtml = renderLinkSection('Social Links', siteData.socialLinks);
-                sectionId = 'social-links-container';
-                break;
-            case 'workLinks':
-                sectionHtml = renderLinkSection('Work', siteData.workLinks);
-                sectionId = 'work-links-container';
-                break;
-            case 'publications':
-                sectionHtml = renderLinkSection('Publications', siteData.publications);
-                sectionId = 'publications-container';
-                break;
-            case 'customSections':
-                sectionHtml = renderCustomSections();
-                sectionId = 'dynamic-sections-container';
-                break;
-            case 'connectLinks':
-                sectionHtml = renderLinkSection(null, siteData.connectLinks, true);
-                sectionId = 'connect-container';
-                break;
-            case 'footer':
-                sectionHtml = renderFooter();
-                break;
+        // Check if it's a known static section or a dynamic one
+        if (['profile', 'socialLinks', 'workLinks', 'publications', 'customSections', 'connectLinks', 'footer'].includes(key)) {
+            switch(key) {
+                case 'profile':
+                    sectionHtml = renderProfile();
+                    break;
+                case 'socialLinks':
+                    sectionHtml = renderLinkSection('Social Links', siteData.socialLinks);
+                    sectionId = 'social-links-container';
+                    break;
+                case 'workLinks':
+                    sectionHtml = renderLinkSection('Work', siteData.workLinks);
+                    sectionId = 'work-links-container';
+                    break;
+                case 'publications':
+                    sectionHtml = renderLinkSection('Publications', siteData.publications);
+                    sectionId = 'publications-container';
+                    break;
+                case 'customSections':
+                    sectionHtml = renderCustomSections();
+                    sectionId = 'dynamic-sections-container';
+                    break;
+                case 'connectLinks':
+                    sectionHtml = renderLinkSection(null, siteData.connectLinks, true);
+                    sectionId = 'connect-container';
+                    break;
+                case 'footer':
+                    sectionHtml = renderFooter();
+                    break;
+            }
+        } else if (siteData[key]) {
+            // Handle promoted custom sections
+            // They are stored as { title: "...", links: [...] }
+            sectionHtml = renderLinkSection(siteData[key].title, siteData[key].links);
+            sectionId = `section-${key}`;
         }
 
         if (sectionHtml) {
             // Divider Logic
-            const prevKey = index > 0 ? order[index - 1] : null;
-            let shouldAddDivider = index > 0 && !isFooter;
+            const settings = (siteData.sectionSettings && siteData.sectionSettings[key]) || {};
+            
+            // Default Logic if not set
+            // Top: True for all except first section (profile) and footer
+            // Bottom: False by default
+            let showTop = settings.dividerTop;
+            let showBottom = settings.dividerBottom;
 
-            // Special case: No divider immediately after Profile (preserves original design)
-            if (prevKey === 'profile') {
-                shouldAddDivider = false;
+            if (typeof showTop === 'undefined') {
+                showTop = index > 0 && !isFooter;
+                // Special case: No divider immediately after Profile (preserves original design)
+                const prevKey = index > 0 ? order[index - 1] : null;
+                if (prevKey === 'profile') showTop = false;
             }
 
-            if (shouldAddDivider) {
+            if (typeof showBottom === 'undefined') {
+                showBottom = false;
+            }
+
+            // Render Top Divider
+            if (showTop) {
                 container.insertAdjacentHTML('beforeend', '<colored-divider></colored-divider>');
             }
 
-            // Wrap in ID if needed
+            // Render Content
             if (sectionId) {
                 container.insertAdjacentHTML('beforeend', `<div id="${sectionId}">${sectionHtml}</div>`);
             } else {
                 container.insertAdjacentHTML('beforeend', sectionHtml);
+            }
+
+            // Render Bottom Divider
+            if (showBottom) {
+                container.insertAdjacentHTML('beforeend', '<colored-divider></colored-divider>');
             }
         }
     });
@@ -199,11 +224,26 @@ function generateItemsHtml(items, isConnect = false) {
 
 function applyButtonColors() {
     const buttons = document.querySelectorAll('.link-btn');
-    const colors = ['link-btn--blue', 'link-btn--green', 'link-btn--yellow', 'link-btn--pink'];
+    
+    // Default colors if not provided in siteData
+    const colors = (siteData.theme && siteData.theme.buttonColors) 
+        ? siteData.theme.buttonColors 
+        : ['#80d6ff', '#3DCD49', '#ffd300', '#ff5852']; // Blue, Green, Yellow, Red/Pinkish
 
     buttons.forEach((btn, index) => {
-        colors.forEach(c => btn.classList.remove(c));
-        btn.classList.add(colors[index % colors.length]);
+        const color = colors[index % colors.length];
+        
+        // Set CSS Variable for dynamic coloring
+        btn.style.setProperty('--btn-color', color);
+        
+        // Clean up any direct styles from previous versions
+        btn.style.backgroundColor = '';
+        btn.style.borderColor = '';
+        btn.style.borderBottom = '';
+        btn.style.boxShadow = '';
+        
+        // Ensure class is correct
+        btn.className = 'link-btn'; 
     });
 }
 

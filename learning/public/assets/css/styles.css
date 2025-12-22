@@ -95,54 +95,40 @@ header {
     font-size: 0.95rem;
     font-weight: 700;
     line-height: 1.5;
-    color: #023e62; /* Updated Color */
+    color: #023e62;
     border-radius: 25px;
     transition: all 0.2s ease-in-out;
+
+    /* Dynamic Color Application via CSS Variable */
+    background-color: var(--btn-color, #80d6ff);
+    border: 2px solid var(--btn-color, #80d6ff);
+    border-bottom: 3px solid var(--btn-color, #80d6ff);
+    box-shadow: inset 0 -4px 0 var(--btn-color, #80d6ff);
 }
 
-/* BUTTON EFFECTS (Inset Shadow) */
+.link-btn:hover {
+    background-color: #fff;
+}
+
+/* Legacy classes kept for reference but not used by JS anymore */
 /* BLUE #80d6ff */
 .link-btn--blue {
-    background-color: #80d6ff;
-    border: 2px solid #80d6ff;
-    border-bottom: 3px solid #80d6ff;
-    box-shadow: inset 0 -4px 0 #80d6ff;
-}
-.link-btn--blue:hover {
-    background-color: #fff;
+    --btn-color: #80d6ff;
 }
 
 /* GREEN #73e2a7 */
 .link-btn--green {
-    background-color: #73e2a7;
-    border: 2px solid #73e2a7;
-    border-bottom: 3px solid #73e2a7;
-    box-shadow: inset 0 -4px 0 #73e2a7;
-}
-.link-btn--green:hover {
-    background-color: #fff;
+    --btn-color: #73e2a7;
 }
 
 /* YELLOW #fed766 */
 .link-btn--yellow {
-    background-color: #fed766;
-    border: 2px solid #fed766;
-    border-bottom: 3px solid #fed766;
-    box-shadow: inset 0 -4px 0 #fed766;
-}
-.link-btn--yellow:hover {
-    background-color: #fff;
+    --btn-color: #fed766;
 }
 
 /* PINK #ffa093 */
 .link-btn--pink {
-    background-color: #ffa093;
-    border: 2px solid #ffa093;
-    border-bottom: 3px solid #ffa093;
-    box-shadow: inset 0 -4px 0 #ffa093;
-}
-.link-btn--pink:hover {
-    background-color: #fff;
+    --btn-color: #ffa093;
 }
 
 /* --- Text Content Areas --- */
