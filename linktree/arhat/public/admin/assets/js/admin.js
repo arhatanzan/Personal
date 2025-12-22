@@ -51,7 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 sessionStorage.setItem('adminPassword', password);
                 showAdmin();
             } else {
-                throw new Error('Invalid password');
+                const data = await response.json().catch(() => ({}));
+                throw new Error(data.error || `Login failed (${response.status})`);
             }
         } catch (err) {
             console.error(err);
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  showAdmin();
             } else {
                 errorDiv.style.display = 'block';
-                errorDiv.textContent = 'Invalid password';
+                errorDiv.textContent = err.message;
             }
         } finally {
             btn.disabled = false;
