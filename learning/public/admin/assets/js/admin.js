@@ -1,5 +1,6 @@
 // State management
-let currentData = JSON.parse(JSON.stringify(siteData)); // Deep copy
+let originalData = JSON.parse(JSON.stringify(siteData)); // Keep track of last saved state
+let currentData = JSON.parse(JSON.stringify(siteData)); // Deep copy for editing
 
 // Initialize defaults if missing
 if (!currentData.sectionOrder) {
@@ -300,6 +301,12 @@ window.addNewCustomSection = function() {
         title: "New Section",
         links: []
     };
+    
+    // Ensure sectionOrder exists
+    if (!currentData.sectionOrder) {
+        currentData.sectionOrder = [];
+    }
+
     // Insert before footer if possible, else append
     const footerIndex = currentData.sectionOrder.indexOf('footer');
     if (footerIndex !== -1) {
@@ -322,7 +329,7 @@ window.deleteCustomSection = function(key) {
 
 window.resetData = function() {
     if(confirm('Are you sure you want to discard all changes and reset to the last saved state?')) {
-        currentData = JSON.parse(JSON.stringify(siteData));
+        currentData = JSON.parse(JSON.stringify(originalData));
         // Re-apply defaults if needed
         if (!currentData.sectionOrder) {
             currentData.sectionOrder = ['profile', 'socialLinks', 'workLinks', 'publications', 'connectLinks', 'footer'];
@@ -443,6 +450,9 @@ window.previewData = function() {
 
 window.saveDataDirectly = async function() {
     const btn = document.getElementById('saveBtn');
+    if (btn.disabled) return; // Prevent double submission
+    
+    console.log("saveDataDirectly called");
     const originalText = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
@@ -499,15 +509,18 @@ window.saveDataDirectly = async function() {
             const result = await response.json();
             alert(result.message || 'Changes saved successfully! The site will rebuild shortly.');
             // Update the "original" data so Reset works correctly relative to this save
-            siteData = JSON.parse(JSON.stringify(currentData));
+            originalData = JSON.parse(JSON.stringify(currentData));
         } else {
             // Handle standard python server (501/405) or missing endpoint (404)
             if (response.status === 501 || response.status === 405 || response.status === 404) {
                 throw new Error("Current server is Read-Only (standard python/live-server).");
             }
             
-            const errData = await response.json().catch(() => ({}));
-            throw new Error(errData.error || 'Server responded with ' + response.status);
+            const errData = await response.json().catch(async () => {
+                const text = await response.text().catch(() => '');
+                return { message: 'Invalid JSON response: ' + text.substring(0, 100) };
+            });
+            throw new Error(errData.error || errData.message || 'Server responded with ' + response.status);
         }
     } catch (error) {
         console.warn(error);
@@ -549,4 +562,11 @@ window.downloadData = function() {
 };
 
 // Initialize
-initForm();
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof siteData !== 'undefined') {
+        initForm();
+    } else {
+        console.error("siteData is missing! Check if data.js is loaded correctly.");
+        alert("Error: siteData not found. Please check the console.");
+    }
+});

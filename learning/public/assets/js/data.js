@@ -27,16 +27,16 @@ const siteData = {
     "publications": [
         {
             "title": "Sirr-e-Ulfat",
-            "hindiTitle": "सिर्र-ए-उल्फत: तोहफा-ए-शेर-ओ-सुख़न",
+            "hindiTitle": "\u0938\u093f\u0930\u094d\u0930-\u090f-\u0909\u0932\u094d\u092b\u0924: \u0924\u094b\u0939\u092b\u093e-\u090f-\u0936\u0947\u0930-\u0913-\u0938\u0941\u0959\u0928",
             "description": "This book is a collection of poems written by me. These poems were written originally in Urdu, but are transliterated in Hindi.",
-            "linkText": "Sirr-e-Ulfat | सिर्र-ए-उल्फत",
+            "linkText": "Sirr-e-Ulfat | \u0938\u093f\u0930\u094d\u0930-\u090f-\u0909\u0932\u094d\u092b\u0924",
             "linkUrl": "#"
         },
         {
             "title": "Sirr-e-Nihaan",
-            "hindiTitle": "सिर्र-ए-निहाँ",
+            "hindiTitle": "\u0938\u093f\u0930\u094d\u0930-\u090f-\u0928\u093f\u0939\u093e\u0901",
             "description": "This book is an anthology. It is a collection of couplets of 16 famous Urdu poets.",
-            "linkText": "Sirr-e-Nihaan | सिर्र-ए-निहाँ",
+            "linkText": "Sirr-e-Nihaan | \u0938\u093f\u0930\u094d\u0930-\u090f-\u0928\u093f\u0939\u093e\u0901",
             "linkUrl": "#"
         },
         {
@@ -74,30 +74,31 @@ const siteData = {
         }
     ],
     "footer": "Learn about updates @ /changelog",
-    "custom_1": {
-        "title": "New Section",
-        "links": [
-            {
-                "text": "New Link",
-                "url": "#"
-            }
-        ]
-    },
     "sectionOrder": [
         "profile",
         "socialLinks",
         "workLinks",
         "publications",
-        "custom_1",
         "connectLinks",
         "footer"
     ],
     "sectionSettings": {
-        "socialLinks": { "showDivider": true },
-        "workLinks": { "showDivider": true },
-        "publications": { "showDivider": true },
-        "custom_1": { "showDivider": true },
-        "connectLinks": { "showDivider": true }
+        "socialLinks": {
+            "showDivider": true
+        },
+        "workLinks": {
+            "showDivider": true
+        },
+        "publications": {
+            "showDivider": true
+        },
+        "custom_1": {
+            "showDivider": true,
+            "dividerBottom": true
+        },
+        "connectLinks": {
+            "showDivider": true
+        }
     },
     "theme": {
         "buttonColors": [
