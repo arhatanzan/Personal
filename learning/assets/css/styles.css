@@ -22,7 +22,7 @@ body {
     color: #023e62; 
     
     margin: 0;
-    padding: 0;
+    padding: 90px 0 0 0; /* Added top padding for fixed header */
     text-align: center;
     background-color: #fff;
     min-height: 100vh;
@@ -30,7 +30,14 @@ body {
 
 /* --- Header & Profile --- */
 header {
-    padding: 20px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.95); /* White background with slight transparency */
+    z-index: 1000;
+    padding: 0;
+    backdrop-filter: blur(5px); /* Optional: nice blur effect */
 }
 
 .brand-name {
@@ -38,14 +45,17 @@ header {
     font-family: 'Daniel', 'La Belle Aurore', cursive; 
     font-size: 32px; /* Requested size */
     color: #023e62;
-    line-height: 1.2;
+    line-height: 1;
+    margin: 0;
+    padding-top: 15px; /* Slight top spacing from window edge */
 }
 
 .subtitle {
     font-family: "Montserrat", sans-serif;
     font-size: 0.8rem;
-    color: #666; /* Kept grey for contrast, or change to #023e62 if preferred */
-    margin-top: 5px;
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 5px;
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.2em;
@@ -56,7 +66,7 @@ header {
     height: 100px;
     border-radius: 50%;
     object-fit: cover;
-    margin: 15px auto;
+    margin: 0 auto 15px; /* Removed top margin */
     display: block;
     border: 2px solid #ddd;
 }

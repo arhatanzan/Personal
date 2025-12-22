@@ -1,0 +1,97 @@
+const siteData = {
+    "profile": {
+        "name": "Arhat Anzan",
+        "subtitle": "Home",
+        "image": "assets/images/arhat.png"
+    },
+    "socialLinks": [
+        {
+            "text": "Facebook",
+            "url": "https://facebook.com/arhatanzan"
+        },
+        {
+            "text": "Instagram",
+            "url": "https://instagram.com/arhat_anzan"
+        }
+    ],
+    "workLinks": [
+        {
+            "text": "Medium Blog",
+            "url": "https://kaifabbas.medium.com/"
+        },
+        {
+            "text": "Books Published",
+            "url": "https://notionpress.com/author/340186"
+        }
+    ],
+    "publications": [
+        {
+            "title": "Sirr-e-Ulfat",
+            "hindiTitle": "सिर्र-ए-उल्फत: तोहफा-ए-शेर-ओ-सुख़न",
+            "description": "This book is a collection of poems written by me. These poems were written originally in Urdu, but are transliterated in Hindi.",
+            "linkText": "Sirr-e-Ulfat | सिर्र-ए-उल्फत",
+            "linkUrl": "#"
+        },
+        {
+            "title": "Sirr-e-Nihaan",
+            "hindiTitle": "सिर्र-ए-निहाँ",
+            "description": "This book is an anthology. It is a collection of couplets of 16 famous Urdu poets.",
+            "linkText": "Sirr-e-Nihaan | सिर्र-ए-निहाँ",
+            "linkUrl": "#"
+        },
+        {
+            "title": "(Un)Erased: Emotions Last",
+            "hindiTitle": "",
+            "description": "This book is a journey trying to deal with dark phases of unfathomable sorrow and grief.",
+            "linkText": "(Un)Erased: Emotions Last",
+            "linkUrl": "#"
+        }
+    ],
+    "connectLinks": [
+        {
+            "icon": "fab fa-instagram",
+            "url": "https://www.instagram.com/arhat_anzan"
+        },
+        {
+            "icon": "fab fa-medium",
+            "url": "#"
+        },
+        {
+            "icon": "fab fa-linkedin",
+            "url": "#"
+        },
+        {
+            "icon": "fab fa-facebook",
+            "url": "https://www.facebook.com/arhatanzan"
+        },
+        {
+            "icon": "fab fa-twitter",
+            "url": "#"
+        },
+        {
+            "icon": "fab fa-youtube",
+            "url": "#"
+        }
+    ],
+    "footer": "Learn about updates @ /changelog",
+    "customSections": [
+        {
+            "title": "New Section",
+            "links": [
+                {
+                    "text": "New Link",
+                    "url": "#"
+                }
+            ]
+        }
+    ],
+    "sectionOrder": [
+        "profile",
+        "socialLinks",
+        "workLinks",
+        "publications",
+        "customSections",
+        "connectLinks",
+        "footer"
+    ]
+};
