@@ -15,7 +15,8 @@ exports.handler = async function(event, context) {
 
         const newData = JSON.parse(event.body);
         const fileContent = `const siteData = ${JSON.stringify(newData, null, 4)};`;
-        const filePath = "learning/public/assets/js/data.js"; // Path relative to repo root
+        // IMPORTANT: Update this path if your repo structure changes
+        const filePath = "learning/public/assets/js/data.js"; 
         const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`;
 
         // 1. Get the current file to get its SHA (required for updates)
