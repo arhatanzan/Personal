@@ -1,7 +1,7 @@
 const siteData = {
     "profile": {
         "name": "Arhat Anzan",
-        "subtitle": "Home",
+        "subtitle": "",
         "image": "assets/images/arhat.png"
     },
     "socialLinks": [
@@ -106,6 +106,8 @@ const siteData = {
             "#3DCD49",
             "#ffd300",
             "#ff5852"
-        ]
+        ],
+        "backgroundColor": "#ffffff",
+        "backgroundImage": ""
     }
 };
