@@ -23,17 +23,12 @@ exports.handler = async function(event, context) {
             };
         }
 
-        // Extract data (support both direct data and wrapped {password, data} format)
-        const newData = body.data || body;
-        
-        // If using wrapped format, ensure we don't save the password into the file
-        if (body.data) {
-             // newData is already correct
-        } else {
-             // Legacy/Direct mode - might include password if we aren't careful, 
-             // but for now let's assume the frontend sends { password: "...", data: {...} }
-             // If the user sends just the data, and we don't have a password set, it works.
-             // If we have a password set, we expect the wrapper.
+        const newData = body.data;
+        if (!newData) {
+             return {
+                statusCode: 400,
+                body: JSON.stringify({ error: "Missing data payload" })
+            };
         }
 
         const fileContent = `const siteData = ${JSON.stringify(newData, null, 4)};`;

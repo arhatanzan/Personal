@@ -17,7 +17,7 @@ exports.handler = async function(event, context) {
         if (password === ADMIN_PASSWORD) {
             return {
                 statusCode: 200,
-                body: JSON.stringify({ message: "Authenticated" })
+                body: JSON.stringify({ success: true, message: "Authenticated" })
             };
         } else {
             return {

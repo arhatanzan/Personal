@@ -3,9 +3,24 @@ import socketserver
 import json
 import os
 
+# Load .env file
+env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+if os.path.exists(env_path):
+    with open(env_path, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, value = line.split('=', 1)
+                if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+                    value = value[1:-1]
+                os.environ[key.strip()] = value
+
+# Change directory to 'public' to serve files from there
+public_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'public')
+if os.path.exists(public_dir):
+    os.chdir(public_dir)
+
 PORT = 8000
-# Set directory to the folder containing this script (learning/)
-DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -15,88 +30,82 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_GET(self):
-        print(f"GET request for: {self.path}")
-        
-        # Redirect /admin to /admin/ (trailing slash) to fix relative paths
         if self.path == '/admin':
             self.send_response(301)
             self.send_header('Location', '/admin/')
             self.end_headers()
             return
             
-        # Serve index.html for /admin/ explicitly if needed, or let default handler work
         if self.path == '/admin/':
             self.path = '/admin/index.html'
         elif self.path == '/':
             self.path = '/index.html'
+        elif self.path == '/config':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            timeout = os.environ.get('SESSION_TIMEOUT', '30')
+            self.wfile.write(json.dumps({'sessionTimeout': int(timeout)}).encode('utf-8'))
+            return
             
-        print(f"Serving path: {self.path}")
         return super().do_GET()
 
     def do_POST(self):
+        if self.path == '/.netlify/functions/login':
+            try:
+                content_length = int(self.headers.get('Content-Length', 0))
+                post_data = self.rfile.read(content_length)
+                payload = json.loads(post_data.decode('utf-8'))
+                
+                password = payload.get('password')
+                admin_password = os.environ.get('ADMIN_PASSWORD')
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                
+                if password == admin_password:
+                    self.wfile.write(json.dumps({'success': True, 'message': 'Authenticated'}).encode('utf-8'))
+                else:
+                    self.wfile.write(json.dumps({'success': False, 'message': 'Invalid password'}).encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(json.dumps({'error': str(e)}).encode('utf-8'))
+            return
+
         if self.path == '/save-data':
-            print("Received save request...")
             try:
                 content_length = int(self.headers.get('Content-Length', 0))
                 if content_length == 0:
-                    raise ValueError("No content received")
+                    raise ValueError("No content")
                     
                 post_data = self.rfile.read(content_length)
-                data = json.loads(post_data.decode('utf-8'))
+                payload = json.loads(post_data.decode('utf-8'))
                 
-                # Format as JS file
-                file_content = f"const siteData = {json.dumps(data, indent=4)};"
+                site_data = payload.get('data')
+                if not site_data:
+                    raise ValueError("Missing data payload")
+
+                file_content = f"var siteData = {json.dumps(site_data, indent=4)};"
                 
-                # Save to assets/js/data.js (relative to served directory 'public')
                 file_path = os.path.abspath(os.path.join('assets', 'js', 'data.js'))
-                
-                print(f"Attempting to save to: {file_path}")
                 with open(file_path, 'w', encoding='utf-8') as f:
                     f.write(file_content)
                 
-                print("File written successfully.")
-                
-                # Only send 200 if we got here
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
                 self.wfile.write(json.dumps({'success': True, 'message': 'File saved successfully!'}).encode('utf-8'))
-                print("Response sent.")
                 
             except Exception as e:
-                print(f"Error processing request: {e}")
-                import traceback
-                traceback.print_exc()
-                # Only send 500 if we haven't sent headers yet (approximate check)
-                try:
-                    self.send_response(500)
-                    self.send_header('Content-type', 'application/json')
-                    self.send_header('Access-Control-Allow-Origin', '*')
-                    self.end_headers()
-                    self.wfile.write(json.dumps({'success': False, 'message': str(e)}).encode('utf-8'))
-                except Exception as send_err:
-                    print(f"Could not send error response: {send_err}")
-        else:
-            self.send_error(404, "File not found")
-
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.end_headers()
-
-# Ensure we serve from the public directory
-PUBLIC_DIR = os.path.join(DIRECTORY, 'public')
-os.chdir(PUBLIC_DIR)
-
-print(f"Server running at http://localhost:{PORT}/admin/")
-print(f"Serving directory: {PUBLIC_DIR}")
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(json.dumps({'error': str(e)}).encode('utf-8'))
 
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    httpd.server_close()
+    print(f"Serving at http://localhost:{PORT}")
+    httpd.serve_forever()
