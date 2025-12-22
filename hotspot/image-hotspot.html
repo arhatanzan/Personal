@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp University Simulator</title>
+    <style>
+        :root {
+            --wa-teal: #008069;
+            --wa-light-green: #25D366;
+            --wa-bg: #E5DDD5;
+            --msg-in: #FFFFFF;
+            --msg-out: #E7FFDB;
+            --text-primary: #111b21;
+            --text-secondary: #667781;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            background-color: #d1d7db;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--wa-bg);
+            background-image: linear-gradient(rgba(229,221,213,0.9), rgba(229,221,213,0.9)), 
+                              url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png'); /* Subtle texture effect */
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        /* HEADER */
+        .header {
+            background: var(--wa-teal);
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .chat-info h3 { margin: 0; font-size: 16px; font-weight: 500; }
+        .chat-info p { margin: 0; font-size: 12px; color: rgba(255,255,255,0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;}
+
+        /* CHAT AREA */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            position: relative;
+            font-size: 14.2px;
+            line-height: 19px;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+        }
+
+        .msg-in {
+            align-self: flex-start;
+            background: var(--msg-in);
+            border-top-left-radius: 0;
+        }
+
+        .msg-out {
+            align-self: flex-end;
+            background: var(--msg-out);
+            border-top-right-radius: 0;
+        }
+
+        .sender-name {
+            font-size: 12.5px;
+            font-weight: bold;
+            color: #d64f4f; /* Typical "Uncle" color */
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .forward-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .media-placeholder {
+            width: 100%;
+            height: 150px;
+            background: #eee;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 30px;
+            border: 1px solid #ddd;
+        }
+
+        .timestamp {
+            font-size: 11px;
+            color: var(--text-secondary);
+            float: right;
+            margin-top: 5px;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* CONTROLS */
+        .controls {
+            background: #f0f2f5;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .status-bar {
+            background: #fff;
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-secondary);
+            border: 1px solid #ddd;
+        }
+
+        .stat-val { font-weight: bold; color: var(--wa-teal); }
+        .stat-danger { color: var(--danger); }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .btn-fwd { background: white; color: var(--text-primary); border: 1px solid #ddd; }
+        .btn-correct { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        .btn-ignore { background: #e0e0e0; color: #555; }
+
+        .btn-fwd:active { background: #f0f0f0; }
+        .btn-correct:active { background: #ffcdd2; }
+
+        /* OVERLAYS */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .hidden { display: none; }
+        
+        .start-btn {
+            background: var(--wa-light-green);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <div class="profile-pic">👨‍👩‍👧‍👦</div>
+        <div class="chat-info">
+            <h3>Sharma Family Group ❤️</h3>
+            <p>Uncle, Auntie, Dad, You, Cousin...</p>
+        </div>
+    </div>
+
+    <div class="chat-area" id="chat">
+        <div class="message msg-in">
+            <span class="sender-name">Dad</span>
+            Welcome to the new group everyone! Please no politics, only family updates. 🙏
+            <span class="timestamp">09:00 AM</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="status-bar">
+            <span>📢 Misinfo Spread: <span id="stat-spread" class="stat-val">0%</span></span>
+            <span>😡 Family Anger: <span id="stat-anger" class="stat-val">0%</span></span>
+        </div>
+        <div class="btn-group" id="btn-group">
+            <button class="action-btn btn-fwd" onclick="handleAction('forward')">
+                <span>↪️ FORWARD</span>
+                <span>(Be Polite)</span>
+            </button>
+            <button class="action-btn btn-correct" onclick="handleAction('correct')">
+                <span>🛑 FACT CHECK</span>
+                <span>(Risk Argument)</span>
+            </button>
+            <button class="action-btn btn-ignore" onclick="handleAction('ignore')">
+                <span>😶 IGNORE</span>
+                <span>(Stay Silent)</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="start-screen" class="overlay">
+        <h2>WhatsApp University</h2>
+        <p style="max-width: 300px; line-height: 1.5;">
+            You are in the Family Group.<br><br>
+            If you <b>Forward</b> lies, society suffers.<br>
+            If you <b>Fact Check</b> your elders, you get kicked out of the family.<br><br>
+            Can you find the balance?
+        </p>
+        <button class="start-btn" onclick="startGame()">Open Chat</button>
+    </div>
+
+    <div id="end-screen" class="overlay hidden">
+        <h2 id="end-title">Game Over</h2>
+        <p id="end-desc"></p>
+        <button class="start-btn" onclick="location.reload()">Reset Group</button>
+    </div>
+</div>
+
+<script>
+    // Audio simulates notification
+    // const beep = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3'); 
+
+    const levels = [
+        {
+            sender: "Ramesh Uncle",
+            text: "UNESCO has declared our National Anthem as the best in the world! 🇮🇳 So proud. Please forward to 10 people.",
+            type: "text",
+            isFake: true,
+            responses: {
+                forward: { text: "Wow! Shared immediately uncle. 🇮🇳", anger: -5, spread: 15 },
+                correct: { text: "Actually Uncle, this is a hoax from 2008. UNESCO never did this.", anger: 20, spread: 0 },
+                ignore: { text: "...", anger: 0, spread: 10 }
+            },
+            reaction: {
+                correct: "Don't try to be too smart. I received this from a retired Army officer. You think you know more than him?"
+            }
+        },
+        {
+            sender: "Auntie Anju",
+            text: "🚨 WARNING 🚨 Kidnappers are dressing up as beggars in our city. If someone asks for water, DO NOT OPEN DOOR. They have chloroform spray!! Forward to save a life!",
+            type: "image",
+            placeholder: "👮‍♂️ ⚠️",
+            isFake: true,
+            responses: {
+                forward: { text: "Omg thanks for telling! Forwarding to the colony group.", anger: -5, spread: 25 },
+                correct: { text: "Auntie, police issued a statement saying this is a rumor. It causes panic.", anger: 30, spread: 0 },
+                ignore: { text: "...", anger: 0, spread: 15 }
+            },
+            reaction: {
+                correct: "I am just trying to protect the children! Why are you always so negative?"
+            }
+        },
+        {
+            sender: "Cousin Rahul",
+            text: "Just found this amazing home remedy. Hot water + Lemon cures 99% of diseases including cancer. Big Pharma is hiding this! 🍋💊",
+            type: "image",
+            placeholder: "🍋 ☕",
+            isFake: true,
+            responses: {
+                forward: { text: "Great tip bro. Will try.", anger: -5, spread: 20 },
+                correct: { text: "This is dangerous misinformation. Cancer needs medical treatment, not lemon water.", anger: 40, spread: 0 },
+                ignore: { text: "...", anger: 0, spread: 10 }
+            },
+            reaction: {
+                correct: "You have been brainwashed by western medicine. Do what you want, don't lecture us."
+            }
+        },
+        {
+            sender: "Ramesh Uncle",
+            text: "Look at this video! These people from [Minority Group] are spitting on food before serving it! 😡 Boycott their shops!",
+            type: "video",
+            placeholder: "▶️ VIDEO",
+            isFake: true,
+            responses: {
+                forward: { text: "Disgusting! I will never go there again.", anger: -10, spread: 50 },
+                correct: { text: "Uncle, this video is 3 years old and from a different country. It's designed to create hate.", anger: 60, spread: 0 },
+                ignore: { text: "...", anger: 0, spread: 20 }
+            },
+            reaction: {
+                correct: "Enough! If you don't respect our culture and elders, maybe you should leave this group. Removed."
+            }
+        }
+    ];
+
+    let currentLevel = 0;
+    let spread = 0;
+    let anger = 0;
+    const chat = document.getElementById('chat');
+    const btnGroup = document.getElementById('btn-group');
+
+    function startGame() {
+        document.getElementById('start-screen').classList.add('hidden');
+        setTimeout(playLevel, 1000);
+    }
+
+    function playLevel() {
+        if (currentLevel >= levels.length) {
+            endGame(true);
+            return;
+        }
+
+        const data = levels[currentLevel];
+        
+        // Disable buttons while typing
+        setButtonsState(true);
+
+        // Simulate "Typing..."
+        showTyping(data.sender, () => {
+            // Post Message
+            addMessage(data.sender, data.text, 'msg-in', true, data.placeholder);
+            setButtonsState(false);
+            chat.scrollTop = chat.scrollHeight;
+        });
+    }
+
+    function handleAction(action) {
+        const data = levels[currentLevel];
+        const response = data.responses[action];
+
+        // Update Stats
+        spread += response.spread;
+        anger += response.anger;
+        if (anger < 0) anger = 0;
+        updateStats();
+
+        // If player responded (not ignore), show their text
+        if (action !== 'ignore') {
+            addMessage("You", response.text, 'msg-out');
+        }
+
+        // Logic for reaction or moving on
+        setButtonsState(true);
+
+        setTimeout(() => {
+            if (action === 'correct' && data.reaction && data.reaction.correct) {
+                // Uncle gets mad
+                showTyping(data.sender, () => {
+                    addMessage(data.sender, data.reaction.correct, 'msg-in');
+                    checkGameOver();
+                });
+            } else {
+                checkGameOver();
+            }
+        }, 1000);
+    }
+
+    function checkGameOver() {
+        if (anger >= 100) {
+            endGame(false, "You were kicked out of the Family Group. The misinformation stopped here, but you are now a social outcast.");
+            return;
+        }
+        if (spread >= 80) {
+            endGame(false, "The city is in chaos. The rumors you forwarded caused riots. But hey, your Uncle loves you.");
+            return;
+        }
+
+        currentLevel++;
+        setTimeout(playLevel, 1500);
+    }
+
+    // --- UI Helpers ---
+
+    function addMessage(sender, text, type, isForwarded = false, placeholder = null) {
+        const div = document.createElement('div');
+        div.className = `message ${type}`;
+        
+        let content = '';
+        if (type === 'msg-in') content += `<span class="sender-name">${sender}</span>`;
+        if (isForwarded) content += `<div class="forward-label"><svg viewBox="0 0 10 10" width="10" height="10" fill="#667781"><path d="M8.6,4.8l-3.3-3.3c-0.2-0.2-0.5-0.2-0.7,0s-0.2,0.5,0,0.7L6.8,4.1H2C1.4,4.1,1,4.5,1,5.1s0.4,1,1,1h4.8L4.6,8c-0.2,0.2-0.2,0.5,0,0.7c0.1,0.1,0.2,0.1,0.3,0.1s0.3,0,0.3-0.1l3.3-3.3C8.8,5.3,8.8,5,8.6,4.8z"/></svg> Forwarded many times</div>`;
+        
+        if (placeholder) {
+            content += `<div class="media-placeholder">${placeholder}</div>`;
+        }
+
+        content += `${text}<div class="timestamp">10:${10 + currentLevel} AM</div>`;
+        
+        div.innerHTML = content;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    function showTyping(sender, callback) {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message msg-in';
+        typingDiv.style.fontStyle = 'italic';
+        typingDiv.style.color = '#555';
+        typingDiv.innerHTML = `<span class="sender-name">${sender}</span> typing...`;
+        chat.appendChild(typingDiv);
+        chat.scrollTop = chat.scrollHeight;
+
+        setTimeout(() => {
+            typingDiv.remove();
+            callback();
+        }, 1500);
+    }
+
+    function updateStats() {
+        const elSpread = document.getElementById('stat-spread');
+        const elAnger = document.getElementById('stat-anger');
+        
+        elSpread.innerText = spread + "%";
+        elAnger.innerText = anger + "%";
+
+        elSpread.className = spread > 50 ? "stat-val stat-danger" : "stat-val";
+        elAnger.className = anger > 50 ? "stat-val stat-danger" : "stat-val";
+    }
+
+    function setButtonsState(disabled) {
+        const btns = document.querySelectorAll('.action-btn');
+        btns.forEach(b => b.disabled = disabled);
+        if(!disabled) {
+            document.querySelector('.controls').style.opacity = "1";
+        } else {
+            document.querySelector('.controls').style.opacity = "0.7";
+        }
+    }
+
+    function endGame(win, msg) {
+        const overlay = document.getElementById('end-screen');
+        const title = document.getElementById('end-title');
+        const desc = document.getElementById('end-desc');
+
+        overlay.classList.remove('hidden');
+        if (win) {
+            title.textContent = "You Survived!";
+            title.style.color = "#25D366";
+            desc.textContent = "You managed to keep the family somewhat happy while preventing total chaos. It's an exhausting balance, isn't it?";
+        } else {
+            title.textContent = "Failed";
+            title.style.color = "#ef4444";
+            desc.textContent = msg;
+        }
+    }
+
+</script>
+</body>
+</html>
