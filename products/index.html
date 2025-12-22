@@ -10,17 +10,17 @@
 <body class="bg-light">
 
 <div class="container py-5" aria-live="polite">
-  <div class="row mb-4 align-items-center">
-    <div class="col-lg-6 mb-3 mb-lg-0">
+  <div class="row mb-4 align-items-end">
+    <div class="col-lg-4 mb-3 mb-lg-0">
       <h1 id="pageH1" class="h3 fw-bold text-navy">Digital & Physical Products</h1>
       <div id="pageDesc" class="text-muted small">
         Instant downloads + external store products - No Sign Required
       </div>
     </div>
 
-    <div class="col-lg-6">
-      <div class="d-flex flex-column align-items-lg-end gap-3">
-        <div class="w-100" style="max-width: 480px;">
+    <div class="col-lg-8">
+      <div class="row g-2 justify-content-lg-end align-items-center">
+        <div class="col-12 col-md-4 col-lg-4">
             <input
               id="searchInput"
               class="form-control"
@@ -28,23 +28,24 @@
               aria-label="Search products"
             />
         </div>
-
-        <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+        <div class="col-6 col-md-auto">
             <select
               id="categorySelect"
-              class="form-select w-auto"
+              class="form-select"
               aria-label="Filter by category"
             >
               <option value="">All categories</option>
             </select>
-    
-            <select id="priceSelect" class="form-select w-auto" aria-label="Filter by price">
+        </div>
+        <div class="col-6 col-md-auto">
+            <select id="priceSelect" class="form-select" aria-label="Filter by price">
               <option value="">All prices</option>
             </select>
-    
+        </div>
+        <div class="col-6 col-md-auto">
             <select
               id="pageSizeSelect"
-              class="form-select w-auto"
+              class="form-select"
               title="Items per page"
               aria-label="Items per page"
             >
@@ -54,13 +55,15 @@
               <option value="50">50 / page</option>
               <option value="100">100 / page</option>
             </select>
-    
-            <select id="sortSelect" class="form-select w-auto" aria-label="Sort products">
+        </div>
+        <div class="col-6 col-md-auto">
+            <select id="sortSelect" class="form-select" aria-label="Sort products">
               <option value="new">Newest</option>
               <option value="az">A → Z</option>
               <option value="za">Z → A</option>
             </select>
-    
+        </div>
+        <div class="col-auto">
             <button id="resetBtn" class="btn btn-navy text-white" aria-label="Reset filters">
               Reset
             </button>
@@ -69,7 +72,7 @@
     </div>
   </div>
 
-  <div id="grid" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4"></div>
+  <div id="grid" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3"></div>
   <div id="empty" class="text-center py-5 text-muted" style="display: none">No products found.</div>
 
   <div id="pagination" class="d-flex justify-content-center mt-5" style="display: none"></div>

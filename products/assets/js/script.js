@@ -293,12 +293,12 @@ It updates CSS custom properties on :root and keeps the file self-contained.
       card.className = "card h-100 border-0 bg-transparent";
 
       // Image fallback: use `imageUrl` if present, otherwise show `thumbText`.
-      let thumbHtml = `<div class="thumb mb-3" aria-hidden="true">${escapeHtml(
+      let thumbHtml = `<div class="thumb mb-1" aria-hidden="true">${escapeHtml(
         p.thumbText
       )}</div>`;
       if (p.imageUrl) {
         const imgSrc = escapeHtml(p.imageUrl);
-        thumbHtml = `<div class="thumb mb-3" data-thumb-text="${escapeHtml(
+        thumbHtml = `<div class="thumb mb-1" data-thumb-text="${escapeHtml(
           p.thumbText
         )}"><img src="${imgSrc}" alt="${escapeHtml(
           p.title
@@ -317,17 +317,19 @@ It updates CSS custom properties on :root and keeps the file self-contained.
     <div class="card-inner">
       <div class="card-front shadow-sm">
         ${thumbHtml}
-        <h6 class="card-title fw-bold mb-2">${titleLink}</h6>
-        <div class="d-flex flex-wrap gap-1 mb-2">
-          <span class="badge bg-light text-dark border fw-normal">${escapeHtml(p.category)}</span>
-          <span class="badge bg-light text-dark border fw-normal">${escapeHtml(getFileType(p))}</span>
+        <div class="d-flex align-items-start mb-1" style="min-height: 2.2rem;">
+            <h6 class="card-title fw-bold mb-0 lh-sm" style="font-size: 0.95rem;">${titleLink}</h6>
+        </div>
+        <div class="d-flex flex-wrap gap-1 mb-1">
+          <span class="badge bg-light text-dark border fw-normal" style="font-size: 0.7rem;">${escapeHtml(p.category)}</span>
+          <span class="badge bg-light text-dark border fw-normal" style="font-size: 0.7rem;">${escapeHtml(getFileType(p))}</span>
           ${renderPriceLabel(p)}
         </div>
         ${renderPriceBlock(p)}
-        <p class="card-text text-muted small mt-2 mb-3 flex-grow-1" style="font-size: 0.85rem;">${escapeHtml(getSummary(p))}</p>
+        <p class="card-text text-muted small mt-1 mb-1 flex-grow-1" style="font-size: 0.8rem; line-height: 1.3;">${escapeHtml(getSummary(p))}</p>
         <div class="mt-auto d-flex gap-2 align-items-center w-100">
           <div class="flex-grow-1">${renderPrimaryButton(p)}</div>
-          <div><button class="btn btn-outline-secondary btn-sm details-btn" style="font-size: 0.8rem;" data-id="${
+          <div><button class="btn btn-outline-secondary btn-sm details-btn" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" data-id="${
             p.id
           }" aria-label="Details for ${escapeHtml(
         p.title
@@ -335,13 +337,13 @@ It updates CSS custom properties on :root and keeps the file self-contained.
         </div>
       </div>
       <div class="card-back shadow-sm">
-        <h6 class="card-title fw-bold text-navy mb-3">Description</h6>
-        <div class="card-text small flex-grow-1 overflow-auto custom-scrollbar" style="font-size: 0.85rem;">
+        <h6 class="card-title fw-bold text-navy mb-2" style="font-size: 0.95rem;">Description</h6>
+        <div class="card-text small flex-grow-1 overflow-auto custom-scrollbar" style="font-size: 0.8rem; line-height: 1.3;">
             ${escapeHtml(p.description)}
         </div>
-        <div class="mt-3 d-flex gap-2 align-items-center w-100">
+        <div class="mt-2 d-flex gap-2 align-items-center w-100">
           <div class="flex-grow-1">${renderPrimaryButton(p)}</div>
-          <div><button class="btn btn-outline-secondary btn-sm back-btn" style="font-size: 0.8rem;" data-id="${
+          <div><button class="btn btn-outline-secondary btn-sm back-btn" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" data-id="${
             p.id
           }" aria-label="Back to product">Back</button></div>
         </div>

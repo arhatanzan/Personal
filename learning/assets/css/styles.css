@@ -1,0 +1,210 @@
+/* --- Font Setup --- */
+/* If you have the Daniel.ttf file, place it in the same folder */
+@font-face {
+    font-family: 'Daniel';
+    src: url('../fonts/danielbk.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* --- General Reset & Typography --- */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    /* Text body is Montserrat */
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600; /* Bolder weight as per design */
+    letter-spacing: 0.1em;
+    
+    /* Updated Color */
+    color: #023e62; 
+    
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background-color: #fff;
+    min-height: 100vh;
+}
+
+/* --- Header & Profile --- */
+header {
+    padding: 20px 0;
+}
+
+.brand-name {
+    /* Heading is Daniel */
+    font-family: 'Daniel', 'La Belle Aurore', cursive; 
+    font-size: 32px; /* Requested size */
+    color: #023e62;
+    line-height: 1.2;
+}
+
+.subtitle {
+    font-family: "Montserrat", sans-serif;
+    font-size: 0.8rem;
+    color: #666; /* Kept grey for contrast, or change to #023e62 if preferred */
+    margin-top: 5px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+}
+
+.profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 15px auto;
+    display: block;
+    border: 2px solid #ddd;
+}
+
+/* --- Section Titles --- */
+.section-title {
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin: 30px 0 20px;
+    color: #023e62;
+}
+
+/* --- The Specific Button Styles --- */
+.links {
+    width: 100%;
+    padding: 0 15px;
+}
+
+.link-btn {
+    display: block;
+    margin: 0 auto 15px;
+    max-width: 550px;
+    padding: 15px 20px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #023e62; /* Updated Color */
+    border-radius: 25px;
+    transition: all 0.2s ease-in-out;
+}
+
+/* BUTTON EFFECTS (Inset Shadow) */
+/* BLUE #80d6ff */
+.link-btn--blue {
+    background-color: #80d6ff;
+    border: 2px solid #80d6ff;
+    border-bottom: 3px solid #80d6ff;
+    box-shadow: inset 0 -4px 0 #80d6ff;
+}
+.link-btn--blue:hover {
+    background-color: #fff;
+}
+
+/* GREEN #73e2a7 */
+.link-btn--green {
+    background-color: #73e2a7;
+    border: 2px solid #73e2a7;
+    border-bottom: 3px solid #73e2a7;
+    box-shadow: inset 0 -4px 0 #73e2a7;
+}
+.link-btn--green:hover {
+    background-color: #fff;
+}
+
+/* YELLOW #fed766 */
+.link-btn--yellow {
+    background-color: #fed766;
+    border: 2px solid #fed766;
+    border-bottom: 3px solid #fed766;
+    box-shadow: inset 0 -4px 0 #fed766;
+}
+.link-btn--yellow:hover {
+    background-color: #fff;
+}
+
+/* PINK #ffa093 */
+.link-btn--pink {
+    background-color: #ffa093;
+    border: 2px solid #ffa093;
+    border-bottom: 3px solid #ffa093;
+    box-shadow: inset 0 -4px 0 #ffa093;
+}
+.link-btn--pink:hover {
+    background-color: #fff;
+}
+
+/* --- Text Content Areas --- */
+.text-content {
+    max-width: 600px;
+    margin: 0 auto 15px;
+    padding: 0 20px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    font-weight: 600; /* Montserrat makes it look slightly thinner, so 600 helps legibility */
+    color: #023e62; /* Updated Color */
+}
+
+.hindi-text {
+    font-weight: 400;
+    font-size: 0.85rem;
+}
+
+/* --- Colored Divider Bar --- */
+.hr-container {
+    padding: 10px 0; 
+    width: 100%;
+    max-width: 600px;
+    margin: 10px auto;
+}
+
+.box {
+    display: flex;
+    height: 8px;
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.box-sm {
+    cursor: pointer;
+    flex-grow: 1;
+    transition: all 0.8s ease-in-out;
+}
+.box-sm:hover { flex-grow: 12; }
+
+.red { background-color: #ff5852; }
+.orange { background-color: #ff9000; }
+.yellow-bar { background-color: #ffd300; }
+.green-bar { background-color: #3DCD49; }
+.blue-bar { background-color: #0089d7; }
+.purple { background-color: #9e44c4; }
+
+/* --- Social Icons --- */
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0 40px;
+    font-size: 2rem;
+}
+
+.social-icons a {
+    color: #023e62; /* Default color matches theme */
+    transition: transform 0.2s;
+}
+
+.social-icons a:hover {
+    transform: scale(1.2);
+    opacity: 0.8;
+}
+
+/* --- Footer --- */
+footer {
+    font-size: 0.7rem;
+    color: #888;
+    margin-bottom: 20px;
+    font-style: italic;
+    font-weight: 400;
+}
