@@ -100,7 +100,7 @@ const siteData = {
             "showDivider": true
         },
         "profile": {
-            "dividerTop": true
+            "dividerTop": false
         }
     },
     "theme": {
