@@ -1,6 +1,7 @@
 // State management
 let originalData = JSON.parse(JSON.stringify(siteData)); // Keep track of last saved state
 let currentData = JSON.parse(JSON.stringify(siteData)); // Deep copy for editing
+let authToken = sessionStorage.getItem('adminPassword'); // Simple session storage for password
 
 // Initialize defaults if missing
 if (!currentData.sectionOrder) {
@@ -11,6 +12,72 @@ if (!currentData.theme) currentData.theme = { buttonColors: ['#80d6ff', '#3DCD49
 
 // Track open sections
 let openSections = new Set();
+
+// Auth Logic
+document.addEventListener('DOMContentLoaded', () => {
+    if (authToken) {
+        showAdmin();
+    } else {
+        // Modal is shown by default in HTML
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const password = document.getElementById('adminPassword').value;
+        const btn = e.target.querySelector('button');
+        const errorDiv = document.getElementById('loginError');
+        
+        btn.disabled = true;
+        btn.innerHTML = 'Verifying...';
+        errorDiv.style.display = 'none';
+
+        try {
+            // Verify against Netlify Function
+            let endpoint = '/.netlify/functions/login';
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                 // Local dev fallback or mock
+                 // For local dev without netlify dev, we might just accept it or fail
+                 // If running netlify dev, this works.
+            }
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+
+            if (response.ok) {
+                authToken = password;
+                sessionStorage.setItem('adminPassword', password);
+                showAdmin();
+            } else {
+                throw new Error('Invalid password');
+            }
+        } catch (err) {
+            console.error(err);
+            // Fallback for local development without Netlify Functions running
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                 console.warn("Local dev: bypassing auth check (assuming you are the admin)");
+                 authToken = password;
+                 sessionStorage.setItem('adminPassword', password);
+                 showAdmin();
+            } else {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Invalid password';
+            }
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Login';
+        }
+    });
+});
+
+function showAdmin() {
+    document.getElementById('loginModal').classList.remove('show');
+    document.getElementById('loginModal').style.display = 'none';
+    document.getElementById('adminContainer').style.display = 'block';
+    initForm();
+}
 
 const staticSections = {
     profile: { title: 'Profile', render: renderProfileFields },
@@ -610,11 +677,16 @@ window.saveDataDirectly = async function() {
 
     try {
         let response;
+        const payload = {
+            password: authToken,
+            data: currentData
+        };
+
         try {
             response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(currentData)
+                body: JSON.stringify(payload)
             });
         } catch (err) {
             // If local node server failed (e.g. not running), try Netlify function path
@@ -624,7 +696,7 @@ window.saveDataDirectly = async function() {
                 response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(currentData)
+                    body: JSON.stringify(payload)
                 });
             } else {
                 throw err;
@@ -638,6 +710,26 @@ window.saveDataDirectly = async function() {
             originalData = JSON.parse(JSON.stringify(currentData));
         } else {
             // Handle standard python server (501/405) or missing endpoint (404)
+            if (response.status === 401) {
+                alert("Unauthorized: Invalid Password. Please refresh and login again.");
+            } else if (response.status === 404 || response.status === 405 || response.status === 501) {
+                // Fallback to download
+                console.warn("Server save failed/not supported. Falling back to download.");
+                downloadData();
+                alert("Could not save to server (feature not available). Downloading file instead.");
+            } else {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || `Server error: ${response.status}`);
+            }
+        }
+    } catch (error) {
+        console.error('Save failed:', error);
+        alert('Error saving data: ' + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+};
             if (response.status === 501 || response.status === 405 || response.status === 404) {
                 throw new Error("Current server is Read-Only (standard python/live-server).");
             }

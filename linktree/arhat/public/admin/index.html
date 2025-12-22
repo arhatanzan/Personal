@@ -13,7 +13,28 @@
 </head>
 <body>
 
-<div class="container">
+<!-- Login Modal -->
+<div id="loginModal" class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.8);" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Admin Login</h5>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="adminPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="adminPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    <div id="loginError" class="text-danger mt-2" style="display: none;">Invalid password</div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="adminContainer" style="display: none;">
     <div class="sticky-header d-flex justify-content-between align-items-center">
         <h1 class="h2 m-0">Site Admin Panel</h1>
         <div>
