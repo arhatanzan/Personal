@@ -127,7 +127,9 @@ function getSectionData(key) {
         case 'connectLinks':
             return { html: renderLinkSection(null, siteData.connectLinks, true), id: 'connect-container' };
         case 'footer':
-            return { html: `<footer>${siteData.footer || ''}</footer>`, id: null };
+            let footerHtml = siteData.footer || '';
+            footerHtml += ` <br><a href="/admin/changelog.html" style="font-size: 0.8em; text-decoration: none; opacity: 0.7;">[Changelog]</a>`;
+            return { html: `<footer>${footerHtml}</footer>`, id: null };
         default:
             // Dynamic Custom Sections
             if (siteData[key]) {

@@ -31,43 +31,78 @@ exports.handler = async function(event, context) {
             };
         }
 
-        const fileContent = `const siteData = ${JSON.stringify(newData, null, 4)};`;
-        // IMPORTANT: Update this path if your repo structure changes
-        const filePath = "linktree/arhat/public/assets/js/data.js"; 
-        const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`;
+        const commitMessage = body.message || "content: update site data via admin panel";
 
-        // 1. Get the current file to get its SHA (required for updates)
-        const getResponse = await fetch(apiUrl, {
-            headers: {
-                "Authorization": `Bearer ${GITHUB_TOKEN}`,
-                "Accept": "application/vnd.github.v3+json"
+        // Helper to update file
+        const updateFile = async (path, content, message, sha = null) => {
+            const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`;
+            
+            if (!sha) {
+                const getResponse = await fetch(apiUrl, {
+                    headers: {
+                        "Authorization": `Bearer ${GITHUB_TOKEN}`,
+                        "Accept": "application/vnd.github.v3+json"
+                    }
+                });
+                if (!getResponse.ok) throw new Error(`GitHub API Error (Get ${path}): ${getResponse.statusText}`);
+                const fileData = await getResponse.json();
+                sha = fileData.sha;
             }
-        });
 
-        if (!getResponse.ok) {
-            throw new Error(`GitHub API Error (Get): ${getResponse.statusText}`);
-        }
+            const putResponse = await fetch(apiUrl, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${GITHUB_TOKEN}`,
+                    "Accept": "application/vnd.github.v3+json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: message,
+                    content: Buffer.from(content).toString('base64'),
+                    sha: sha
+                })
+            });
 
-        const fileData = await getResponse.json();
-        const sha = fileData.sha;
+            if (!putResponse.ok) throw new Error(`GitHub API Error (Put ${path}): ${putResponse.statusText}`);
+        };
 
-        // 2. Commit the update
-        const putResponse = await fetch(apiUrl, {
-            method: "PUT",
-            headers: {
-                "Authorization": `Bearer ${GITHUB_TOKEN}`,
-                "Accept": "application/vnd.github.v3+json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                message: "content: update site data via admin panel",
-                content: Buffer.from(fileContent).toString('base64'),
-                sha: sha
-            })
-        });
+        // 1. Update data.js
+        const fileContent = `const siteData = ${JSON.stringify(newData, null, 4)};`;
+        const dataFilePath = "linktree/arhat/public/assets/js/data.js"; 
+        await updateFile(dataFilePath, fileContent, commitMessage);
 
-        if (!putResponse.ok) {
-            throw new Error(`GitHub API Error (Put): ${putResponse.statusText}`);
+        // 2. Update changelog.html
+        try {
+            const changelogPath = "linktree/arhat/public/admin/changelog.html";
+            const changelogApiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${changelogPath}`;
+            
+            const getChangelogResponse = await fetch(changelogApiUrl, {
+                headers: {
+                    "Authorization": `Bearer ${GITHUB_TOKEN}`,
+                    "Accept": "application/vnd.github.v3+json"
+                }
+            });
+
+            if (getChangelogResponse.ok) {
+                const changelogData = await getChangelogResponse.json();
+                let changelogContent = Buffer.from(changelogData.content, 'base64').toString('utf-8');
+                
+                const timestamp = new Date().toLocaleString('en-US', { timeZone: 'UTC' }); // Use UTC or specific timezone if needed
+                
+                const newEntry = `
+                <div class="changelog-entry">
+                    <h5>${commitMessage}</h5>
+                    <div class="timestamp"><i class="far fa-clock me-1"></i>${timestamp} (UTC)</div>
+                </div>`;
+                
+                if (changelogContent.includes('<!-- CHANGELOG_START -->')) {
+                    changelogContent = changelogContent.replace('<!-- CHANGELOG_START -->', '<!-- CHANGELOG_START -->' + newEntry);
+                    await updateFile(changelogPath, changelogContent, "chore: update changelog", changelogData.sha);
+                }
+            }
+        } catch (e) {
+            console.error("Failed to update changelog:", e);
+            // Don't fail the whole request if changelog update fails
         }
 
         return {

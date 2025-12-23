@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog - Arhat Anzan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="/admin/assets/css/admin.css">
+    <style>
+        .changelog-entry {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .changelog-entry:last-child {
+            border-bottom: none;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Modal -->
+<div id="loginModal" class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.8);" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Admin Login</h5>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="adminPassword" class="form-label">Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="adminPassword" required placeholder="Enter admin password">
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword" title="Show/Hide Password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" onclick="handleLogin(event)">Login</button>
+                    <div id="loginError" class="alert alert-danger mt-3" style="display: none;">
+                        <i class="fas fa-exclamation-circle me-2"></i><span id="loginErrorText">Invalid password</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="adminContainer" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <h1 class="h2 m-0">Changelog</h1>
+        <a href="/admin/" class="btn btn-outline-primary">Back to Admin</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div id="changelogList">
+                <!-- CHANGELOG_START -->
+                <!-- CHANGELOG_END -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auth Logic (Simplified from admin.js)
+    let authToken = sessionStorage.getItem('adminPassword');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setupPasswordToggle();
+        if (authToken) {
+            checkSession();
+        }
+    });
+
+    function setupPasswordToggle() {
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('adminPassword');
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+        }
+    }
+
+    async function handleLogin(e) {
+        if (e) e.preventDefault();
+        const passwordInput = document.getElementById('adminPassword');
+        const btn = document.querySelector('#loginForm button.btn-primary');
+        const errorDiv = document.getElementById('loginError');
+        
+        if (!passwordInput) return;
+        const password = passwordInput.value;
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = 'Verifying...';
+        }
+        if (errorDiv) errorDiv.style.display = 'none';
+
+        try {
+            const endpoint = '/.netlify/functions/login';
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                authToken = password;
+                sessionStorage.setItem('adminPassword', authToken);
+                sessionStorage.setItem('loginTime', Date.now());
+                showAdmin();
+            } else {
+                if (errorDiv) {
+                    errorDiv.style.display = 'block';
+                    document.getElementById('loginErrorText').textContent = 'Invalid password';
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            if (errorDiv) {
+                errorDiv.style.display = 'block';
+                document.getElementById('loginErrorText').textContent = 'Error logging in';
+            }
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Login';
+            }
+        }
+    }
+
+    function showAdmin() {
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('loginModal').classList.remove('show');
+        document.getElementById('adminContainer').style.display = 'block';
+    }
+
+    function checkSession() {
+        // Simple check, relying on admin.js logic mostly but simplified here
+        const loginTime = sessionStorage.getItem('loginTime');
+        if (authToken && loginTime) {
+             // Assume valid for now, or could re-verify
+             showAdmin();
+        }
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

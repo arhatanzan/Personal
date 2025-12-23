@@ -510,7 +510,21 @@ window.previewData = function() {
     outputArea.scrollIntoView({ behavior: 'smooth' });
 };
 
-window.saveDataDirectly = async function() {
+window.openSaveModal = function() {
+    const modal = new bootstrap.Modal(document.getElementById('saveModal'));
+    modal.show();
+};
+
+window.confirmSave = function() {
+    const message = document.getElementById('commitMessage').value || "Update site data";
+    const modalEl = document.getElementById('saveModal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    modal.hide();
+    
+    saveDataDirectly(message);
+};
+
+window.saveDataDirectly = async function(commitMessage = "Update site data") {
     const btn = document.getElementById('saveBtn');
     if (btn.disabled) return;
     
@@ -533,7 +547,7 @@ window.saveDataDirectly = async function() {
 
     try {
         let response;
-        const payload = { password: authToken, data: currentData };
+        const payload = { password: authToken, data: currentData, message: commitMessage };
 
         try {
             response = await fetch(endpoint, {
