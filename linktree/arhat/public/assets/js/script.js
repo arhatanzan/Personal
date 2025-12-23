@@ -33,10 +33,12 @@ function renderSite() {
     let isSubPage = false;
 
     if (pageId && siteData.pages && siteData.pages[pageId]) {
+        const pageData = siteData.pages[pageId];
         activeData = {
-            ...siteData.pages[pageId],
-            theme: siteData.pages[pageId].theme || siteData.theme,
-            profile: siteData.pages[pageId].profile || siteData.profile
+            ...pageData,
+            theme: pageData.theme || siteData.theme,
+            profile: pageData.profile || siteData.profile,
+            footer: (pageData.useGlobalFooter !== false) ? siteData.footer : pageData.footer
         };
         isSubPage = true;
     }
@@ -242,9 +244,11 @@ function generateItemsHtml(items, isConnect = false) {
     };
 
     items.forEach(item => {
-        const { title, subtitle, description, text, url, icon } = item;
+        const { title, subtitle, description, text, url, icon, customColor } = item;
         
         const hasContent = title || subtitle || description;
+        const btnStyle = customColor ? `style="--btn-color: ${customColor}"` : '';
+        const btnClass = customColor ? 'link-btn custom-color' : 'link-btn';
         
         if (hasContent) {
             flushBuffer();
@@ -257,7 +261,7 @@ function generateItemsHtml(items, isConnect = false) {
                 </p>
                 ${(text && url) ? `
                 <div class="links">
-                    <a href="${url}" class="link-btn">${text}</a>
+                    <a href="${url}" class="${btnClass}" ${btnStyle}>${text}</a>
                 </div>` : ''}
             `;
         } else {
@@ -265,7 +269,7 @@ function generateItemsHtml(items, isConnect = false) {
             if (icon) {
                  linksBuffer.push(`<a href="${url}" target="_blank"><i class="${icon}"></i></a>`);
             } else if (text && url) {
-                 linksBuffer.push(`<a href="${url}" class="link-btn" target="_blank">${text}</a>`);
+                 linksBuffer.push(`<a href="${url}" class="${btnClass}" ${btnStyle} target="_blank">${text}</a>`);
             }
         }
     });
@@ -281,6 +285,8 @@ function applyButtonColors(theme) {
         : ['#80d6ff', '#3DCD49', '#ffd300', '#ff5852'];
 
     buttons.forEach((btn, index) => {
+        if (btn.classList.contains('custom-color')) return;
+
         const color = colors[index % colors.length];
         btn.style.setProperty('--btn-color', color);
         // Reset legacy inline styles
@@ -288,6 +294,6 @@ function applyButtonColors(theme) {
         btn.style.borderColor = '';
         btn.style.borderBottom = '';
         btn.style.boxShadow = '';
-        btn.className = 'link-btn'; 
+        if (!btn.classList.contains('link-btn')) btn.classList.add('link-btn');
     });
 }
