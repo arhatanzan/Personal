@@ -18,15 +18,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     checkEmptyChangelog();
+    setupScrollToTop();
 });
+
+function setupScrollToTop() {
+    const scrollArea = document.getElementById('changelogScrollArea');
+    const backToTopBtn = document.getElementById('backToTopBtn');
+
+    if (scrollArea && backToTopBtn) {
+        scrollArea.addEventListener('scroll', () => {
+            if (scrollArea.scrollTop > 300) {
+                backToTopBtn.style.display = 'block';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
+        });
+    }
+}
+
+function scrollToTop() {
+    const scrollArea = document.getElementById('changelogScrollArea');
+    if (scrollArea) {
+        scrollArea.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+}
 
 function checkEmptyChangelog() {
     const list = document.getElementById('changelogList');
     if (list) {
-        // Check if there are any .changelog-entry elements
-        const entries = list.querySelectorAll('.changelog-entry');
+        // Check if there are any rows (excluding comments/text nodes if possible, but querySelector works)
+        const entries = list.querySelectorAll('tr');
         if (entries.length === 0) {
-            list.innerHTML = '<div class="text-center text-muted py-4"><i class="fas fa-info-circle me-2"></i>No changelog records found.</div>';
+            list.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4"><i class="fas fa-info-circle me-2"></i>No changelog records found.</td></tr>';
         }
     }
 }

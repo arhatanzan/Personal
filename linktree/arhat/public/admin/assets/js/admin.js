@@ -1,6 +1,7 @@
 // State
 let originalData = null;
 let currentData = null;
+let activePageId = null; // null = home, string = page key
 let authToken = localStorage.getItem('adminPassword');
 let sessionTimeout = 30 * 60 * 1000; // 30 mins default
 let sessionTimer = null;
@@ -14,6 +15,25 @@ const staticSections = {
     connectLinks: { title: 'Connect Icons', render: (key) => renderListFields(key) },
     footer: { title: 'Footer', render: renderFooterFields }
 };
+
+function getActiveData() {
+    if (!activePageId) return currentData;
+    if (!currentData.pages) currentData.pages = {};
+    if (!currentData.pages[activePageId]) {
+        // Should not happen if logic is correct, but safe fallback
+        currentData.pages[activePageId] = createNewPageStructure();
+    }
+    return currentData.pages[activePageId];
+}
+
+function createNewPageStructure() {
+    return {
+        // profile: { name: "New Page", subtitle: "", image: "" }, // Inherit by default
+        sectionOrder: ['profile', 'footer'],
+        // footer: "© 2025", // Inherit by default (useGlobalFooter is undefined -> true)
+        // theme: JSON.parse(JSON.stringify(currentData.theme || {})) // Inherit by default
+    };
+}
 
 // Initialization
 document.addEventListener('DOMContentLoaded', async () => {
@@ -190,27 +210,222 @@ function initData() {
         }
         if (!currentData.sectionSettings) currentData.sectionSettings = {};
         if (!currentData.theme) currentData.theme = { buttonColors: ['#80d6ff', '#3DCD49', '#ffd300', '#ff5852'] };
+        if (!currentData.pages) currentData.pages = {};
     }
     return true;
 }
 
+// Page Management
+window.switchPage = function(pageId) {
+    activePageId = pageId === 'home' ? null : pageId;
+    openSections.clear();
+    renderForm();
+};
+
+window.addNewPage = function() {
+    const modal = new bootstrap.Modal(document.getElementById('newPageModal'));
+    document.getElementById('newPageId').value = '';
+    document.getElementById('newPageError').style.display = 'none';
+    modal.show();
+};
+
+window.handleCreatePage = function() {
+    const input = document.getElementById('newPageId');
+    const errorDiv = document.getElementById('newPageError');
+    const title = input.value.trim();
+    
+    if (!title) {
+        errorDiv.textContent = "Page ID cannot be empty.";
+        errorDiv.style.display = 'block';
+        return;
+    }
+    
+    const id = title.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    
+    if (id === 'home' || id === 'admin' || id === 'assets') {
+        errorDiv.textContent = "This Page ID is reserved.";
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    if (currentData.pages && currentData.pages[id]) {
+        errorDiv.textContent = "Page ID already exists!";
+        errorDiv.style.display = 'block';
+        return;
+    }
+    
+    if (!currentData.pages) currentData.pages = {};
+    currentData.pages[id] = createNewPageStructure();
+    
+    // Close modal
+    const modalEl = document.getElementById('newPageModal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    modal.hide();
+    
+    activePageId = id;
+    openSections.clear();
+    renderForm();
+    checkChanges();
+};
+
+window.deletePage = function() {
+    if (!activePageId) return;
+    if (confirm(`Are you sure you want to delete page '${activePageId}'? This cannot be undone.`)) {
+        delete currentData.pages[activePageId];
+        activePageId = null;
+        renderForm();
+        checkChanges();
+    }
+};
+
+window.updatePageId = function(newId) {
+    if (!activePageId || newId === activePageId) return;
+    if (!newId) return;
+    
+    const sanitizedId = newId.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    if (currentData.pages[sanitizedId]) {
+        alert("Page ID already exists!");
+        return;
+    }
+    
+    currentData.pages[sanitizedId] = currentData.pages[activePageId];
+    delete currentData.pages[activePageId];
+    activePageId = sanitizedId;
+    renderForm();
+    checkChanges();
+};
+
+function renderPageSelector() {
+    const selector = document.getElementById('pageSelector');
+    if (!selector) return;
+    
+    const pages = currentData.pages ? Object.keys(currentData.pages) : [];
+    
+    let html = `<option value="home" ${activePageId === null ? 'selected' : ''}>Home Page</option>`;
+    pages.forEach(pageId => {
+        html += `<option value="${pageId}" ${activePageId === pageId ? 'selected' : ''}>${pageId}</option>`;
+    });
+    
+    selector.innerHTML = html;
+}
+
 // Rendering
 function renderForm() {
+    renderPageSelector();
     const container = document.getElementById('formContainer');
     container.innerHTML = '';
     
     if (typeof checkChanges === 'function') checkChanges();
 
-    container.insertAdjacentHTML('beforeend', renderThemeSettings());
+    const data = getActiveData();
 
-    currentData.sectionOrder.forEach((key, index) => {
+    // Global Defaults (Home Page Only)
+    if (!activePageId) {
+        container.insertAdjacentHTML('beforeend', `
+            <div class="card mb-4 border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="m-0"><i class="fas fa-globe me-2"></i>Global Defaults</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3">These settings apply to all pages unless specifically overridden.</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Global Footer</label>
+                        <input type="text" class="form-control" value="${data.footer || ''}" onchange="updateFooter(this.value)">
+                        <div class="form-text">Sub-pages can inherit this footer text.</div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded border h-100">
+                                <strong><i class="fas fa-palette me-2"></i>Global Theme</strong>
+                                <p class="small text-muted mb-0 mt-1">Managed in "Theme Settings" below.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded border h-100">
+                                <strong><i class="fas fa-user me-2"></i>Global Profile</strong>
+                                <p class="small text-muted mb-0 mt-1">Managed in "Profile" section below.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+    }
+
+    // Page Settings (ID and Delete) for sub-pages
+    if (activePageId) {
+        const useGlobalFooter = data.useGlobalFooter !== false;
+        const useGlobalTheme = !data.theme;
+        const useGlobalProfile = !data.profile;
+        
+        container.insertAdjacentHTML('beforeend', `
+            <div class="card mb-4 border-warning">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                    <h5 class="m-0"><i class="fas fa-cog me-2"></i>Page Configuration: ${activePageId}</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="border-bottom pb-2 mb-3">General Settings</h6>
+                    <div class="row g-3 align-items-end mb-4">
+                        <div class="col-md-8">
+                            <label class="form-label">Page ID (URL slug)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">?page=</span>
+                                <input type="text" class="form-control" value="${activePageId}" onchange="updatePageId(this.value)">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-danger w-100" onclick="deletePage()"><i class="fas fa-trash me-2"></i>Delete Page</button>
+                        </div>
+                    </div>
+
+                    <h6 class="border-bottom pb-2 mb-3">Global Inheritance</h6>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="useGlobalTheme" ${useGlobalTheme ? 'checked' : ''} onchange="updateThemeGlobal(this.checked)">
+                                <label class="form-check-label" for="useGlobalTheme"><strong>Inherit Global Theme</strong></label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="useGlobalProfile" ${useGlobalProfile ? 'checked' : ''} onchange="updateProfileGlobal(this.checked)">
+                                <label class="form-check-label" for="useGlobalProfile"><strong>Inherit Global Profile</strong></label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="useGlobalFooter" ${useGlobalFooter ? 'checked' : ''} onchange="updateFooterGlobal(this.checked)">
+                                <label class="form-check-label" for="useGlobalFooter"><strong>Inherit Global Footer</strong></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+    }
+
+    if (!activePageId || data.theme) {
+        container.insertAdjacentHTML('beforeend', renderThemeSettings());
+    } else {
+        container.insertAdjacentHTML('beforeend', `
+            <div class="card mb-4 border-secondary opacity-75">
+                <div class="card-header bg-light">
+                    <h5 class="m-0 text-muted"><i class="fas fa-palette me-2"></i>Theme Settings (Inherited)</h5>
+                </div>
+                <div class="card-body text-center text-muted">
+                    <p>This page is using the Global Theme.</p>
+                    <button class="btn btn-sm btn-outline-primary" onclick="updateThemeGlobal(false)">Customize Theme</button>
+                </div>
+            </div>
+        `);
+    }
+
+    (data.sectionOrder || []).forEach((key, index) => {
         let title = '', renderFn = null, isCustom = false;
 
         if (staticSections[key]) {
             title = staticSections[key].title;
             renderFn = staticSections[key].render;
-        } else if (currentData[key]) {
-            title = currentData[key].title || 'Custom Section';
+        } else if (data[key]) {
+            title = data[key].title || 'Custom Section';
             renderFn = (k) => renderCustomSectionFields(k);
             isCustom = true;
         } else {
@@ -219,7 +434,7 @@ function renderForm() {
 
         const sectionId = `section-${key}`;
         const isOpen = openSections.has(sectionId);
-        const settings = currentData.sectionSettings[key] || {};
+        const settings = (data.sectionSettings && data.sectionSettings[key]) || {};
         const showDividerTop = settings.dividerTop ?? (index > 0 && key !== 'footer');
         const showDividerBottom = settings.dividerBottom ?? false;
 
@@ -230,7 +445,7 @@ function renderForm() {
                         <h2 class="m-0 fs-5">${title} <span class="badge bg-secondary ms-2" style="font-size: 0.6em">${isCustom ? 'Custom' : 'Static'}</span></h2>
                         <div class="d-flex gap-1 ms-auto me-3" onclick="event.stopPropagation()">
                             <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="moveSection(${index}, -1)" ${index === 0 ? 'disabled' : ''}><i class="fas fa-arrow-up"></i></button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="moveSection(${index}, 1)" ${index === currentData.sectionOrder.length - 1 ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="moveSection(${index}, 1)" ${index === (data.sectionOrder.length - 1) ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
                         </div>
                     </div>
                     <i class="fas fa-chevron-down toggle-icon"></i>
@@ -264,9 +479,11 @@ function renderForm() {
 }
 
 function renderThemeSettings() {
-    const colors = currentData.theme.buttonColors || [];
+    const data = getActiveData();
+    const theme = data.theme || {};
+    const colors = theme.buttonColors || [];
     const isOpen = openSections.has('theme-settings');
-    const currentFont = currentData.theme.fontFamily || "'Montserrat', sans-serif";
+    const currentFont = theme.fontFamily || "'Montserrat', sans-serif";
     const knownFonts = ["'Montserrat', sans-serif", "'Open Sans', sans-serif", "'Lato', sans-serif", "'Poppins', sans-serif", "'Roboto', sans-serif", "'Merriweather', serif", "'Playfair Display', serif", "'Lora', serif", "'Georgia', serif", "'Courier New', monospace"];
     const isCustom = !knownFonts.includes(currentFont);
 
@@ -280,11 +497,11 @@ function renderThemeSettings() {
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label class="form-label">Background Color</label>
-                        <input type="color" class="form-control form-control-color w-100" value="${currentData.theme.backgroundColor || '#ffffff'}" onchange="updateThemeSetting('backgroundColor', this.value)">
+                        <input type="color" class="form-control form-control-color w-100" value="${theme.backgroundColor || '#ffffff'}" onchange="updateThemeSetting('backgroundColor', this.value)">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Text Color</label>
-                        <input type="color" class="form-control form-control-color w-100" value="${currentData.theme.textColor || '#023e62'}" onchange="updateThemeSetting('textColor', this.value)">
+                        <input type="color" class="form-control form-control-color w-100" value="${theme.textColor || '#023e62'}" onchange="updateThemeSetting('textColor', this.value)">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Font Family</label>
@@ -317,22 +534,22 @@ function renderThemeSettings() {
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small">Custom Font URL (Google Fonts)</label>
-                                    <input type="text" class="form-control form-control-sm" placeholder="https://fonts.googleapis.com/css2?family=My+Font&display=swap" value="${currentData.theme.customFontUrl || ''}" onchange="updateThemeSetting('customFontUrl', this.value)">
+                                    <input type="text" class="form-control form-control-sm" placeholder="https://fonts.googleapis.com/css2?family=My+Font&display=swap" value="${theme.customFontUrl || ''}" onchange="updateThemeSetting('customFontUrl', this.value)">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-12">
                         <label class="form-label">Background Image URL (Optional)</label>
-                        <input type="text" class="form-control" value="${currentData.theme.backgroundImage || ''}" placeholder="https://example.com/image.jpg" onchange="updateThemeSetting('backgroundImage', this.value)">
+                        <input type="text" class="form-control" value="${theme.backgroundImage || ''}" placeholder="https://example.com/image.jpg" onchange="updateThemeSetting('backgroundImage', this.value)">
                     </div>
                 </div>
                 <h6 class="border-bottom pb-2 mb-3">Sizing & Spacing</h6>
                 <div class="row g-3 mb-3">
-                    <div class="col-md-3"><label class="form-label">Base Font Size (px)</label><input type="number" class="form-control" value="${currentData.theme.fontSize || 16}" onchange="updateThemeSetting('fontSize', this.value)"></div>
-                    <div class="col-md-3"><label class="form-label">Section Spacing (px)</label><input type="number" class="form-control" value="${currentData.theme.sectionSpacing || 30}" onchange="updateThemeSetting('sectionSpacing', this.value)"></div>
-                    <div class="col-md-3"><label class="form-label">Text Spacing (px)</label><input type="number" class="form-control" value="${currentData.theme.textSpacing || 15}" onchange="updateThemeSetting('textSpacing', this.value)"></div>
-                    <div class="col-md-3"><label class="form-label">Button Spacing (px)</label><input type="number" class="form-control" value="${currentData.theme.btnSpacing || 15}" onchange="updateThemeSetting('btnSpacing', this.value)"></div>
+                    <div class="col-md-3"><label class="form-label">Base Font Size (px)</label><input type="number" class="form-control" value="${theme.fontSize || 16}" onchange="updateThemeSetting('fontSize', this.value)"></div>
+                    <div class="col-md-3"><label class="form-label">Section Spacing (px)</label><input type="number" class="form-control" value="${theme.sectionSpacing || 30}" onchange="updateThemeSetting('sectionSpacing', this.value)"></div>
+                    <div class="col-md-3"><label class="form-label">Text Spacing (px)</label><input type="number" class="form-control" value="${theme.textSpacing || 15}" onchange="updateThemeSetting('textSpacing', this.value)"></div>
+                    <div class="col-md-3"><label class="form-label">Button Spacing (px)</label><input type="number" class="form-control" value="${theme.btnSpacing || 15}" onchange="updateThemeSetting('btnSpacing', this.value)"></div>
                 </div>
                 <h6 class="border-bottom pb-2 mb-3">Button Colors</h6>
                 <div class="d-flex flex-wrap gap-2 mb-2">
@@ -350,27 +567,60 @@ function renderThemeSettings() {
 }
 
 function renderProfileFields() {
+    const data = getActiveData();
+    const isSubPage = !!activePageId;
+    const useGlobalProfile = isSubPage && !data.profile;
+
+    if (useGlobalProfile) {
+        return `
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle me-2"></i>Using Global Profile. 
+                <button class="btn btn-sm btn-link p-0 align-baseline" onclick="updateProfileGlobal(false)">Customize for this page</button>
+            </div>
+        `;
+    }
+
+    const profile = data.profile || {};
     return `
         <div class="row">
-            <div class="col-md-6 mb-3"><label>Name</label><input type="text" class="form-control" value="${currentData.profile.name || ''}" onchange="updateProfile('name', this.value)"></div>
-            <div class="col-md-6 mb-3"><label>Subtitle</label><input type="text" class="form-control" value="${currentData.profile.subtitle || ''}" onchange="updateProfile('subtitle', this.value)"></div>
-            <div class="col-12 mb-3"><label>Image Path</label><input type="text" class="form-control" value="${currentData.profile.image || ''}" onchange="updateProfile('image', this.value)"></div>
+            <div class="col-md-6 mb-3"><label>Name</label><input type="text" class="form-control" value="${profile.name || ''}" onchange="updateProfile('name', this.value)"></div>
+            <div class="col-md-6 mb-3"><label>Subtitle</label><input type="text" class="form-control" value="${profile.subtitle || ''}" onchange="updateProfile('subtitle', this.value)"></div>
+            <div class="col-12 mb-3"><label>Image Path</label><input type="text" class="form-control" value="${profile.image || ''}" onchange="updateProfile('image', this.value)"></div>
         </div>
     `;
 }
 
 function renderFooterFields() {
-    return `<label>Footer Text</label><input type="text" class="form-control" value="${currentData.footer || ''}" onchange="updateFooter(this.value)">`;
+    const data = getActiveData();
+    const isSubPage = !!activePageId;
+    const useGlobal = isSubPage ? (data.useGlobalFooter !== false) : false; 
+    
+    let html = '';
+    
+    // Checkbox moved to Page Configuration section
+    
+    const value = useGlobal ? (currentData.footer || '') : (data.footer || '');
+    const disabled = useGlobal ? 'disabled' : '';
+    
+    html += `<label>Footer Text</label><input type="text" class="form-control" value="${value}" ${disabled} onchange="updateFooter(this.value)">`;
+    
+    if (useGlobal) {
+        html += `<small class="text-muted">Global value: "${currentData.footer || ''}"</small>`;
+    }
+    
+    return html;
 }
 
 function renderListFields(key) {
-    const items = currentData[key] || [];
+    const data = getActiveData();
+    const items = data[key] || [];
     return `<div id="${key}List">${items.map((item, index) => renderItemForm(item, index, key)).join('')}</div>
         <button type="button" class="btn btn-success btn-sm" onclick="addItem('${key}')">+ Add Item</button>`;
 }
 
 function renderCustomSectionFields(key) {
-    const section = currentData[key];
+    const data = getActiveData();
+    const section = data[key];
     return `
         <div class="mb-3"><label>Section Title</label><input type="text" class="form-control" value="${section.title}" onchange="updateCustomSectionTitle('${key}', this.value)"></div>
         <div id="${key}List">${(section.links || []).map((item, index) => renderItemForm(item, index, key)).join('')}</div>
@@ -385,6 +635,15 @@ function renderItemForm(item, index, parentKey) {
     const text = item.text || '';
     const url = item.url || '';
     const icon = item.icon || '';
+    const customColor = item.customColor || '';
+    
+    // Calculate default color for preview
+    const data = getActiveData();
+    const theme = data.theme || currentData.theme || {};
+    const colors = theme.buttonColors || ['#80d6ff', '#3DCD49', '#ffd300', '#ff5852'];
+    const defaultColor = colors[index % colors.length];
+    const previewColor = customColor || defaultColor;
+
     const updateFn = `updateItem('${parentKey}', ${index},`;
     const removeFn = `removeItem('${parentKey}', ${index})`;
 
@@ -401,8 +660,18 @@ function renderItemForm(item, index, parentKey) {
     }
 
     return `
-        <div class="item-card">
-            <div class="item-header"><span class="item-title">Item #${index + 1}</span><button type="button" class="btn btn-danger btn-sm" onclick="${removeFn}">Remove</button></div>
+        <div class="item-card" style="border-left: 5px solid ${previewColor}">
+            <div class="item-header">
+                <span class="item-title">Item #${index + 1}</span>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="input-group input-group-sm" style="width: 140px;" title="Override Button Color">
+                        <span class="input-group-text p-1"><div style="width: 15px; height: 15px; background-color: ${previewColor}; border-radius: 50%;"></div></span>
+                        <input type="color" class="form-control form-control-color" value="${previewColor}" onchange="${updateFn} 'customColor', this.value)">
+                        ${customColor ? `<button class="btn btn-outline-secondary" onclick="${updateFn} 'customColor', '')" title="Reset to Default">×</button>` : ''}
+                    </div>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="${removeFn}">Remove</button>
+                </div>
+            </div>
             <div class="row g-3">
                 <div class="col-md-6"><label>Title</label><input type="text" class="form-control" value="${title}" placeholder="e.g. Project Name" onchange="${updateFn} 'title', this.value)"></div>
                 <div class="col-md-6"><label>Subtitle</label><input type="text" class="form-control" value="${subtitle}" placeholder="e.g. Hindi translation" onchange="${updateFn} 'subtitle', this.value)"></div>
@@ -421,8 +690,9 @@ window.toggleSection = function(id) {
 };
 
 window.toggleAll = function(expand) {
+    const data = getActiveData();
     if (expand) {
-        currentData.sectionOrder.forEach(key => openSections.add(`section-${key}`));
+        (data.sectionOrder || []).forEach(key => openSections.add(`section-${key}`));
         openSections.add('theme-settings');
     } else {
         openSections.clear();
@@ -431,29 +701,32 @@ window.toggleAll = function(expand) {
 };
 
 window.moveSection = function(index, direction) {
+    const data = getActiveData();
     const newIndex = index + direction;
-    if (newIndex >= 0 && newIndex < currentData.sectionOrder.length) {
-        [currentData.sectionOrder[index], currentData.sectionOrder[newIndex]] = [currentData.sectionOrder[newIndex], currentData.sectionOrder[index]];
+    if (newIndex >= 0 && newIndex < data.sectionOrder.length) {
+        [data.sectionOrder[index], data.sectionOrder[newIndex]] = [data.sectionOrder[newIndex], data.sectionOrder[index]];
         renderForm();
         checkChanges();
     }
 };
 
 window.addNewCustomSection = function() {
+    const data = getActiveData();
     const id = `custom_${Date.now()}`;
-    currentData[id] = { title: "New Section", links: [] };
-    if (!currentData.sectionOrder) currentData.sectionOrder = [];
-    const footerIndex = currentData.sectionOrder.indexOf('footer');
-    footerIndex !== -1 ? currentData.sectionOrder.splice(footerIndex, 0, id) : currentData.sectionOrder.push(id);
+    data[id] = { title: "New Section", links: [] };
+    if (!data.sectionOrder) data.sectionOrder = [];
+    const footerIndex = data.sectionOrder.indexOf('footer');
+    footerIndex !== -1 ? data.sectionOrder.splice(footerIndex, 0, id) : data.sectionOrder.push(id);
     openSections.add(`section-${id}`);
     renderForm();
     checkChanges();
 };
 
 window.deleteCustomSection = function(key) {
+    const data = getActiveData();
     if(confirm('Delete this section?')) {
-        delete currentData[key];
-        currentData.sectionOrder = currentData.sectionOrder.filter(k => k !== key);
+        delete data[key];
+        data.sectionOrder = data.sectionOrder.filter(k => k !== key);
         renderForm();
         checkChanges();
     }
@@ -469,39 +742,74 @@ window.resetData = function() {
 };
 
 // Updates
-window.updateProfile = (key, value) => { currentData.profile[key] = value; checkChanges(); };
-window.updateFooter = (value) => { currentData.footer = value; checkChanges(); };
-window.updateCustomSectionTitle = (key, value) => { currentData[key].title = value; checkChanges(); };
+window.updateProfile = (key, value) => { getActiveData().profile[key] = value; checkChanges(); };
+window.updateFooter = (value) => { getActiveData().footer = value; checkChanges(); };
+window.updateThemeGlobal = (useGlobal) => {
+    const data = getActiveData();
+    if (useGlobal) {
+        delete data.theme;
+    } else {
+        data.theme = JSON.parse(JSON.stringify(currentData.theme || {}));
+    }
+    renderForm();
+    checkChanges();
+};
+window.updateProfileGlobal = (useGlobal) => {
+    const data = getActiveData();
+    if (useGlobal) {
+        delete data.profile;
+    } else {
+        data.profile = JSON.parse(JSON.stringify(currentData.profile || {}));
+    }
+    renderForm();
+    checkChanges();
+};
+window.updateFooterGlobal = (useGlobal) => { 
+    const data = getActiveData();
+    data.useGlobalFooter = useGlobal;
+    renderForm();
+    checkChanges(); 
+};
+window.updateCustomSectionTitle = (key, value) => { getActiveData()[key].title = value; checkChanges(); };
 window.updateDivider = (key, pos, val) => {
-    if (!currentData.sectionSettings) currentData.sectionSettings = {};
-    if (!currentData.sectionSettings[key]) currentData.sectionSettings[key] = {};
-    pos === 'top' ? currentData.sectionSettings[key].dividerTop = val : currentData.sectionSettings[key].dividerBottom = val;
+    const data = getActiveData();
+    if (!data.sectionSettings) data.sectionSettings = {};
+    if (!data.sectionSettings[key]) data.sectionSettings[key] = {};
+    pos === 'top' ? data.sectionSettings[key].dividerTop = val : data.sectionSettings[key].dividerBottom = val;
     checkChanges();
 };
 
 window.updateItem = function(parentKey, index, field, value) {
-    let items = (staticSections[parentKey] || parentKey === 'connectLinks') ? currentData[parentKey] : currentData[parentKey].links;
+    const data = getActiveData();
+    let items = (staticSections[parentKey] || parentKey === 'connectLinks') ? data[parentKey] : data[parentKey].links;
     items[index][field] = value;
     checkChanges();
 };
 
 window.addItem = function(parentKey) {
+    const data = getActiveData();
     let newItem = parentKey === 'connectLinks' ? { icon: "fab fa-star", url: "#" } : { text: "New Item", url: "#" };
-    (staticSections[parentKey] || parentKey === 'connectLinks') ? currentData[parentKey].push(newItem) : currentData[parentKey].links.push(newItem);
+    (staticSections[parentKey] || parentKey === 'connectLinks') ? data[parentKey].push(newItem) : data[parentKey].links.push(newItem);
     openSections.add(`section-${parentKey}`);
     renderForm();
     checkChanges();
 };
 
 window.removeItem = function(parentKey, index) {
+    const data = getActiveData();
     if(confirm('Remove item?')) {
-        (staticSections[parentKey] || parentKey === 'connectLinks') ? currentData[parentKey].splice(index, 1) : currentData[parentKey].links.splice(index, 1);
+        (staticSections[parentKey] || parentKey === 'connectLinks') ? data[parentKey].splice(index, 1) : data[parentKey].links.splice(index, 1);
         renderForm();
         checkChanges();
     }
 };
 
-window.updateThemeSetting = (key, value) => { if (!currentData.theme) currentData.theme = {}; currentData.theme[key] = value; checkChanges(); };
+window.updateThemeSetting = (key, value) => { 
+    const data = getActiveData();
+    if (!data.theme) data.theme = {}; 
+    data.theme[key] = value; 
+    checkChanges(); 
+};
 window.handleFontSelection = (value) => {
     const customInputs = document.getElementById('customFontInputs');
     if (value === 'custom') {
@@ -512,9 +820,9 @@ window.handleFontSelection = (value) => {
         updateThemeSetting('customFontUrl', ''); 
     }
 };
-window.updateThemeColor = (index, value) => { currentData.theme.buttonColors[index] = value; checkChanges(); };
-window.addThemeColor = () => { currentData.theme.buttonColors.push('#000000'); openSections.add('theme-settings'); renderForm(); checkChanges(); };
-window.removeThemeColor = (index) => { currentData.theme.buttonColors.splice(index, 1); renderForm(); checkChanges(); };
+window.updateThemeColor = (index, value) => { getActiveData().theme.buttonColors[index] = value; checkChanges(); };
+window.addThemeColor = () => { getActiveData().theme.buttonColors.push('#000000'); openSections.add('theme-settings'); renderForm(); checkChanges(); };
+window.removeThemeColor = (index) => { getActiveData().theme.buttonColors.splice(index, 1); renderForm(); checkChanges(); };
 
 // Save & Download
 window.previewData = function() {
@@ -631,10 +939,12 @@ window.downloadData = function() {
 
 window.checkChanges = function() {
     const btn = document.getElementById('saveBtn');
+    const resetBtn = document.getElementById('resetBtn');
     if (!btn) return;
     
     const hasChanges = JSON.stringify(originalData) !== JSON.stringify(currentData);
     btn.disabled = !hasChanges;
+    if (resetBtn) resetBtn.disabled = !hasChanges;
     
     if (hasChanges) {
         btn.classList.remove('btn-secondary');
