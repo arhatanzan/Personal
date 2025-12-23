@@ -196,6 +196,8 @@ function initData() {
 function renderForm() {
     const container = document.getElementById('formContainer');
     container.innerHTML = '';
+    
+    if (typeof checkChanges === 'function') checkChanges();
 
     container.insertAdjacentHTML('beforeend', renderThemeSettings());
 
@@ -623,4 +625,22 @@ window.downloadData = function() {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
+};
+
+window.checkChanges = function() {
+    const btn = document.getElementById('saveBtn');
+    if (!btn) return;
+    
+    const hasChanges = JSON.stringify(originalData) !== JSON.stringify(currentData);
+    btn.disabled = !hasChanges;
+    
+    if (hasChanges) {
+        btn.classList.remove('btn-secondary');
+        btn.classList.add('btn-success');
+        btn.innerHTML = 'Save Directly';
+    } else {
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-secondary');
+        btn.innerHTML = 'No Changes';
+    }
 };
