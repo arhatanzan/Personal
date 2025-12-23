@@ -89,9 +89,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 if not site_data:
                     raise ValueError("Missing data payload")
 
-                file_content = f"var siteData = {json.dumps(site_data, indent=4)};"
+                file_content = json.dumps(site_data, indent=4)
                 
-                file_path = os.path.abspath(os.path.join('assets', 'js', 'data.js'))
+                file_path = os.path.abspath('data.json')
                 with open(file_path, 'w', encoding='utf-8') as f:
                     f.write(file_content)
                 

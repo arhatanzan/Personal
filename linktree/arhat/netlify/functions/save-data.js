@@ -66,9 +66,9 @@ exports.handler = async function(event, context) {
             if (!putResponse.ok) throw new Error(`GitHub API Error (Put ${path}): ${putResponse.statusText}`);
         };
 
-        // 1. Update data.js
-        const fileContent = `const siteData = ${JSON.stringify(newData, null, 4)};`;
-        const dataFilePath = "linktree/arhat/public/assets/js/data.js"; 
+        // 1. Update data.json
+        const fileContent = JSON.stringify(newData, null, 4);
+        const dataFilePath = "linktree/arhat/public/data.json"; 
         await updateFile(dataFilePath, fileContent, commitMessage);
 
         // 2. Update changelog.html
