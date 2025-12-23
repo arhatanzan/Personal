@@ -281,7 +281,7 @@ function generateItemsHtml(items, isConnect = false) {
 function applyButtonColors(theme) {
     const buttons = document.querySelectorAll('.link-btn');
     const colors = (theme && theme.buttonColors) 
-        ? theme.buttonColors 
+        ? theme.buttonColors
         : ['#80d6ff', '#3DCD49', '#ffd300', '#ff5852'];
 
     buttons.forEach((btn, index) => {
@@ -296,4 +296,30 @@ function applyButtonColors(theme) {
         btn.style.boxShadow = '';
         if (!btn.classList.contains('link-btn')) btn.classList.add('link-btn');
     });
+}
+
+function adjustColors(hexColor, amount) {
+    const cleanHex = hexColor.replace('#', '');
+    let r = parseInt(cleanHex.substring(0, 2), 16);
+    let g = parseInt(cleanHex.substring(2, 4), 16);
+    let b = parseInt(cleanHex.substring(4, 6), 16);
+
+    r = Math.min(255, Math.max(0, r + amount));
+    g = Math.min(255, Math.max(0, g + amount));
+    b = Math.min(255, Math.max(0, b + amount));
+
+    const toHex = (c) => {
+        const hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex : hex;
+    }
+
+    return "#" + toHex(r) + toHex(g) + toHex(b);
+}
+
+
+function hslToHex(h, s, l) {
+  l /= 100;
+  const a = s * Math.min(l, 1 - l) / 100;
+  const f = n => { const k = (n + h / 30) % 12; const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1); return Math.round(255 * color).toString(16).padStart(2, '0'); };
+  return `#${f(0)}${f(8)}${f(4)}`;
 }

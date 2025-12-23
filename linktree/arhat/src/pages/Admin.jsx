@@ -29,8 +29,12 @@ const Admin = ({ initialData }) => {
     setError('');
 
     try {
-        const endpoint = window.location.port === '5173' ? '/.netlify/functions/login' : '/.netlify/functions/login'; 
-        
+        // Use relative endpoint for dev/prod compatibility
+        let endpoint = '/.netlify/functions/login';
+        // If running on localhost:5173 (Vite dev), use proxy (already set in vite.config.js)
+        if (window.location.hostname === 'localhost' && window.location.port === '5173') {
+            endpoint = '/.netlify/functions/login';
+        }
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -39,12 +43,12 @@ const Admin = ({ initialData }) => {
 
         const data = await response.json();
 
-        if (response.ok && data.success) {
+        if (response.ok && (data.success || data.message === 'Authenticated')) {
             localStorage.setItem('adminPassword', password);
             localStorage.setItem('loginTime', Date.now());
             setIsAuthenticated(true);
         } else {
-            setError(data.message || 'Invalid password');
+            setError(data.message || data.error || 'Invalid password');
         }
     } catch (err) {
         setError('Login failed. Ensure backend is running.');

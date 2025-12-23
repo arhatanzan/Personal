@@ -57,16 +57,24 @@ const Home = ({ siteData }) => {
   if (!activeData) return null;
 
   const { profile, sectionOrder, sectionSettings, theme } = activeData;
-  const buttonColors = (theme && theme.buttonColors) || ['#80d6ff', '#3DCD49', '#ffd300', '#ff5852'];
+    // Button color order to match legacy_public divider: blue, purple, red, orange, yellow, green
+    const buttonColors = (theme && theme.buttonColors) || [
+        '#0089d7', // blue
+        '#9e44c4', // purple
+        '#ff5852', // red
+        '#ff9000', // orange
+        '#ffd300', // yellow
+        '#3DCD49'  // green
+    ];
 
-  // Helper to get button color
-  let btnColorIndex = 0;
-  const getBtnColor = (customColor) => {
-      if (customColor) return customColor;
-      const color = buttonColors[btnColorIndex % buttonColors.length];
-      btnColorIndex++;
-      return color;
-  };
+    // Global button color index for cycling across all sections (useRef to persist across renders)
+    const btnColorIndexRef = React.useRef(0);
+    const getBtnColor = (customColor) => {
+        if (customColor) return customColor;
+        const color = buttonColors[btnColorIndexRef.current % buttonColors.length];
+        btnColorIndexRef.current++;
+        return color;
+    };
 
   // Prepare sections
   let order = sectionOrder || ['profile', 'socialLinks', 'workLinks', 'publications', 'connectLinks', 'footer'];
@@ -92,31 +100,36 @@ const Home = ({ siteData }) => {
         )}
       </header>
 
-      <div id="site-container">
-        {order.map((key, index) => {
-            // Divider Logic
-            const settings = (activeData.sectionSettings && activeData.sectionSettings[key]) || {};
-            let showTop = settings.dividerTop;
-            let showBottom = settings.dividerBottom;
+            <div id="site-container">
+                {(() => {
+                    // Reset color index at the start of each render
+                    btnColorIndexRef.current = 0;
+                    return order.map((key, index) => {
+                        // Divider Logic
+                        const settings = (activeData.sectionSettings && activeData.sectionSettings[key]) || {};
+                        let showTop = settings.dividerTop;
+                        let showBottom = settings.dividerBottom;
 
-            if (typeof showTop === 'undefined') {
-                showTop = index > 0 && key !== 'footer';
-                if (index > 0 && order[index - 1] === 'profile') showTop = false;
-            }
-            if (typeof showBottom === 'undefined') showBottom = false;
+                        if (typeof showTop === 'undefined') {
+                            showTop = index > 0 && key !== 'footer';
+                            if (index > 0 && order[index - 1] === 'profile') showTop = false;
+                        }
+                        if (typeof showBottom === 'undefined') showBottom = false;
 
-            const sectionContent = renderSection(key, activeData, getBtnColor);
-            if (!sectionContent) return null;
+                        // Pass the global getBtnColor to each section
+                        const sectionContent = renderSection(key, activeData, getBtnColor);
+                        if (!sectionContent) return null;
 
-            return (
-                <React.Fragment key={key}>
-                    {showTop && <ColoredDivider />}
-                    {sectionContent}
-                    {showBottom && <ColoredDivider />}
-                </React.Fragment>
-            );
-        })}
-      </div>
+                        return (
+                            <React.Fragment key={key}>
+                                {showTop && <ColoredDivider />}
+                                {sectionContent}
+                                {showBottom && <ColoredDivider />}
+                            </React.Fragment>
+                        );
+                    });
+                })()}
+            </div>
     </div>
   );
 };

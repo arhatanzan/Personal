@@ -7,10 +7,17 @@ export default defineConfig({
   server: {
     proxy: {
       '/.netlify/functions': {
-        target: 'http://localhost:8888',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
       }
     }
+  },
+  // Build into `dist` and copy `public` assets (default `publicDir`) there.
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    sourcemap: false
   }
 })
+
