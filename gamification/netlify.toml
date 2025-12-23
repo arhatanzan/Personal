@@ -1,0 +1,5 @@
+[build]
+  # This command checks for changes. 
+  # If it returns 0 (success/no diff), the build is CANCELLED.
+  # If it returns 1 (failure/diff found), the build PROCEEDS.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ."

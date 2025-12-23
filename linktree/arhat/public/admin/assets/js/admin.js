@@ -1,7 +1,7 @@
 // State
 let originalData = null;
 let currentData = null;
-let authToken = sessionStorage.getItem('adminPassword');
+let authToken = localStorage.getItem('adminPassword');
 let sessionTimeout = 30 * 60 * 1000; // 30 mins default
 let sessionTimer = null;
 let openSections = new Set();
@@ -27,9 +27,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     setupPasswordToggle();
     
+    // Sync logout across tabs
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'adminPassword' && !event.newValue) {
+            logout("Logged out from another tab.", false);
+        }
+    });
+    
     if (authToken) {
         checkSession();
         showAdmin();
+    } else {
+        logout(null, false);
     }
 });
 
@@ -48,7 +57,7 @@ async function loadConfig() {
 }
 
 function checkSession() {
-    const loginTime = sessionStorage.getItem('loginTime');
+    const loginTime = localStorage.getItem('loginTime');
     if (authToken && loginTime) {
         const elapsed = Date.now() - parseInt(loginTime);
         if (elapsed > sessionTimeout) {
@@ -96,8 +105,8 @@ window.handleLogin = async function(e) {
 
         if (response.ok && data.success) {
             authToken = password;
-            sessionStorage.setItem('adminPassword', authToken);
-            sessionStorage.setItem('loginTime', Date.now());
+            localStorage.setItem('adminPassword', authToken);
+            localStorage.setItem('loginTime', Date.now());
             startSessionTimer(sessionTimeout);
             showAdmin();
             passwordInput.value = '';
@@ -117,10 +126,12 @@ window.handleLogin = async function(e) {
     }
 };
 
-window.logout = function(msg) {
+window.logout = function(msg, clear = true) {
+    if (clear) {
+        localStorage.removeItem('adminPassword');
+        localStorage.removeItem('loginTime');
+    }
     authToken = null;
-    sessionStorage.removeItem('adminPassword');
-    sessionStorage.removeItem('loginTime');
     if (sessionTimer) clearTimeout(sessionTimer);
     
     document.getElementById('adminContainer').style.display = 'none';
@@ -187,6 +198,8 @@ function initData() {
 function renderForm() {
     const container = document.getElementById('formContainer');
     container.innerHTML = '';
+    
+    if (typeof checkChanges === 'function') checkChanges();
 
     container.insertAdjacentHTML('beforeend', renderThemeSettings());
 
@@ -422,6 +435,7 @@ window.moveSection = function(index, direction) {
     if (newIndex >= 0 && newIndex < currentData.sectionOrder.length) {
         [currentData.sectionOrder[index], currentData.sectionOrder[newIndex]] = [currentData.sectionOrder[newIndex], currentData.sectionOrder[index]];
         renderForm();
+        checkChanges();
     }
 };
 
@@ -433,6 +447,7 @@ window.addNewCustomSection = function() {
     footerIndex !== -1 ? currentData.sectionOrder.splice(footerIndex, 0, id) : currentData.sectionOrder.push(id);
     openSections.add(`section-${id}`);
     renderForm();
+    checkChanges();
 };
 
 window.deleteCustomSection = function(key) {
@@ -440,6 +455,7 @@ window.deleteCustomSection = function(key) {
         delete currentData[key];
         currentData.sectionOrder = currentData.sectionOrder.filter(k => k !== key);
         renderForm();
+        checkChanges();
     }
 };
 
@@ -448,22 +464,25 @@ window.resetData = function() {
         currentData = JSON.parse(JSON.stringify(originalData));
         openSections.clear();
         renderForm();
+        checkChanges();
     }
 };
 
 // Updates
-window.updateProfile = (key, value) => currentData.profile[key] = value;
-window.updateFooter = (value) => currentData.footer = value;
-window.updateCustomSectionTitle = (key, value) => currentData[key].title = value;
+window.updateProfile = (key, value) => { currentData.profile[key] = value; checkChanges(); };
+window.updateFooter = (value) => { currentData.footer = value; checkChanges(); };
+window.updateCustomSectionTitle = (key, value) => { currentData[key].title = value; checkChanges(); };
 window.updateDivider = (key, pos, val) => {
     if (!currentData.sectionSettings) currentData.sectionSettings = {};
     if (!currentData.sectionSettings[key]) currentData.sectionSettings[key] = {};
     pos === 'top' ? currentData.sectionSettings[key].dividerTop = val : currentData.sectionSettings[key].dividerBottom = val;
+    checkChanges();
 };
 
 window.updateItem = function(parentKey, index, field, value) {
     let items = (staticSections[parentKey] || parentKey === 'connectLinks') ? currentData[parentKey] : currentData[parentKey].links;
     items[index][field] = value;
+    checkChanges();
 };
 
 window.addItem = function(parentKey) {
@@ -471,16 +490,18 @@ window.addItem = function(parentKey) {
     (staticSections[parentKey] || parentKey === 'connectLinks') ? currentData[parentKey].push(newItem) : currentData[parentKey].links.push(newItem);
     openSections.add(`section-${parentKey}`);
     renderForm();
+    checkChanges();
 };
 
 window.removeItem = function(parentKey, index) {
     if(confirm('Remove item?')) {
         (staticSections[parentKey] || parentKey === 'connectLinks') ? currentData[parentKey].splice(index, 1) : currentData[parentKey].links.splice(index, 1);
         renderForm();
+        checkChanges();
     }
 };
 
-window.updateThemeSetting = (key, value) => { if (!currentData.theme) currentData.theme = {}; currentData.theme[key] = value; };
+window.updateThemeSetting = (key, value) => { if (!currentData.theme) currentData.theme = {}; currentData.theme[key] = value; checkChanges(); };
 window.handleFontSelection = (value) => {
     const customInputs = document.getElementById('customFontInputs');
     if (value === 'custom') {
@@ -491,14 +512,19 @@ window.handleFontSelection = (value) => {
         updateThemeSetting('customFontUrl', ''); 
     }
 };
-window.updateThemeColor = (index, value) => currentData.theme.buttonColors[index] = value;
-window.addThemeColor = () => { currentData.theme.buttonColors.push('#000000'); openSections.add('theme-settings'); renderForm(); };
-window.removeThemeColor = (index) => { currentData.theme.buttonColors.splice(index, 1); renderForm(); };
+window.updateThemeColor = (index, value) => { currentData.theme.buttonColors[index] = value; checkChanges(); };
+window.addThemeColor = () => { currentData.theme.buttonColors.push('#000000'); openSections.add('theme-settings'); renderForm(); checkChanges(); };
+window.removeThemeColor = (index) => { currentData.theme.buttonColors.splice(index, 1); renderForm(); checkChanges(); };
 
 // Save & Download
 window.previewData = function() {
-    const output = `const siteData = ${JSON.stringify(currentData, null, 4)};`;
     const outputArea = document.getElementById('outputArea');
+    if (outputArea.style.display === 'block') {
+        outputArea.style.display = 'none';
+        return;
+    }
+
+    const output = `const siteData = ${JSON.stringify(currentData, null, 4)};`;
     outputArea.style.display = 'block';
     outputArea.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -510,7 +536,21 @@ window.previewData = function() {
     outputArea.scrollIntoView({ behavior: 'smooth' });
 };
 
-window.saveDataDirectly = async function() {
+window.openSaveModal = function() {
+    const modal = new bootstrap.Modal(document.getElementById('saveModal'));
+    modal.show();
+};
+
+window.confirmSave = function() {
+    const message = document.getElementById('commitMessage').value || "Update site data";
+    const modalEl = document.getElementById('saveModal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    modal.hide();
+    
+    saveDataDirectly(message);
+};
+
+window.saveDataDirectly = async function(commitMessage = "Update site data") {
     const btn = document.getElementById('saveBtn');
     if (btn.disabled) return;
     
@@ -533,7 +573,7 @@ window.saveDataDirectly = async function() {
 
     try {
         let response;
-        const payload = { password: authToken, data: currentData };
+        const payload = { password: authToken, data: currentData, message: commitMessage };
 
         try {
             response = await fetch(endpoint, {
@@ -587,4 +627,22 @@ window.downloadData = function() {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
+};
+
+window.checkChanges = function() {
+    const btn = document.getElementById('saveBtn');
+    if (!btn) return;
+    
+    const hasChanges = JSON.stringify(originalData) !== JSON.stringify(currentData);
+    btn.disabled = !hasChanges;
+    
+    if (hasChanges) {
+        btn.classList.remove('btn-secondary');
+        btn.classList.add('btn-success');
+        btn.innerHTML = 'Save Directly';
+    } else {
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-secondary');
+        btn.innerHTML = 'No Changes';
+    }
 };
