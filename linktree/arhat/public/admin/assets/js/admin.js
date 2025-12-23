@@ -631,10 +631,12 @@ window.downloadData = function() {
 
 window.checkChanges = function() {
     const btn = document.getElementById('saveBtn');
+    const resetBtn = document.getElementById('resetBtn');
     if (!btn) return;
     
     const hasChanges = JSON.stringify(originalData) !== JSON.stringify(currentData);
     btn.disabled = !hasChanges;
+    if (resetBtn) resetBtn.disabled = !hasChanges;
     
     if (hasChanges) {
         btn.classList.remove('btn-secondary');

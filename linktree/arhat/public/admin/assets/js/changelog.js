@@ -18,7 +18,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     checkEmptyChangelog();
+    setupScrollToTop();
 });
+
+function setupScrollToTop() {
+    const scrollArea = document.getElementById('changelogScrollArea');
+    const backToTopBtn = document.getElementById('backToTopBtn');
+
+    if (scrollArea && backToTopBtn) {
+        scrollArea.addEventListener('scroll', () => {
+            if (scrollArea.scrollTop > 300) {
+                backToTopBtn.style.display = 'block';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
+        });
+    }
+}
+
+function scrollToTop() {
+    const scrollArea = document.getElementById('changelogScrollArea');
+    if (scrollArea) {
+        scrollArea.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+}
 
 function checkEmptyChangelog() {
     const list = document.getElementById('changelogList');
