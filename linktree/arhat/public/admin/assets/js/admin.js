@@ -1,7 +1,7 @@
 // State
 let originalData = null;
 let currentData = null;
-let authToken = sessionStorage.getItem('adminPassword');
+let authToken = localStorage.getItem('adminPassword');
 let sessionTimeout = 30 * 60 * 1000; // 30 mins default
 let sessionTimer = null;
 let openSections = new Set();
@@ -27,6 +27,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     setupPasswordToggle();
     
+    // Sync logout across tabs
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'adminPassword' && !event.newValue) {
+            logout("Logged out from another tab.", false);
+        }
+    });
+    
     if (authToken) {
         checkSession();
         showAdmin();
@@ -48,7 +55,7 @@ async function loadConfig() {
 }
 
 function checkSession() {
-    const loginTime = sessionStorage.getItem('loginTime');
+    const loginTime = localStorage.getItem('loginTime');
     if (authToken && loginTime) {
         const elapsed = Date.now() - parseInt(loginTime);
         if (elapsed > sessionTimeout) {
@@ -96,8 +103,8 @@ window.handleLogin = async function(e) {
 
         if (response.ok && data.success) {
             authToken = password;
-            sessionStorage.setItem('adminPassword', authToken);
-            sessionStorage.setItem('loginTime', Date.now());
+            localStorage.setItem('adminPassword', authToken);
+            localStorage.setItem('loginTime', Date.now());
             startSessionTimer(sessionTimeout);
             showAdmin();
             passwordInput.value = '';
@@ -601,4 +608,27 @@ window.downloadData = function() {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
+};
+
+window.logout = function(msg, clear = true) {
+    if (clear) {
+        localStorage.removeItem('adminPassword');
+        localStorage.removeItem('loginTime');
+    }
+    authToken = null;
+    if (sessionTimer) clearTimeout(sessionTimer);
+    
+    document.getElementById('adminContainer').style.display = 'none';
+    document.getElementById('loginModal').style.display = 'block';
+    document.getElementById('loginModal').classList.add('show');
+    
+    const errorDiv = document.getElementById('loginError');
+    if (msg) {
+        errorDiv.style.display = 'block';
+        document.getElementById('loginErrorText').textContent = msg;
+    } else {
+        errorDiv.style.display = 'none';
+    }
+    
+    document.getElementById('adminPassword').value = '';
 };
