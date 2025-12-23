@@ -124,10 +124,12 @@ window.handleLogin = async function(e) {
     }
 };
 
-window.logout = function(msg) {
+window.logout = function(msg, clear = true) {
+    if (clear) {
+        localStorage.removeItem('adminPassword');
+        localStorage.removeItem('loginTime');
+    }
     authToken = null;
-    sessionStorage.removeItem('adminPassword');
-    sessionStorage.removeItem('loginTime');
     if (sessionTimer) clearTimeout(sessionTimer);
     
     document.getElementById('adminContainer').style.display = 'none';
@@ -429,6 +431,7 @@ window.moveSection = function(index, direction) {
     if (newIndex >= 0 && newIndex < currentData.sectionOrder.length) {
         [currentData.sectionOrder[index], currentData.sectionOrder[newIndex]] = [currentData.sectionOrder[newIndex], currentData.sectionOrder[index]];
         renderForm();
+        checkChanges();
     }
 };
 
@@ -440,6 +443,7 @@ window.addNewCustomSection = function() {
     footerIndex !== -1 ? currentData.sectionOrder.splice(footerIndex, 0, id) : currentData.sectionOrder.push(id);
     openSections.add(`section-${id}`);
     renderForm();
+    checkChanges();
 };
 
 window.deleteCustomSection = function(key) {
@@ -447,6 +451,7 @@ window.deleteCustomSection = function(key) {
         delete currentData[key];
         currentData.sectionOrder = currentData.sectionOrder.filter(k => k !== key);
         renderForm();
+        checkChanges();
     }
 };
 
@@ -455,22 +460,25 @@ window.resetData = function() {
         currentData = JSON.parse(JSON.stringify(originalData));
         openSections.clear();
         renderForm();
+        checkChanges();
     }
 };
 
 // Updates
-window.updateProfile = (key, value) => currentData.profile[key] = value;
-window.updateFooter = (value) => currentData.footer = value;
-window.updateCustomSectionTitle = (key, value) => currentData[key].title = value;
+window.updateProfile = (key, value) => { currentData.profile[key] = value; checkChanges(); };
+window.updateFooter = (value) => { currentData.footer = value; checkChanges(); };
+window.updateCustomSectionTitle = (key, value) => { currentData[key].title = value; checkChanges(); };
 window.updateDivider = (key, pos, val) => {
     if (!currentData.sectionSettings) currentData.sectionSettings = {};
     if (!currentData.sectionSettings[key]) currentData.sectionSettings[key] = {};
     pos === 'top' ? currentData.sectionSettings[key].dividerTop = val : currentData.sectionSettings[key].dividerBottom = val;
+    checkChanges();
 };
 
 window.updateItem = function(parentKey, index, field, value) {
     let items = (staticSections[parentKey] || parentKey === 'connectLinks') ? currentData[parentKey] : currentData[parentKey].links;
     items[index][field] = value;
+    checkChanges();
 };
 
 window.addItem = function(parentKey) {
@@ -478,16 +486,18 @@ window.addItem = function(parentKey) {
     (staticSections[parentKey] || parentKey === 'connectLinks') ? currentData[parentKey].push(newItem) : currentData[parentKey].links.push(newItem);
     openSections.add(`section-${parentKey}`);
     renderForm();
+    checkChanges();
 };
 
 window.removeItem = function(parentKey, index) {
     if(confirm('Remove item?')) {
         (staticSections[parentKey] || parentKey === 'connectLinks') ? currentData[parentKey].splice(index, 1) : currentData[parentKey].links.splice(index, 1);
         renderForm();
+        checkChanges();
     }
 };
 
-window.updateThemeSetting = (key, value) => { if (!currentData.theme) currentData.theme = {}; currentData.theme[key] = value; };
+window.updateThemeSetting = (key, value) => { if (!currentData.theme) currentData.theme = {}; currentData.theme[key] = value; checkChanges(); };
 window.handleFontSelection = (value) => {
     const customInputs = document.getElementById('customFontInputs');
     if (value === 'custom') {
@@ -498,14 +508,19 @@ window.handleFontSelection = (value) => {
         updateThemeSetting('customFontUrl', ''); 
     }
 };
-window.updateThemeColor = (index, value) => currentData.theme.buttonColors[index] = value;
-window.addThemeColor = () => { currentData.theme.buttonColors.push('#000000'); openSections.add('theme-settings'); renderForm(); };
-window.removeThemeColor = (index) => { currentData.theme.buttonColors.splice(index, 1); renderForm(); };
+window.updateThemeColor = (index, value) => { currentData.theme.buttonColors[index] = value; checkChanges(); };
+window.addThemeColor = () => { currentData.theme.buttonColors.push('#000000'); openSections.add('theme-settings'); renderForm(); checkChanges(); };
+window.removeThemeColor = (index) => { currentData.theme.buttonColors.splice(index, 1); renderForm(); checkChanges(); };
 
 // Save & Download
 window.previewData = function() {
-    const output = `const siteData = ${JSON.stringify(currentData, null, 4)};`;
     const outputArea = document.getElementById('outputArea');
+    if (outputArea.style.display === 'block') {
+        outputArea.style.display = 'none';
+        return;
+    }
+
+    const output = `const siteData = ${JSON.stringify(currentData, null, 4)};`;
     outputArea.style.display = 'block';
     outputArea.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -608,27 +623,4 @@ window.downloadData = function() {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-};
-
-window.logout = function(msg, clear = true) {
-    if (clear) {
-        localStorage.removeItem('adminPassword');
-        localStorage.removeItem('loginTime');
-    }
-    authToken = null;
-    if (sessionTimer) clearTimeout(sessionTimer);
-    
-    document.getElementById('adminContainer').style.display = 'none';
-    document.getElementById('loginModal').style.display = 'block';
-    document.getElementById('loginModal').classList.add('show');
-    
-    const errorDiv = document.getElementById('loginError');
-    if (msg) {
-        errorDiv.style.display = 'block';
-        document.getElementById('loginErrorText').textContent = msg;
-    } else {
-        errorDiv.style.display = 'none';
-    }
-    
-    document.getElementById('adminPassword').value = '';
 };

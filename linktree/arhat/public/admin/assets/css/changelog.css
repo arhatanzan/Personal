@@ -1,0 +1,11 @@
+.changelog-entry {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+}
+.changelog-entry:last-child {
+    border-bottom: none;
+}
+.timestamp {
+    color: #666;
+    font-size: 0.9em;
+}
