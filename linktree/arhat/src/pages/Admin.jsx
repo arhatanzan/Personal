@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Alert, Modal } from 'react-bootstrap';
+import AdminHeader from '../components/admin/AdminHeader';
 import '../admin.css';
 
 const Admin = ({ initialData }) => {
@@ -8,11 +9,11 @@ const Admin = ({ initialData }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [siteData, setSiteData] = useState(initialData);
+  const [activePageId, setActivePageId] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('adminPassword');
     if (token) {
-        // Simple session check
         const loginTime = localStorage.getItem('loginTime');
         if (loginTime && (Date.now() - parseInt(loginTime) < 30 * 60 * 1000)) {
             setIsAuthenticated(true);
@@ -29,7 +30,6 @@ const Admin = ({ initialData }) => {
 
     try {
         const endpoint = window.location.port === '5173' ? '/.netlify/functions/login' : '/.netlify/functions/login'; 
-        // Vite runs on 5173 usually.
         
         const response = await fetch(endpoint, {
             method: 'POST',
@@ -51,6 +51,11 @@ const Admin = ({ initialData }) => {
     } finally {
         setLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+      localStorage.removeItem('adminPassword');
+      setIsAuthenticated(false);
   };
 
   if (!isAuthenticated) {
@@ -78,15 +83,26 @@ const Admin = ({ initialData }) => {
       );
   }
 
+  const pages = siteData && siteData.pages ? Object.keys(siteData.pages) : [];
+
   return (
       <div className="admin-panel">
-          <Container>
-              <h1>Admin Dashboard</h1>
-              <p>Welcome back. Migration in progress.</p>
-              <Button variant="danger" onClick={() => {
-                  localStorage.removeItem('adminPassword');
-                  setIsAuthenticated(false);
-              }}>Logout</Button>
+          <AdminHeader 
+              activePageId={activePageId}
+              pages={pages}
+              onSwitchPage={setActivePageId}
+              onAddPage={() => alert('Add Page functionality to be implemented')}
+              onLogout={handleLogout}
+              onToggleAll={() => {}}
+          />
+          <Container className="mt-4">
+              <div className="scrollable-content">
+                  <Alert variant="info">
+                      <i className="fas fa-info-circle me-2"></i>
+                      Admin Panel Migration in Progress. Currently viewing: <strong>{activePageId || 'Home Page'}</strong>
+                  </Alert>
+                  {/* Form components will go here */}
+              </div>
           </Container>
       </div>
   );
