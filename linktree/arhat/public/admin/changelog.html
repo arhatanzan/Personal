@@ -50,14 +50,26 @@
 
     <div class="scrollable-content">
         <div class="card shadow-sm">
-            <div class="card-body">
-                <div id="changelogList">
-                    <!-- CHANGELOG_START -->
-                <div class="changelog-entry">
-                    <h5>Test Admin Panel Commit</h5>
-                    <div class="timestamp"><i class="far fa-clock me-1"></i>12/23/2025, 7:48:01 AM (UTC)</div>
-                </div>
-                    <!-- CHANGELOG_END -->
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" style="width: 150px;">Date</th>
+                                <th scope="col" style="width: 150px;">Time (UTC)</th>
+                                <th scope="col">Record</th>
+                            </tr>
+                        </thead>
+                        <tbody id="changelogList">
+                            <!-- CHANGELOG_START -->
+                            <tr>
+                                <td>12/23/2025</td>
+                                <td>7:48:01 AM</td>
+                                <td>Test Admin Panel Commit</td>
+                            </tr>
+                            <!-- CHANGELOG_END -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

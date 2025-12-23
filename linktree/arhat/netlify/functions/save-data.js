@@ -87,13 +87,16 @@ exports.handler = async function(event, context) {
                 const changelogData = await getChangelogResponse.json();
                 let changelogContent = Buffer.from(changelogData.content, 'base64').toString('utf-8');
                 
-                const timestamp = new Date().toLocaleString('en-US', { timeZone: 'UTC' }); // Use UTC or specific timezone if needed
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('en-US', { timeZone: 'UTC' });
+                const timeStr = now.toLocaleTimeString('en-US', { timeZone: 'UTC' });
                 
                 const newEntry = `
-                <div class="changelog-entry">
-                    <h5>${commitMessage}</h5>
-                    <div class="timestamp"><i class="far fa-clock me-1"></i>${timestamp} (UTC)</div>
-                </div>`;
+                            <tr>
+                                <td>${dateStr}</td>
+                                <td>${timeStr}</td>
+                                <td>${commitMessage}</td>
+                            </tr>`;
                 
                 if (changelogContent.includes('<!-- CHANGELOG_START -->')) {
                     changelogContent = changelogContent.replace('<!-- CHANGELOG_START -->', '<!-- CHANGELOG_START -->' + newEntry);
