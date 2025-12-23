@@ -13,8 +13,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (authToken) {
         checkSession();
+    } else {
+        logout(null, false);
     }
+    
+    checkEmptyChangelog();
 });
+
+function checkEmptyChangelog() {
+    const list = document.getElementById('changelogList');
+    if (list) {
+        // Check if there are any .changelog-entry elements
+        const entries = list.querySelectorAll('.changelog-entry');
+        if (entries.length === 0) {
+            list.innerHTML = '<div class="text-center text-muted py-4"><i class="fas fa-info-circle me-2"></i>No changelog records found.</div>';
+        }
+    }
+}
 
 function setupPasswordToggle() {
     const togglePassword = document.getElementById('togglePassword');

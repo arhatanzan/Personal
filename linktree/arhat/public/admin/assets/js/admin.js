@@ -37,6 +37,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (authToken) {
         checkSession();
         showAdmin();
+    } else {
+        logout(null, false);
     }
 });
 

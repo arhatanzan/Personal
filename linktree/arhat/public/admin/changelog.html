@@ -15,7 +15,7 @@
 <body>
 
 <!-- Login Modal -->
-<div id="loginModal" class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.8);" data-bs-backdrop="static" data-bs-keyboard="false">
+<div id="loginModal" class="modal fade" tabindex="-1" style="display: none;" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -43,16 +43,18 @@
 </div>
 
 <div class="container" id="adminContainer" style="display: none;">
-    <div class="d-flex justify-content-between align-items-center my-4">
+    <div class="sticky-header d-flex justify-content-between align-items-center">
         <h1 class="h2 m-0">Changelog</h1>
         <a href="/admin/" class="btn btn-outline-primary">Back to Admin</a>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div id="changelogList">
-                <!-- CHANGELOG_START -->
-                <!-- CHANGELOG_END -->
+    <div class="scrollable-content">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div id="changelogList">
+                    <!-- CHANGELOG_START -->
+                    <!-- CHANGELOG_END -->
+                </div>
             </div>
         </div>
     </div>
