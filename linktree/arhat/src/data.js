@@ -122,8 +122,33 @@ export const siteData = {
         "profile",
         "footer"
     ],
-    "pages": {},
+    "pages": {
+        "new-page": {
+            "sectionOrder": [
+                "profile",
+                "footer",
+                "newsection"
+            ],
+            "newsection": {
+                "title": "new section",
+                "links": [
+                    {
+                        "title": "New Item",
+                        "url": "?page=home",
+                        "subtitle": "item",
+                        "description": "loreum ipsum",
+                        "text": "fuc"
+                    }
+                ]
+            }
+        }
+    },
     "changelog": [
+        {
+            "date": "12/24/2025",
+            "timestamp": "11:53:48 PM",
+            "message": "Update site data via Admin Panel"
+        },
         {
             "date": "12/24/2025",
             "timestamp": "11:52:25 PM",
