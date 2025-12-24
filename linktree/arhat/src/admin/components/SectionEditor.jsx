@@ -9,6 +9,7 @@ const SectionEditor = ({
     isGlobalList, 
     activePageId, 
     availablePages, // New prop
+    isReadOnly = false, // New prop for global sections in page view
     onUpdate, 
     onMove, 
     onMoveToGlobal, 
@@ -365,6 +366,7 @@ const SectionEditor = ({
                         <span className="badge bg-secondary ms-2" style={{fontSize: '0.6em'}}>
                             {isGlobalList ? 'Global' : (type === 'custom' ? (isInherited ? 'Global' : 'Custom') : 'Static')}
                         </span>
+                        {isReadOnly && <span className="badge bg-info ms-1" style={{fontSize: '0.6em'}}>Read Only</span>}
                     </h2>
                     {!isGlobalList && (
                         <div className="d-flex gap-1 ms-auto me-3" onClick={(e) => e.stopPropagation()}>
@@ -381,6 +383,12 @@ const SectionEditor = ({
             </div>
             {isOpen && (
                 <div className="section-content">
+                    {isReadOnly && (
+                        <div className="alert alert-info mb-3">
+                            <i className="fas fa-info-circle me-2"></i>
+                            This is a global section. You can reorder it here, but content must be edited in <strong>Global Settings</strong>.
+                        </div>
+                    )}
                     <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
                         <div className="d-flex gap-4">
                             <Form.Check 
@@ -389,6 +397,7 @@ const SectionEditor = ({
                                 label="Divider Top"
                                 checked={showDividerTop}
                                 onChange={(e) => onToggleDivider(sectionKey, 'top', e.target.checked)}
+                                disabled={isReadOnly}
                             />
                             <Form.Check 
                                 type="switch"
@@ -396,21 +405,24 @@ const SectionEditor = ({
                                 label="Divider Bottom"
                                 checked={showDividerBottom}
                                 onChange={(e) => onToggleDivider(sectionKey, 'bottom', e.target.checked)}
+                                disabled={isReadOnly}
                             />
                         </div>
                         <div className="d-flex gap-2">
                             {!activePageId && isGlobalList && sectionKey !== 'theme' && (
                                 <Button variant="warning" size="sm" onClick={() => onMoveToLocal(sectionKey)}>Move to Page Specific</Button>
                             )}
-                            {(!activePageId && !isGlobalList) || (activePageId && !isInherited) ? (
+                            {(!activePageId && !isGlobalList && !isReadOnly) || (activePageId && !isInherited && !isReadOnly) ? (
                                 <Button variant="info" size="sm" className="text-white" onClick={() => onMoveToGlobal(sectionKey)}>Move to Global Defaults</Button>
                             ) : null}
-                            {!isInherited && sectionKey !== 'theme' && (
+                            {!isInherited && sectionKey !== 'theme' && !isReadOnly && (
                                 <Button variant="danger" size="sm" onClick={() => onDelete(sectionKey)}>Delete</Button>
                             )}
                         </div>
                     </div>
-                    {renderContent()}
+                    <div style={isReadOnly ? {pointerEvents: 'none', opacity: 0.6} : {}}>
+                        {renderContent()}
+                    </div>
                 </div>
             )}
         </div>

@@ -34,42 +34,18 @@ function PublicProfile() {
             newActiveData.connectLinks = siteData.connectLinks;
         }
 
-        // 2. Handle Global Sections Data & Order
+        // 2. Handle Global Sections Data
+        // Since global sections are now explicitly in the page's sectionOrder, we just need to ensure the data is present.
         if (siteData.globalSections && siteData.globalSections.length > 0) {
-             const masterOrder = siteData.sectionOrder || [];
-             const globalKeys = siteData.globalSections;
-             const pageOrder = pageData.sectionOrder || [];
-             
-             let finalOrder = [];
-             let contentInjected = false;
-             
-             // Iterate through Master Layout to preserve Global Section positions
-             masterOrder.forEach(key => {
-                 if (globalKeys.includes(key)) {
-                     finalOrder.push(key);
-                     // Ensure data for this global section is available
-                     if (!newActiveData[key]) {
-                         newActiveData[key] = siteData[key];
-                     }
-                 } else {
-                     // This is a non-global slot in the master layout.
-                     // We inject the page content here.
-                     if (!contentInjected) {
-                         finalOrder.push(...pageOrder);
-                         contentInjected = true;
-                     }
+             siteData.globalSections.forEach(key => {
+                 if (!newActiveData[key]) {
+                     newActiveData[key] = siteData[key];
                  }
              });
-             
-             // If content was never injected (e.g. master layout is all global), append it
-             if (!contentInjected) {
-                 finalOrder.push(...pageOrder);
-             }
-             
-             newActiveData.sectionOrder = finalOrder;
-        } else {
-            newActiveData.sectionOrder = pageData.sectionOrder || siteData.sectionOrder;
         }
+        
+        // Use the page's own sectionOrder (which now includes global keys)
+        newActiveData.sectionOrder = pageData.sectionOrder || [];
 
         setActiveData(newActiveData);
         setIsSubPage(true);

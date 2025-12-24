@@ -285,6 +285,19 @@ const AdminPanel = () => {
         
         const newIndex = index + direction;
         if (newIndex >= 0 && newIndex < list.length) {
+            // If moving global sections, also sync the master sectionOrder
+            if (isGlobalList) {
+                const key1 = list[index];
+                const key2 = list[newIndex];
+                const masterList = newCurrentData.sectionOrder;
+                const idx1 = masterList.indexOf(key1);
+                const idx2 = masterList.indexOf(key2);
+                
+                if (idx1 !== -1 && idx2 !== -1) {
+                    [masterList[idx1], masterList[idx2]] = [masterList[idx2], masterList[idx1]];
+                }
+            }
+
             [list[index], list[newIndex]] = [list[newIndex], list[index]];
             setCurrentData(newCurrentData);
             setHasChanges(true);
@@ -299,6 +312,15 @@ const AdminPanel = () => {
             if (!newCurrentData.globalSections) newCurrentData.globalSections = [];
             if (!newCurrentData.globalSections.includes(key)) {
                 newCurrentData.globalSections.push(key);
+                
+                // Add to all other pages
+                Object.keys(newCurrentData.pages || {}).forEach(pageId => {
+                    const page = newCurrentData.pages[pageId];
+                    if (!page.sectionOrder.includes(key)) {
+                        page.sectionOrder.push(key);
+                    }
+                });
+
                 setCurrentData(newCurrentData);
                 setHasChanges(true);
             }
@@ -311,14 +333,27 @@ const AdminPanel = () => {
                     newCurrentData[key] = JSON.parse(JSON.stringify(pageData[key]));
                 }
                 
-                // Remove from local
+                // Remove from local data storage (but keep in order list for positioning)
                 delete pageData[key];
-                pageData.sectionOrder = pageData.sectionOrder.filter(k => k !== key);
                 
                 // Add to global list
                 if (!newCurrentData.globalSections.includes(key)) {
                     newCurrentData.globalSections.push(key);
                 }
+
+                // Add to master sectionOrder (Home) if not present
+                if (!newCurrentData.sectionOrder.includes(key)) {
+                    newCurrentData.sectionOrder.push(key);
+                }
+
+                // Add to all OTHER pages
+                Object.keys(newCurrentData.pages || {}).forEach(pageId => {
+                    if (pageId === activeView) return; // Already here
+                    const page = newCurrentData.pages[pageId];
+                    if (!page.sectionOrder.includes(key)) {
+                        page.sectionOrder.push(key);
+                    }
+                });
                 
                 setCurrentData(newCurrentData);
                 setHasChanges(true);
@@ -673,16 +708,16 @@ const AdminPanel = () => {
                             </div>
 
                             {(activeData.sectionOrder || []).map((key, index) => {
-                                // Skip if in global sections (applies to home and all subpages)
-                                if (currentData.globalSections && currentData.globalSections.includes(key)) return null;
                                 // Skip connectLinks as it is now part of footer
                                 if (key === 'connectLinks') return null;
                                 // Skip profile and footer as they are fixed
                                 if (key === 'profile' || key === 'footer') return null;
                                 
+                                const isGlobal = currentData.globalSections && currentData.globalSections.includes(key);
+
                                 // Calculate start index for colors
                                 const currentStartIndex = globalButtonCount;
-                                const sectionData = activeData[key];
+                                const sectionData = isGlobal ? currentData[key] : activeData[key];
                                 const items = sectionData?.links || sectionData || [];
                                 if (Array.isArray(items)) {
                                     globalButtonCount += items.length;
@@ -693,14 +728,15 @@ const AdminPanel = () => {
                                         key={key}
                                         sectionKey={key}
                                         index={index}
-                                        data={{...activeData, openAllSections: expandAll}}
+                                        data={{...(isGlobal ? currentData : activeData), openAllSections: expandAll}}
                                         isGlobalList={false}
+                                        isReadOnly={isGlobal}
                                         activePageId={activeView === 'home' ? null : activeView}
                                         availablePages={['home', ...Object.keys(currentData.pages || {})]}
-                                        onUpdate={handleUpdateSection}
+                                        onUpdate={isGlobal ? undefined : handleUpdateSection}
                                         onMove={(i, d) => handleMoveSection(i, d, false)}
-                                        onMoveToGlobal={handleMoveToGlobal}
-                                        onDelete={handleDeleteSection}
+                                        onMoveToGlobal={isGlobal ? undefined : handleMoveToGlobal}
+                                        onDelete={isGlobal ? undefined : handleDeleteSection}
                                         onToggleDivider={handleToggleDivider}
                                         startColorIndex={currentStartIndex}
                                         theme={activeData.theme}
