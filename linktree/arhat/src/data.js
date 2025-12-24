@@ -137,12 +137,21 @@ export const siteData = {
                         "subtitle": "welp",
                         "description": "welp welp",
                         "text": "welp"
+                    },
+                    {
+                        "title": "New Item",
+                        "url": "#"
                     }
                 ]
             }
         }
     },
     "changelog": [
+        {
+            "date": "12/25/2025",
+            "timestamp": "12:34:31 AM",
+            "message": "Update site data via Admin Panel"
+        },
         {
             "date": "12/25/2025",
             "timestamp": "12:18:53 AM",
