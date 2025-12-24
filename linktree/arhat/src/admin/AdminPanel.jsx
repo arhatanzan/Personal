@@ -27,11 +27,18 @@ const AdminPanel = () => {
 
     // Load Config & Check Session
     useEffect(() => {
+        // Add admin-body class to body for styling
+        document.body.classList.add('admin-body');
+        
         const storedAuth = localStorage.getItem('adminPassword');
         if (storedAuth) {
             setIsAuthenticated(true);
             initData();
         }
+
+        return () => {
+            document.body.classList.remove('admin-body');
+        };
     }, []);
 
     const initData = () => {
@@ -41,6 +48,7 @@ const AdminPanel = () => {
         if (!data.sectionSettings) data.sectionSettings = {};
         if (!data.theme) data.theme = { buttonColors: ['#80d6ff', '#3DCD49', '#ffd300', '#ff5852'] };
         if (!data.pages) data.pages = {};
+        if (!data.changelog) data.changelog = [];
         setCurrentData(data);
         setHasChanges(false);
     };
@@ -83,18 +91,35 @@ const AdminPanel = () => {
 
     const handleConfirmSave = async () => {
         setLoading(true);
+        
+        // Add changelog entry
+        const now = new Date();
+        const newEntry = {
+            date: now.toLocaleDateString(),
+            timestamp: now.toLocaleTimeString(),
+            message: commitMessage
+        };
+        
+        const dataToSave = { ...currentData };
+        if (!dataToSave.changelog) dataToSave.changelog = [];
+        dataToSave.changelog.unshift(newEntry);
+
         try {
             const endpoint = window.location.port === '8000' ? '/.netlify/functions/save-data' : '/.netlify/functions/save-data';
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('adminPassword')}`
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ ...currentData, message: commitMessage })
+                body: JSON.stringify({ 
+                    password: localStorage.getItem('adminPassword'),
+                    data: dataToSave, 
+                    message: commitMessage 
+                })
             });
             if (response.ok) {
                 alert('Changes saved successfully!');
+                setCurrentData(dataToSave);
                 setHasChanges(false);
                 setShowSaveModal(false);
             } else {
@@ -227,7 +252,8 @@ const AdminPanel = () => {
 
     const handleToggleDivider = (key, type, value) => {
         const newCurrentData = { ...currentData };
-        const data = (activeView === 'home') ? newCurrentData : newCurrentData.pages[activeView];
+        // For global view, we edit the root data directly, just like home view
+        const data = (activeView === 'home' || activeView === 'global') ? newCurrentData : newCurrentData.pages[activeView];
         
         if (!data.sectionSettings) data.sectionSettings = {};
         if (!data.sectionSettings[key]) data.sectionSettings[key] = {};
@@ -437,24 +463,33 @@ const AdminPanel = () => {
                         <div className="section-list">
                             <div className="bg-white p-5 rounded-4 shadow-sm border">
                                 <h2 className="fw-bold text-dark mb-4">System Changelog</h2>
-                                <div className="changelog-entry mb-4">
-                                    <h5 className="fw-bold">v2.1.0 - UI Overhaul & Features</h5>
-                                    <ul className="text-muted">
-                                        <li>Implemented "Vibrant & Compact" Dashboard Theme.</li>
-                                        <li>Added Dark Sidebar and Gradient Buttons.</li>
-                                        <li>Added "Collapse All" / "Expand All" functionality.</li>
-                                        <li>Added Cyclic Color Preview for buttons.</li>
-                                        <li>Added Page Deletion capability.</li>
-                                        <li>Fixed navigation delays and scrolling issues.</li>
-                                    </ul>
-                                </div>
-                                <div className="changelog-entry mb-4">
-                                    <h5 className="fw-bold">v2.0.0 - Dashboard Architecture</h5>
-                                    <ul className="text-muted">
-                                        <li>Refactored Admin Panel into Dashboard layout.</li>
-                                        <li>Implemented View-based rendering for performance.</li>
-                                        <li>Added Global vs Page-Specific configuration.</li>
-                                    </ul>
+                                <div className="table-responsive">
+                                    <table className="table table-hover align-middle">
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th style={{width: '150px'}}>Date</th>
+                                                <th style={{width: '150px'}}>Time</th>
+                                                <th>Message</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {(currentData.changelog || []).map((entry, idx) => (
+                                                <tr key={idx}>
+                                                    <td className="fw-bold text-muted">{entry.date}</td>
+                                                    <td className="text-muted small">{entry.timestamp}</td>
+                                                    <td>{entry.message}</td>
+                                                </tr>
+                                            ))}
+                                            {(!currentData.changelog || currentData.changelog.length === 0) && (
+                                                <tr>
+                                                    <td colSpan="3" className="text-center text-muted py-5">
+                                                        <i className="fas fa-history fa-2x mb-3 opacity-50"></i>
+                                                        <p className="mb-0">No changes recorded yet.</p>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
