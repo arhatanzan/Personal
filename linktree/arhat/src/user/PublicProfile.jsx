@@ -36,16 +36,32 @@ function PublicProfile() {
 
         // 2. Handle Global Sections Data
         // Since global sections are now explicitly in the page's sectionOrder, we just need to ensure the data is present.
+        // Fallback: If a global section is NOT in sectionOrder (legacy data), append it.
+        let finalOrder = pageData.sectionOrder ? [...pageData.sectionOrder] : [];
+        
         if (siteData.globalSections && siteData.globalSections.length > 0) {
              siteData.globalSections.forEach(key => {
+                 if (key === 'theme') return;
+                 
+                 // Ensure data exists
                  if (!newActiveData[key]) {
                      newActiveData[key] = siteData[key];
+                 }
+                 
+                 // Ensure it is in the order list
+                 if (!finalOrder.includes(key)) {
+                     // Insert before footer if possible
+                     const footerIndex = finalOrder.indexOf('footer');
+                     if (footerIndex !== -1) {
+                         finalOrder.splice(footerIndex, 0, key);
+                     } else {
+                         finalOrder.push(key);
+                     }
                  }
              });
         }
         
-        // Use the page's own sectionOrder (which now includes global keys)
-        newActiveData.sectionOrder = pageData.sectionOrder || [];
+        newActiveData.sectionOrder = finalOrder;
 
         setActiveData(newActiveData);
         setIsSubPage(true);

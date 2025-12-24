@@ -85,6 +85,7 @@ export const siteData = {
         "socialLinks",
         "workLinks",
         "publications",
+        "sectionkaif",
         "connectLinks",
         "footer"
     ],
@@ -126,6 +127,8 @@ export const siteData = {
         "new-page": {
             "sectionOrder": [
                 "profile",
+                "sectionkaif",
+                "connectLinks",
                 "footer"
             ]
         }

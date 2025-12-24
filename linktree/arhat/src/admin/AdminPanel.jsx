@@ -145,6 +145,42 @@ const AdminPanel = () => {
         if (!data.theme) data.theme = { buttonColors: ['#80d6ff', '#3DCD49', '#ffd300', '#ff5852'] };
         if (!data.pages) data.pages = {};
         if (!data.changelog) data.changelog = [];
+
+        // Ensure all global sections are present in all pages' sectionOrder
+        if (data.globalSections) {
+            const globalKeys = data.globalSections.filter(k => k !== 'theme'); // Theme is not a visible section
+            
+            // 1. Check Home Page (sectionOrder)
+            globalKeys.forEach(key => {
+                if (!data.sectionOrder.includes(key)) {
+                    // Insert before footer if possible
+                    const footerIndex = data.sectionOrder.indexOf('footer');
+                    if (footerIndex !== -1) {
+                        data.sectionOrder.splice(footerIndex, 0, key);
+                    } else {
+                        data.sectionOrder.push(key);
+                    }
+                }
+            });
+
+            // 2. Check Subpages
+            Object.keys(data.pages).forEach(pageId => {
+                const page = data.pages[pageId];
+                if (!page.sectionOrder) page.sectionOrder = [];
+                
+                globalKeys.forEach(key => {
+                    if (!page.sectionOrder.includes(key)) {
+                        const footerIndex = page.sectionOrder.indexOf('footer');
+                        if (footerIndex !== -1) {
+                            page.sectionOrder.splice(footerIndex, 0, key);
+                        } else {
+                            page.sectionOrder.push(key);
+                        }
+                    }
+                });
+            });
+        }
+
         setCurrentData(data);
         setHasChanges(false);
     };
