@@ -7,6 +7,7 @@ import Profile from './components/Profile'
 import LinkSection from './components/LinkSection'
 import ColoredDivider from './components/ColoredDivider'
 import Footer from './components/Footer'
+import NotFound from '../NotFound'
 
 function PublicProfile() {
   console.log('PublicProfile rendering, siteData:', siteData);
@@ -16,8 +17,16 @@ function PublicProfile() {
   
   const [activeData, setActiveData] = useState(siteData || {});
   const [isSubPage, setIsSubPage] = useState(false);
+  const [isNotFound, setIsNotFound] = useState(false);
 
   useEffect(() => {
+    // Check for 404 first
+    if (pageId && (!siteData.pages || !siteData.pages[pageId])) {
+        setIsNotFound(true);
+        return;
+    }
+    setIsNotFound(false);
+
     if (pageId && siteData && siteData.pages && siteData.pages[pageId]) {
         const pageData = siteData.pages[pageId];
         
@@ -120,6 +129,7 @@ function PublicProfile() {
       });
   }, [activeData, theme]);
 
+  if (isNotFound) return <NotFound />;
   if (!activeData) return null;
 
   // Filter out profile and footer from the dynamic order list as they are fixed
