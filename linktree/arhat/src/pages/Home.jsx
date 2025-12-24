@@ -57,14 +57,12 @@ const Home = ({ siteData }) => {
   if (!activeData) return null;
 
   const { profile, sectionOrder, sectionSettings, theme } = activeData;
-    // Button color order to match legacy_public divider: blue, purple, red, orange, yellow, green
+    // Button color order to match legacy_public divider: Light Blue, Green, Yellow, Red
     const buttonColors = (theme && theme.buttonColors) || [
-        '#0089d7', // blue
-        '#9e44c4', // purple
-        '#ff5852', // red
-        '#ff9000', // orange
-        '#ffd300', // yellow
-        '#3DCD49'  // green
+        '#80d6ff', // Light Blue
+        '#3DCD49', // Green
+        '#ffd300', // Yellow
+        '#ff5852'  // Red
     ];
 
     // Global button color index for cycling across all sections (useRef to persist across renders)

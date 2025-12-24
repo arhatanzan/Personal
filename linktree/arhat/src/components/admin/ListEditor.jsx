@@ -3,7 +3,7 @@ import { Button } from 'react-bootstrap';
 import SectionEditor from './SectionEditor';
 import ItemEditor from './ItemEditor';
 
-const ListEditor = ({ title, items, onChange, themeColors, itemTemplate }) => {
+const ListEditor = ({ title, items, onChange, themeColors, itemTemplate, ...props }) => {
     
     const handleItemChange = (index, newItem) => {
         const newItems = [...items];
@@ -28,7 +28,7 @@ const ListEditor = ({ title, items, onChange, themeColors, itemTemplate }) => {
     };
 
     return (
-        <SectionEditor title={title}>
+        <SectionEditor title={title} {...props}>
             <div className="d-flex flex-column gap-3">
                 {items.map((item, index) => (
                     <ItemEditor 

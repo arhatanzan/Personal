@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
+import Changelog from './pages/Changelog';
 
 function App() {
   const [siteData, setSiteData] = useState(null);
@@ -27,6 +28,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home siteData={siteData} />} />
         <Route path="/admin" element={<Admin initialData={siteData} />} />
+        <Route path="/changelog" element={<Changelog />} />
       </Routes>
     </Router>
   );

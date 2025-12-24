@@ -71,9 +71,9 @@ exports.handler = async function(event, context) {
         const dataFilePath = "linktree/arhat/public/data.json"; 
         await updateFile(dataFilePath, fileContent, commitMessage);
 
-        // 2. Update changelog.html
+        // 2. Update changelog.json
         try {
-            const changelogPath = "linktree/arhat/public/admin/changelog.html";
+            const changelogPath = "linktree/arhat/public/changelog.json";
             const changelogApiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${changelogPath}`;
             
             const getChangelogResponse = await fetch(changelogApiUrl, {
@@ -83,26 +83,31 @@ exports.handler = async function(event, context) {
                 }
             });
 
+            let changelogData = [];
+            let sha = null;
+
             if (getChangelogResponse.ok) {
-                const changelogData = await getChangelogResponse.json();
-                let changelogContent = Buffer.from(changelogData.content, 'base64').toString('utf-8');
-                
-                const now = new Date();
-                const dateStr = now.toLocaleDateString('en-US', { timeZone: 'UTC' });
-                const timeStr = now.toLocaleTimeString('en-US', { timeZone: 'UTC' });
-                
-                const newEntry = `
-                            <tr>
-                                <td>${dateStr}</td>
-                                <td>${timeStr}</td>
-                                <td>${commitMessage}</td>
-                            </tr>`;
-                
-                if (changelogContent.includes('<!-- CHANGELOG_START -->')) {
-                    changelogContent = changelogContent.replace('<!-- CHANGELOG_START -->', '<!-- CHANGELOG_START -->' + newEntry);
-                    await updateFile(changelogPath, changelogContent, "chore: update changelog", changelogData.sha);
-                }
+                const fileData = await getChangelogResponse.json();
+                const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+                changelogData = JSON.parse(content);
+                sha = fileData.sha;
             }
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { timeZone: 'UTC' });
+            const timeStr = now.toLocaleTimeString('en-US', { timeZone: 'UTC' });
+            
+            const newEntry = {
+                date: dateStr,
+                time: timeStr,
+                message: commitMessage
+            };
+            
+            // Prepend new entry
+            changelogData.unshift(newEntry);
+            
+            await updateFile(changelogPath, JSON.stringify(changelogData, null, 4), "chore: update changelog", sha);
+
         } catch (e) {
             console.error("Failed to update changelog:", e);
             // Don't fail the whole request if changelog update fails

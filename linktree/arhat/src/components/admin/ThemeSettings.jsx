@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Row, Col, Card, Button, InputGroup } from 'react-bootstrap';
+import { Form, Row, Col, Card, Button, InputGroup, Collapse } from 'react-bootstrap';
 
 const ThemeSettings = ({ theme, onChange, isOpen, onToggle }) => {
     const currentFont = theme.fontFamily || "'Montserrat', sans-serif";

@@ -2,13 +2,13 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 import SectionEditor from './SectionEditor';
 
-const FooterEditor = ({ footer, onChange }) => {
+const FooterEditor = ({ footer, onChange, ...props }) => {
     const handleChange = (field, value) => {
         onChange({ ...footer, [field]: value });
     };
 
     return (
-        <SectionEditor title="Footer Settings">
+        <SectionEditor title="Footer Settings" {...props}>
             <Form.Group className="mb-3">
                 <Form.Label>Footer Text</Form.Label>
                 <Form.Control 
