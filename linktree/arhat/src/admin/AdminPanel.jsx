@@ -15,6 +15,7 @@ const AdminPanel = () => {
     const [activeView, setActiveView] = useState('home'); // 'home', 'global', or pageId
     const [hasChanges, setHasChanges] = useState(false);
     const [expandAll, setExpandAll] = useState(false);
+    const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
     // Modal States
     const [showAddPageModal, setShowAddPageModal] = useState(false);
@@ -506,6 +507,11 @@ const AdminPanel = () => {
         setActiveView('home');
     };
 
+    const handleMenuClick = (view) => {
+        setActiveView(view);
+        setShowMobileSidebar(false);
+    };
+
     if (!isAuthenticated) {
         return (
             <Modal show={true} backdrop="static" centered>
@@ -533,8 +539,11 @@ const AdminPanel = () => {
 
     return (
         <div className="admin-dashboard">
+            {/* Mobile Sidebar Overlay */}
+            {showMobileSidebar && <div className="sidebar-overlay" onClick={() => setShowMobileSidebar(false)}></div>}
+
             {/* Sidebar */}
-            <div className="admin-sidebar">
+            <div className={`admin-sidebar ${showMobileSidebar ? 'open' : ''}`}>
                 <div className="sidebar-header">
                     <h3>Arhat Anzan</h3>
                     <span className="badge bg-primary">Admin</span>
@@ -544,7 +553,7 @@ const AdminPanel = () => {
                     <div className="menu-label">General</div>
                     <button 
                         className={`menu-item ${activeView === 'global' ? 'active' : ''}`}
-                        onClick={() => setActiveView('global')}
+                        onClick={() => handleMenuClick('global')}
                     >
                         <i className="fas fa-globe"></i> Global Settings
                     </button>
@@ -552,7 +561,7 @@ const AdminPanel = () => {
                     <div className="menu-label mt-4">Pages</div>
                     <button 
                         className={`menu-item ${activeView === 'home' ? 'active' : ''}`}
-                        onClick={() => setActiveView('home')}
+                        onClick={() => handleMenuClick('home')}
                     >
                         <i className="fas fa-home"></i> Home Page
                     </button>
@@ -561,7 +570,7 @@ const AdminPanel = () => {
                         <button 
                             key={pageId}
                             className={`menu-item ${activeView === pageId ? 'active' : ''}`}
-                            onClick={() => setActiveView(pageId)}
+                            onClick={() => handleMenuClick(pageId)}
                         >
                             <i className="fas fa-file-alt"></i> {pageId}
                         </button>
@@ -574,7 +583,7 @@ const AdminPanel = () => {
                     <div className="menu-label mt-4">System</div>
                     <button 
                         className={`menu-item ${activeView === 'changelog' ? 'active' : ''}`}
-                        onClick={() => setActiveView('changelog')}
+                        onClick={() => handleMenuClick('changelog')}
                     >
                         <i className="fas fa-history"></i> Changelog
                     </button>
@@ -592,6 +601,9 @@ const AdminPanel = () => {
                 {/* Top Bar */}
                 <div className="top-bar">
                     <div className="breadcrumb">
+                        <Button variant="link" className="d-md-none me-2 p-0 text-dark" onClick={() => setShowMobileSidebar(!showMobileSidebar)}>
+                            <i className="fas fa-bars"></i>
+                        </Button>
                         <span className="text-muted">Dashboard</span>
                         <i className="fas fa-chevron-right mx-2 text-muted" style={{fontSize: '0.8em'}}></i>
                         <span className="fw-bold text-dark">
