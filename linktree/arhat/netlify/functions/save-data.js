@@ -23,6 +23,21 @@ export const handler = async (event, context) => {
         if (process.env.GITHUB_TOKEN && process.env.GITHUB_OWNER && process.env.GITHUB_NAME) {
             return await saveToGitHub(data, commitMessage);
         } else {
+            // If on Netlify (production) but missing credentials, warn the user
+            if (process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+                 const missing = [];
+                 if (!process.env.GITHUB_TOKEN) missing.push('GITHUB_TOKEN');
+                 if (!process.env.GITHUB_OWNER) missing.push('GITHUB_OWNER');
+                 if (!process.env.GITHUB_NAME) missing.push('GITHUB_NAME');
+                 
+                 return {
+                    statusCode: 500,
+                    body: JSON.stringify({ 
+                        success: false, 
+                        message: `Missing GitHub Environment Variables: ${missing.join(', ')}. Please configure them in Netlify Site Settings.` 
+                    })
+                };
+            }
             return saveLocally(data);
         }
 
