@@ -130,16 +130,12 @@ function PublicProfile() {
 
   if (!activeData) return null;
 
-  let order = activeData.sectionOrder || ['profile', 'socialLinks', 'workLinks', 'publications', 'connectLinks', 'footer'];
+  // Filter out profile and footer from the dynamic order list as they are fixed
+  let order = (activeData.sectionOrder || []).filter(key => key !== 'profile' && key !== 'footer' && key !== 'connectLinks');
   
   // Handle Back Button for subpages
   if (isSubPage) {
-      const profileIndex = order.indexOf('profile');
-      if (profileIndex !== -1) {
-          order = [...order.slice(0, profileIndex + 1), 'backButton', ...order.slice(profileIndex + 1)];
-      } else {
-          order = ['backButton', ...order];
-      }
+      order = ['backButton', ...order];
   }
 
   const renderSection = (key, index) => {
@@ -148,18 +144,15 @@ function PublicProfile() {
       let showTop = settings.dividerTop;
       let showBottom = settings.dividerBottom;
 
+      // Default divider logic: Show top divider for all sections except the first one
       if (typeof showTop === 'undefined') {
-          showTop = index > 0 && key !== 'footer';
-          if (index > 0 && order[index - 1] === 'profile') showTop = false;
+          showTop = index > 0;
       }
       if (typeof showBottom === 'undefined') showBottom = false;
 
       let content = null;
       
       switch(key) {
-          case 'profile':
-              content = <Profile profile={activeData.profile} />;
-              break;
           case 'socialLinks':
               content = <LinkSection title="Social Links" items={activeData.socialLinks} theme={theme} id="social-links-container" />;
               break;
@@ -168,18 +161,6 @@ function PublicProfile() {
               break;
           case 'publications':
               content = <LinkSection title="Publications" items={activeData.publications} theme={theme} id="publications-container" />;
-              break;
-          case 'footer':
-              content = (
-                  <>
-                    <LinkSection items={activeData.connectLinks} isConnect={true} theme={theme} id="connect-container" />
-                    <Footer text={activeData.footer} />
-                  </>
-              );
-              break;
-          case 'connectLinks':
-              // Merged into footer
-              content = null;
               break;
           case 'backButton':
               content = (
@@ -210,10 +191,18 @@ function PublicProfile() {
 
   return (
     <>
+      {/* Fixed Header (Profile) */}
       <Header profile={activeData.profile} />
+      <Profile profile={activeData.profile} />
+      
       <div id="site-container">
           {order.map((key, index) => renderSection(key, index))}
       </div>
+
+      {/* Fixed Footer */}
+      <ColoredDivider />
+      <LinkSection items={activeData.connectLinks} isConnect={true} theme={theme} id="connect-container" />
+      <Footer text={activeData.footer} />
     </>
   )
 }

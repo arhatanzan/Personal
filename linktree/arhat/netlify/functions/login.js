@@ -8,9 +8,15 @@ export const handler = async (event, context) => {
         const correctPassword = process.env.ADMIN_PASSWORD;
 
         if (password === correctPassword) {
+            // Default to 30 minutes if not set
+            const timeoutMinutes = parseInt(process.env.SESSION_TIMEOUT) || 30;
+            
             return {
                 statusCode: 200,
-                body: JSON.stringify({ success: true })
+                body: JSON.stringify({ 
+                    success: true,
+                    timeout: timeoutMinutes
+                })
             };
         } else {
             return {

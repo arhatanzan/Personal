@@ -30,9 +30,27 @@ const AdminPanel = () => {
         // Add admin-body class to body for styling
         document.body.classList.add('admin-body');
         
+        const performLogout = () => {
+            localStorage.removeItem('adminPassword');
+            localStorage.removeItem('lastActiveTime');
+            localStorage.removeItem('sessionTimeout');
+            setIsAuthenticated(false);
+            setCurrentData(null);
+        };
+
         const verifySession = async () => {
             const storedAuth = localStorage.getItem('adminPassword');
+            const lastActive = localStorage.getItem('lastActiveTime');
+            const timeout = parseInt(localStorage.getItem('sessionTimeout')) || 30;
+
             if (storedAuth) {
+                // Check timeout locally first
+                if (lastActive && (Date.now() - parseInt(lastActive) > timeout * 60 * 1000)) {
+                    console.log("Session timed out locally");
+                    performLogout();
+                    return;
+                }
+
                 try {
                     const endpoint = window.location.port === '8000' ? '/.netlify/functions/login' : '/.netlify/functions/login';
                     const response = await fetch(endpoint, {
@@ -43,11 +61,13 @@ const AdminPanel = () => {
                     const data = await response.json();
                     if (response.ok && data.success) {
                         setIsAuthenticated(true);
+                        // Update session info
+                        localStorage.setItem('lastActiveTime', Date.now());
+                        if (data.timeout) localStorage.setItem('sessionTimeout', data.timeout);
                         initData();
                     } else {
                         // Invalid session
-                        localStorage.removeItem('adminPassword');
-                        setIsAuthenticated(false);
+                        performLogout();
                     }
                 } catch (e) {
                     console.error("Session verification failed", e);
@@ -62,10 +82,8 @@ const AdminPanel = () => {
         const handleStorageChange = (e) => {
             if (e.key === 'adminPassword') {
                 if (e.newValue) {
-                    // Logged in elsewhere
                     verifySession(); 
                 } else {
-                    // Logged out elsewhere
                     setIsAuthenticated(false);
                     setCurrentData(null);
                 }
@@ -79,6 +97,45 @@ const AdminPanel = () => {
             window.removeEventListener('storage', handleStorageChange);
         };
     }, []);
+
+    // Session Timeout & Activity Tracker
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        let lastWrite = Date.now();
+        
+        const updateActivity = () => {
+            const now = Date.now();
+            // Throttle updates to localStorage (max once per minute)
+            if (now - lastWrite > 60000) { 
+                localStorage.setItem('lastActiveTime', now);
+                lastWrite = now;
+            }
+        };
+
+        const checkTimeout = () => {
+            const lastActive = localStorage.getItem('lastActiveTime');
+            const timeout = parseInt(localStorage.getItem('sessionTimeout')) || 30;
+            
+            if (lastActive && (Date.now() - parseInt(lastActive) > timeout * 60 * 1000)) {
+                console.log("Session timed out due to inactivity");
+                handleLogout();
+            }
+        };
+
+        window.addEventListener('mousemove', updateActivity);
+        window.addEventListener('keydown', updateActivity);
+        window.addEventListener('click', updateActivity);
+        
+        const interval = setInterval(checkTimeout, 60000); // Check every minute
+
+        return () => {
+            window.removeEventListener('mousemove', updateActivity);
+            window.removeEventListener('keydown', updateActivity);
+            window.removeEventListener('click', updateActivity);
+            clearInterval(interval);
+        };
+    }, [isAuthenticated]);
 
     const initData = () => {
         const data = JSON.parse(JSON.stringify(initialSiteData));
@@ -106,6 +163,8 @@ const AdminPanel = () => {
             const data = await response.json();
             if (response.ok && data.success) {
                 localStorage.setItem('adminPassword', password);
+                localStorage.setItem('lastActiveTime', Date.now());
+                if (data.timeout) localStorage.setItem('sessionTimeout', data.timeout);
                 setIsAuthenticated(true);
                 initData();
             } else {
@@ -120,6 +179,8 @@ const AdminPanel = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('adminPassword');
+        localStorage.removeItem('lastActiveTime');
+        localStorage.removeItem('sessionTimeout');
         setIsAuthenticated(false);
         setPassword('');
     };
@@ -332,6 +393,12 @@ const AdminPanel = () => {
 
         if (targetData[key]) {
             alert("Section already exists!");
+            return;
+        }
+
+        // Prevent adding reserved global sections to pages
+        if (!isAddingGlobalSection && (key === 'profile' || key === 'footer' || key === 'theme')) {
+            alert("This section name is reserved for global settings.");
             return;
         }
 
@@ -610,6 +677,8 @@ const AdminPanel = () => {
                                 if (currentData.globalSections && currentData.globalSections.includes(key)) return null;
                                 // Skip connectLinks as it is now part of footer
                                 if (key === 'connectLinks') return null;
+                                // Skip profile and footer as they are fixed
+                                if (key === 'profile' || key === 'footer') return null;
                                 
                                 // Calculate start index for colors
                                 const currentStartIndex = globalButtonCount;
