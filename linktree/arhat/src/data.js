@@ -77,7 +77,8 @@ export const siteData = {
     "globalSections": [
         "theme",
         "profile",
-        "connectLinks"
+        "connectLinks",
+        "sectionkaif"
     ],
     "sectionOrder": [
         "profile",
@@ -125,28 +126,16 @@ export const siteData = {
         "new-page": {
             "sectionOrder": [
                 "profile",
-                "footer",
-                "sectionkaif"
-            ],
-            "sectionkaif": {
-                "title": "section kaif",
-                "links": [
-                    {
-                        "title": "welp",
-                        "url": "#",
-                        "subtitle": "welp",
-                        "description": "welp welp",
-                        "text": "welp"
-                    },
-                    {
-                        "title": "New Item",
-                        "url": "#"
-                    }
-                ]
-            }
+                "footer"
+            ]
         }
     },
     "changelog": [
+        {
+            "date": "12/25/2025",
+            "timestamp": "12:58:48 AM",
+            "message": "Update site data via Admin Panel"
+        },
         {
             "date": "12/25/2025",
             "timestamp": "12:34:31 AM",
@@ -157,5 +146,21 @@ export const siteData = {
             "timestamp": "12:18:53 AM",
             "message": "Update site data via Admin Panel"
         }
-    ]
+    ],
+    "sectionkaif": {
+        "title": "section kaif",
+        "links": [
+            {
+                "title": "welp",
+                "url": "#",
+                "subtitle": "welp",
+                "description": "welp welp",
+                "text": "welp"
+            },
+            {
+                "title": "New Item",
+                "url": "#"
+            }
+        ]
+    }
 };
