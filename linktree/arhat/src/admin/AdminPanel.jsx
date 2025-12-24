@@ -140,7 +140,7 @@ const AdminPanel = () => {
     const initData = () => {
         const data = JSON.parse(JSON.stringify(initialSiteData));
         if (!data.sectionOrder) data.sectionOrder = ['profile', 'socialLinks', 'workLinks', 'publications', 'connectLinks', 'footer'];
-        if (!data.globalSections) data.globalSections = ['theme', 'profile', 'footer'];
+        if (!data.globalSections) data.globalSections = ['theme', 'profile', 'connectLinks'];
         if (!data.sectionSettings) data.sectionSettings = {};
         if (!data.theme) data.theme = { buttonColors: ['#80d6ff', '#3DCD49', '#ffd300', '#ff5852'] };
         if (!data.pages) data.pages = {};

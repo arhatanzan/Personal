@@ -38,8 +38,8 @@ const SectionEditor = ({
         socialLinks: 'Social Links',
         workLinks: 'Work Links',
         publications: 'Publications',
-        connectLinks: 'Connect Icons',
-        footer: 'Footer',
+        connectLinks: 'Footer (Icons & Text)',
+        footer: 'Footer (Legacy)',
         theme: 'Theme Settings'
     };
 
@@ -292,12 +292,12 @@ const SectionEditor = ({
             );
         }
 
-        // Footer Editor
-        if (sectionKey === 'footer') {
+        // Footer Editor (Now just Connect Icons)
+        if (sectionKey === 'connectLinks') {
              return (
                 <div>
                     <div className="mb-4">
-                        <h6 className="text-muted mb-3">Connect Icons</h6>
+                        <h6 className="text-muted mb-3">Social Icons</h6>
                         {renderListEditor('connectLinks', data.connectLinks || [], true)}
                     </div>
                     <hr />
@@ -305,9 +305,15 @@ const SectionEditor = ({
                     <Form.Control 
                         value={data.footer || ''} 
                         onChange={(e) => onUpdate('footer', e.target.value)} 
+                        placeholder="Copyright text or similar..."
                     />
                 </div>
             );
+        }
+
+        // Legacy Footer Editor (Hidden/Deprecated)
+        if (sectionKey === 'footer') {
+             return <div>Footer settings have been moved to 'Connect Icons'.</div>;
         }
 
         return <div>Unknown Section Type</div>;
