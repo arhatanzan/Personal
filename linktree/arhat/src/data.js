@@ -27,16 +27,16 @@ export const siteData = {
     "publications": [
         {
             "title": "Sirr-e-Ulfat",
-            "subtitle": "\u0938\u093f\u0930\u094d\u0930-\u090f-\u0909\u0932\u094d\u092b\u0924: \u0924\u094b\u0939\u092b\u093e-\u090f-\u0936\u0947\u0930-\u0913-\u0938\u0941\u0959\u0928",
+            "subtitle": "सिर्र-ए-उल्फत: तोहफा-ए-शेर-ओ-सुख़न",
             "description": "This book is a collection of poems written by me. These poems were written originally in Urdu, but are transliterated in Hindi.",
-            "text": "Sirr-e-Ulfat | \u0938\u093f\u0930\u094d\u0930-\u090f-\u0909\u0932\u094d\u092b\u0924",
-            "url": "#"
+            "text": "Sirr-e-Ulfat | सिर्र-ए-उल्फत",
+            "url": "/new-page"
         },
         {
             "title": "Sirr-e-Nihaan",
-            "subtitle": "\u0938\u093f\u0930\u094d\u0930-\u090f-\u0928\u093f\u0939\u093e\u0901",
+            "subtitle": "सिर्र-ए-निहाँ",
             "description": "This book is an anthology. It is a collection of couplets of 16 famous Urdu poets.",
-            "text": "Sirr-e-Nihaan | \u0938\u093f\u0930\u094d\u0930-\u090f-\u0928\u093f\u0939\u093e\u0901",
+            "text": "Sirr-e-Nihaan | सिर्र-ए-निहाँ",
             "url": "#"
         },
         {
@@ -120,5 +120,33 @@ export const siteData = {
         ],
         "backgroundColor": "#ffffff",
         "backgroundImage": ""
-    }
+    },
+    "pages": {
+        "new-page": {
+            "sectionOrder": [
+                "profile",
+                "footer",
+                "sectionkaif"
+            ],
+            "sectionkaif": {
+                "title": "section kaif",
+                "links": [
+                    {
+                        "title": "welp",
+                        "url": "#",
+                        "subtitle": "welp",
+                        "description": "welp welp",
+                        "text": "welp"
+                    }
+                ]
+            }
+        }
+    },
+    "changelog": [
+        {
+            "date": "12/25/2025",
+            "timestamp": "12:18:53 AM",
+            "message": "Update site data via Admin Panel"
+        }
+    ]
 };
