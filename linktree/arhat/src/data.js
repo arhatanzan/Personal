@@ -30,7 +30,7 @@ export const siteData = {
             "subtitle": "सिर्र-ए-उल्फत: तोहफा-ए-शेर-ओ-सुख़न",
             "description": "This book is a collection of poems written by me. These poems were written originally in Urdu, but are transliterated in Hindi.",
             "text": "Sirr-e-Ulfat | सिर्र-ए-उल्फत",
-            "url": "#"
+            "url": "?page=new-page"
         },
         {
             "title": "Sirr-e-Nihaan",
@@ -144,6 +144,11 @@ export const siteData = {
         }
     },
     "changelog": [
+        {
+            "date": "12/24/2025",
+            "timestamp": "11:55:48 PM",
+            "message": "Update site data via Admin Panel"
+        },
         {
             "date": "12/24/2025",
             "timestamp": "11:53:48 PM",
