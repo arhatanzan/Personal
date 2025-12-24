@@ -1,7 +1,7 @@
 /* --- Font Setup --- */
 @font-face {
     font-family: 'Daniel';
-    src: url('/assets/fonts/danielbk.ttf') format('truetype');
+    src: url('./assets/fonts/danielbk.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -24,14 +24,18 @@
 }
 
 body {
+    /* Text body is Montserrat */
     font-family: var(--font-family);
-    font-weight: 600;
+    font-weight: 600; /* Bolder weight as per design */
     letter-spacing: 0.1em;
     font-size: var(--font-size-base);
-    color: var(--text-color);
+    
+    /* Updated Color */
+    color: var(--text-color); 
+    
     margin: 0;
-    /* padding: 90px 0 0 0;  Moved to .public-layout */
-    text-align: center;
+    padding: 90px 0 0 0; /* Added top padding for fixed header */
+    text-align: center !important; /* Force center alignment */
     background-color: var(--bg-color);
     background-image: var(--bg-image);
     background-size: cover;
@@ -39,30 +43,31 @@ body {
     min-height: 100vh;
 }
 
-/* Public Layout Specifics */
-.public-layout {
-    padding-top: 90px;
+/* Ensure headings are centered */
+h1, h2, h3, h4, h5, h6 {
+    text-align: center !important;
 }
 
 /* --- Header & Profile --- */
-.site-header {
+header {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    background-color: var(--header-bg);
+    background-color: var(--header-bg); /* White background with slight transparency */
     z-index: 1000;
     padding: 0;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px); /* Optional: nice blur effect */
 }
 
 .brand-name {
+    /* Heading is Daniel */
     font-family: 'Daniel', 'La Belle Aurore', cursive; 
-    font-size: 32px;
+    font-size: 32px; /* Requested size */
     color: var(--text-color);
     line-height: 1;
     margin: 0;
-    padding-top: 15px;
+    padding-top: 15px; /* Slight top spacing from window edge */
 }
 
 .subtitle {
@@ -82,7 +87,7 @@ body {
     height: 100px;
     border-radius: 50%;
     object-fit: cover;
-    margin: 0 auto var(--text-spacing);
+    margin: 0 auto var(--text-spacing); /* Removed top margin */
     display: block;
     border: 2px solid #ddd;
 }
@@ -94,6 +99,7 @@ body {
     font-weight: 800;
     margin: var(--section-spacing) 0 20px;
     color: var(--text-color);
+    text-align: center; /* Ensure section titles are centered */
 }
 
 /* --- The Specific Button Styles --- */
@@ -114,6 +120,8 @@ body {
     color: var(--text-color);
     border-radius: 25px;
     transition: all 0.2s ease-in-out;
+
+    /* Dynamic Color Application via CSS Variable */
     background-color: var(--btn-color, #80d6ff);
     border: 2px solid var(--btn-color, #80d6ff);
     border-bottom: 3px solid var(--btn-color, #80d6ff);
@@ -122,6 +130,28 @@ body {
 
 .link-btn:hover {
     background-color: #fff;
+    color: var(--text-color); /* Ensure text color stays consistent on hover */
+}
+
+/* Legacy classes kept for reference but not used by JS anymore */
+/* BLUE #80d6ff */
+.link-btn--blue {
+    --btn-color: #80d6ff;
+}
+
+/* GREEN #73e2a7 */
+.link-btn--green {
+    --btn-color: #73e2a7;
+}
+
+/* YELLOW #fed766 */
+.link-btn--yellow {
+    --btn-color: #fed766;
+}
+
+/* PINK #ffa093 */
+.link-btn--pink {
+    --btn-color: #ffa093;
 }
 
 /* --- Text Content Areas --- */
@@ -131,8 +161,9 @@ body {
     padding: 0 20px;
     font-size: 0.9rem;
     line-height: 1.5;
-    font-weight: 600;
-    color: #023e62;
+    font-weight: 600; /* Montserrat makes it look slightly thinner, so 600 helps legibility */
+    color: #023e62; /* Updated Color */
+    text-align: center; /* Ensure text content is centered */
 }
 
 .hindi-text {
@@ -180,7 +211,7 @@ body {
 }
 
 .social-icons a {
-    color: #023e62;
+    color: #023e62; /* Default color matches theme */
     transition: transform 0.2s;
 }
 
