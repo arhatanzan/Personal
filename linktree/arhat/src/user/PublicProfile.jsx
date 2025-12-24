@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useSearchParams, Link } from 'react-router-dom'
+import { useSearchParams, useParams, Link } from 'react-router-dom'
 import { siteData } from '../data'
 import './styles/user.css'
 import Header from './components/Header'
@@ -11,7 +11,8 @@ import Footer from './components/Footer'
 function PublicProfile() {
   console.log('PublicProfile rendering, siteData:', siteData);
   const [searchParams] = useSearchParams();
-  const pageId = searchParams.get('page');
+  const { pageId: paramPageId } = useParams();
+  const pageId = paramPageId || searchParams.get('page');
   
   const [activeData, setActiveData] = useState(siteData || {});
   const [isSubPage, setIsSubPage] = useState(false);
@@ -19,13 +20,58 @@ function PublicProfile() {
   useEffect(() => {
     if (pageId && siteData && siteData.pages && siteData.pages[pageId]) {
         const pageData = siteData.pages[pageId];
-        setActiveData({
+        
+        // 1. Prepare Base Data
+        const newActiveData = {
             ...pageData,
             theme: pageData.theme || siteData.theme,
             profile: pageData.profile || siteData.profile,
             footer: (pageData.useGlobalFooter !== false) ? siteData.footer : pageData.footer,
-            sectionOrder: pageData.sectionOrder || siteData.sectionOrder
-        });
+        };
+
+        // Ensure connectLinks is available (used by footer)
+        if (!newActiveData.connectLinks && siteData.connectLinks) {
+            newActiveData.connectLinks = siteData.connectLinks;
+        }
+
+        // 2. Handle Global Sections Data & Order
+        if (siteData.globalSections && siteData.globalSections.length > 0) {
+             const masterOrder = siteData.sectionOrder || [];
+             const globalKeys = siteData.globalSections;
+             const pageOrder = pageData.sectionOrder || [];
+             
+             let finalOrder = [];
+             let contentInjected = false;
+             
+             // Iterate through Master Layout to preserve Global Section positions
+             masterOrder.forEach(key => {
+                 if (globalKeys.includes(key)) {
+                     finalOrder.push(key);
+                     // Ensure data for this global section is available
+                     if (!newActiveData[key]) {
+                         newActiveData[key] = siteData[key];
+                     }
+                 } else {
+                     // This is a non-global slot in the master layout.
+                     // We inject the page content here.
+                     if (!contentInjected) {
+                         finalOrder.push(...pageOrder);
+                         contentInjected = true;
+                     }
+                 }
+             });
+             
+             // If content was never injected (e.g. master layout is all global), append it
+             if (!contentInjected) {
+                 finalOrder.push(...pageOrder);
+             }
+             
+             newActiveData.sectionOrder = finalOrder;
+        } else {
+            newActiveData.sectionOrder = pageData.sectionOrder || siteData.sectionOrder;
+        }
+
+        setActiveData(newActiveData);
         setIsSubPage(true);
     } else {
         setActiveData(siteData || {});

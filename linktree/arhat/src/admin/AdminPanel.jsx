@@ -432,7 +432,7 @@ const AdminPanel = () => {
                                 <i className="fas fa-trash-alt me-1"></i> Delete Page
                             </Button>
                         )}
-                        <a href="/" target="_blank" className="btn btn-outline-secondary btn-sm d-flex align-items-center">
+                        <a href={activeView === 'home' || activeView === 'global' || activeView === 'changelog' ? '/' : `/${activeView}`} target="_blank" className="btn btn-outline-secondary btn-sm d-flex align-items-center">
                             <i className="fas fa-external-link-alt me-1"></i> View Site
                         </a>
                         {hasChanges && (
@@ -634,7 +634,7 @@ const AdminPanel = () => {
                             className="form-control-lg"
                         />
                         <Form.Text className="text-muted">
-                            This will create a new page at /?page={newPageId || '...'}
+                            This will create a new page at /{newPageId || '...'}
                         </Form.Text>
                     </Form.Group>
                 </Modal.Body>

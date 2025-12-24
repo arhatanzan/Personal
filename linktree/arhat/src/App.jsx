@@ -6,8 +6,9 @@ import AdminPanel from './admin/AdminPanel'
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<PublicProfile />} />
       <Route path="/admin" element={<AdminPanel />} />
+      <Route path="/" element={<PublicProfile />} />
+      <Route path="/:pageId" element={<PublicProfile />} />
     </Routes>
   )
 }

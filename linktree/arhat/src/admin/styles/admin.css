@@ -33,8 +33,10 @@ body.admin-body {
     background-color: var(--content-bg);
     color: var(--text-main);
     height: 100vh;
-    margin: 0;
-    overflow: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    text-align: left !important;
 }
 
 /* Dashboard Layout */

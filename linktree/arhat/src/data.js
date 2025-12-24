@@ -27,16 +27,16 @@ export const siteData = {
     "publications": [
         {
             "title": "Sirr-e-Ulfat",
-            "subtitle": "सिर्र-ए-उल्फत: तोहफा-ए-शेर-ओ-सुख़न",
+            "subtitle": "\u0938\u093f\u0930\u094d\u0930-\u090f-\u0909\u0932\u094d\u092b\u0924: \u0924\u094b\u0939\u092b\u093e-\u090f-\u0936\u0947\u0930-\u0913-\u0938\u0941\u0959\u0928",
             "description": "This book is a collection of poems written by me. These poems were written originally in Urdu, but are transliterated in Hindi.",
-            "text": "Sirr-e-Ulfat | सिर्र-ए-उल्फत",
-            "url": "?page=new-page"
+            "text": "Sirr-e-Ulfat | \u0938\u093f\u0930\u094d\u0930-\u090f-\u0909\u0932\u094d\u092b\u0924",
+            "url": "#"
         },
         {
             "title": "Sirr-e-Nihaan",
-            "subtitle": "सिर्र-ए-निहाँ",
+            "subtitle": "\u0938\u093f\u0930\u094d\u0930-\u090f-\u0928\u093f\u0939\u093e\u0901",
             "description": "This book is an anthology. It is a collection of couplets of 16 famous Urdu poets.",
-            "text": "Sirr-e-Nihaan | सिर्र-ए-निहाँ",
+            "text": "Sirr-e-Nihaan | \u0938\u093f\u0930\u094d\u0930-\u090f-\u0928\u093f\u0939\u093e\u0901",
             "url": "#"
         },
         {
@@ -73,7 +73,12 @@ export const siteData = {
             "url": "#"
         }
     ],
-    "footer": "Learn about updates @ /changelog",
+    "footer": "",
+    "globalSections": [
+        "theme",
+        "profile",
+        "footer"
+    ],
     "sectionOrder": [
         "profile",
         "socialLinks",
@@ -103,8 +108,7 @@ export const siteData = {
             "dividerTop": false
         },
         "footer": {
-            "dividerBottom": false,
-            "dividerTop": true
+            "dividerBottom": false
         }
     },
     "theme": {
@@ -116,53 +120,5 @@ export const siteData = {
         ],
         "backgroundColor": "#ffffff",
         "backgroundImage": ""
-    },
-    "globalSections": [
-        "theme",
-        "profile",
-        "footer"
-    ],
-    "pages": {
-        "new-page": {
-            "sectionOrder": [
-                "profile",
-                "footer",
-                "newsection"
-            ],
-            "newsection": {
-                "title": "new section",
-                "links": [
-                    {
-                        "title": "New Item",
-                        "url": "?page=home",
-                        "subtitle": "item",
-                        "description": "loreum ipsum",
-                        "text": "fuc"
-                    }
-                ]
-            }
-        }
-    },
-    "changelog": [
-        {
-            "date": "12/24/2025",
-            "timestamp": "11:55:48 PM",
-            "message": "Update site data via Admin Panel"
-        },
-        {
-            "date": "12/24/2025",
-            "timestamp": "11:53:48 PM",
-            "message": "Update site data via Admin Panel"
-        },
-        {
-            "date": "12/24/2025",
-            "timestamp": "11:52:25 PM",
-            "message": "Update site data via Admin Panel"
-        },
-        {
-            "date": "12/24/2025",
-            "timestamp": "11:49:03 PM",
-            "message": "Update site data via Admin Panel"
-        }
-    ]
+    }
 };

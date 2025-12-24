@@ -146,7 +146,7 @@ const SectionEditor = ({
                                         onChange={(e) => {
                                             if (e.target.value) {
                                                 const newItems = [...items];
-                                                newItems[idx] = { ...item, url: `?page=${e.target.value}` };
+                                                newItems[idx] = { ...item, url: `/${e.target.value}` };
                                                 onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
                                             }
                                         }}
