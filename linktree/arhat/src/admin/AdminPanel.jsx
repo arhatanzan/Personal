@@ -1,0 +1,674 @@
+import React, { useState, useEffect } from 'react';
+import { Button, Form, Modal, Alert, Badge } from 'react-bootstrap';
+import './styles/admin.css';
+import { siteData as initialSiteData } from '../data';
+import SectionEditor from './components/SectionEditor';
+
+const AdminPanel = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [password, setPassword] = useState('');
+    const [loginError, setLoginError] = useState('');
+    const [loading, setLoading] = useState(false);
+    
+    // Data State
+    const [currentData, setCurrentData] = useState(null);
+    const [activeView, setActiveView] = useState('home'); // 'home', 'global', or pageId
+    const [hasChanges, setHasChanges] = useState(false);
+    const [expandAll, setExpandAll] = useState(false);
+
+    // Modal States
+    const [showAddPageModal, setShowAddPageModal] = useState(false);
+    const [newPageId, setNewPageId] = useState('');
+    const [showSaveModal, setShowSaveModal] = useState(false);
+    const [commitMessage, setCommitMessage] = useState('Update site data via Admin Panel');
+    const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+    const [newSectionName, setNewSectionName] = useState('');
+    const [isAddingGlobalSection, setIsAddingGlobalSection] = useState(false);
+
+    // Load Config & Check Session
+    useEffect(() => {
+        const storedAuth = localStorage.getItem('adminPassword');
+        if (storedAuth) {
+            setIsAuthenticated(true);
+            initData();
+        }
+    }, []);
+
+    const initData = () => {
+        const data = JSON.parse(JSON.stringify(initialSiteData));
+        if (!data.sectionOrder) data.sectionOrder = ['profile', 'socialLinks', 'workLinks', 'publications', 'connectLinks', 'footer'];
+        if (!data.globalSections) data.globalSections = ['theme', 'profile', 'footer'];
+        if (!data.sectionSettings) data.sectionSettings = {};
+        if (!data.theme) data.theme = { buttonColors: ['#80d6ff', '#3DCD49', '#ffd300', '#ff5852'] };
+        if (!data.pages) data.pages = {};
+        setCurrentData(data);
+        setHasChanges(false);
+    };
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setLoginError('');
+        try {
+            const endpoint = window.location.port === '8000' ? '/.netlify/functions/login' : '/.netlify/functions/login';
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                localStorage.setItem('adminPassword', password);
+                setIsAuthenticated(true);
+                initData();
+            } else {
+                throw new Error(data.message || 'Invalid password');
+            }
+        } catch (error) {
+            setLoginError(error.message || 'Login failed.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('adminPassword');
+        setIsAuthenticated(false);
+        setPassword('');
+    };
+
+    const handleSave = () => {
+        setShowSaveModal(true);
+    };
+
+    const handleConfirmSave = async () => {
+        setLoading(true);
+        try {
+            const endpoint = window.location.port === '8000' ? '/.netlify/functions/save-data' : '/.netlify/functions/save-data';
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('adminPassword')}`
+                },
+                body: JSON.stringify({ ...currentData, message: commitMessage })
+            });
+            if (response.ok) {
+                alert('Changes saved successfully!');
+                setHasChanges(false);
+                setShowSaveModal(false);
+            } else {
+                const errText = await response.text();
+                throw new Error(errText || 'Failed to save changes');
+            }
+        } catch (error) {
+            alert(`Error saving changes: ${error.message}\n\nNote: If you are running on localhost, ensure you are using 'netlify dev' to enable backend functions.`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreatePage = () => {
+        if (!newPageId) return;
+        const sanitized = newPageId.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+        if (currentData.pages[sanitized]) {
+            alert("Page already exists");
+            return;
+        }
+        const newData = {...currentData};
+        newData.pages[sanitized] = { sectionOrder: ['profile', 'footer'] };
+        setCurrentData(newData);
+        setActiveView(sanitized);
+        setHasChanges(true);
+        setShowAddPageModal(false);
+        setNewPageId('');
+    };
+
+    // Helper to get active data object (Home or Page)
+    const getActiveData = () => {
+        if (activeView === 'global' || activeView === 'changelog') return currentData;
+        if (activeView === 'home') return currentData;
+        return currentData.pages[activeView] || currentData;
+    };
+        return currentData.pages[activeView];
+    };
+
+    const handleUpdateSection = (key, newData) => {
+        const newCurrentData = { ...currentData };
+        
+        if (activeView === 'global') {
+             newCurrentData[key] = newData;
+        } else if (activeView === 'home') {
+            newCurrentData[key] = newData;
+        } else {
+            newCurrentData.pages[activeView][key] = newData;
+        }
+        
+        setCurrentData(newCurrentData);
+        setHasChanges(true);
+    };
+
+    const handleMoveSection = (index, direction, isGlobalList) => {
+        const newCurrentData = { ...currentData };
+        let list;
+        
+        if (isGlobalList) {
+            list = newCurrentData.globalSections;
+        } else if (activeView === 'home') {
+            list = newCurrentData.sectionOrder;
+        } else {
+            list = newCurrentData.pages[activeView].sectionOrder;
+        }
+        
+        const newIndex = index + direction;
+        if (newIndex >= 0 && newIndex < list.length) {
+            [list[index], list[newIndex]] = [list[newIndex], list[index]];
+            setCurrentData(newCurrentData);
+            setHasChanges(true);
+        }
+    };
+
+    const handleMoveToGlobal = (key) => {
+        const newCurrentData = { ...currentData };
+        
+        if (activeView === 'home') {
+            // Home Page: Move to Global Defaults list
+            if (!newCurrentData.globalSections) newCurrentData.globalSections = [];
+            if (!newCurrentData.globalSections.includes(key)) {
+                newCurrentData.globalSections.push(key);
+                setCurrentData(newCurrentData);
+                setHasChanges(true);
+            }
+        } else if (activeView !== 'global') {
+            // Sub Page: Move to Global (Copy and Delete Local)
+            if (confirm(`Move section '${key}' to Global Defaults? It will be available to all pages.`)) {
+                const pageData = newCurrentData.pages[activeView];
+                // Copy data to global if not exists
+                if (!newCurrentData[key] && pageData[key]) {
+                    newCurrentData[key] = JSON.parse(JSON.stringify(pageData[key]));
+                }
+                
+                // Remove from local
+                delete pageData[key];
+                pageData.sectionOrder = pageData.sectionOrder.filter(k => k !== key);
+                
+                // Add to global list
+                if (!newCurrentData.globalSections.includes(key)) {
+                    newCurrentData.globalSections.push(key);
+                }
+                
+                setCurrentData(newCurrentData);
+                setHasChanges(true);
+            }
+        }
+    };
+
+    const handleMoveToLocal = (key) => {
+        if (activeView === 'home' || activeView === 'global') {
+            // Remove from Global Defaults list
+            const newCurrentData = { ...currentData };
+            if (newCurrentData.globalSections) {
+                newCurrentData.globalSections = newCurrentData.globalSections.filter(k => k !== key);
+                setCurrentData(newCurrentData);
+                setHasChanges(true);
+            }
+        }
+    };
+
+    const handleDeleteSection = (key) => {
+        if (!confirm('Delete this section?')) return;
+        const newCurrentData = { ...currentData };
+        const data = (activeView === 'home') ? newCurrentData : newCurrentData.pages[activeView];
+        
+        delete data[key];
+        data.sectionOrder = data.sectionOrder.filter(k => k !== key);
+        
+        setCurrentData(newCurrentData);
+        setHasChanges(true);
+    };
+
+    const handleToggleDivider = (key, type, value) => {
+        const newCurrentData = { ...currentData };
+        const data = (activeView === 'home') ? newCurrentData : newCurrentData.pages[activeView];
+        
+        if (!data.sectionSettings) data.sectionSettings = {};
+        if (!data.sectionSettings[key]) data.sectionSettings[key] = {};
+        
+        if (type === 'top') data.sectionSettings[key].dividerTop = value;
+        if (type === 'bottom') data.sectionSettings[key].dividerBottom = value;
+        
+        setCurrentData(newCurrentData);
+        setHasChanges(true);
+    };
+
+    const handleAddSection = (isGlobal = false) => {
+        setIsAddingGlobalSection(isGlobal);
+        setNewSectionName('');
+        setShowAddSectionModal(true);
+    };
+
+    const handleConfirmAddSection = () => {
+        if (!newSectionName) return;
+        
+        const key = newSectionName.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (!key) return;
+
+        const newCurrentData = { ...currentData };
+        let targetData;
+        let orderList;
+
+        if (isAddingGlobalSection) {
+            targetData = newCurrentData;
+            if (!newCurrentData.globalSections) newCurrentData.globalSections = [];
+            orderList = newCurrentData.globalSections;
+        } else {
+            targetData = (activeView === 'home') ? newCurrentData : newCurrentData.pages[activeView];
+            if (!targetData.sectionOrder) targetData.sectionOrder = [];
+            orderList = targetData.sectionOrder;
+        }
+
+        if (targetData[key]) {
+            alert("Section already exists!");
+            return;
+        }
+
+        // Add new section data
+        targetData[key] = {
+            title: newSectionName,
+            links: []
+        };
+        
+        // Add to order
+        orderList.push(key);
+
+        setCurrentData(newCurrentData);
+        setHasChanges(true);
+        setShowAddSectionModal(false);
+    };
+
+    const handleDiscard = () => {
+        if (window.confirm('Are you sure you want to discard all unsaved changes?')) {
+            setActiveView('home');
+            initData();
+        }
+    };
+
+    const handleDeletePage = () => {
+        if (activeView === 'home' || activeView === 'global') return;
+        if (!window.confirm(`Are you sure you want to delete the page "${activeView}"? This cannot be undone.`)) return;
+
+        const newCurrentData = { ...currentData };
+        delete newCurrentData.pages[activeView];
+        
+        setCurrentData(newCurrentData);
+        setHasChanges(true);
+        setActiveView('home');
+    };
+
+    if (!isAuthenticated) {
+        return (
+            <Modal show={true} backdrop="static" centered>
+                <Modal.Header><Modal.Title>Admin Login</Modal.Title></Modal.Header>
+                <Modal.Body>
+                    {loginError && <Alert variant="danger">{loginError}</Alert>}
+                    <Form onSubmit={handleLogin}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Password</Form.Label>
+                            <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />
+                        </Form.Group>
+                        <Button variant="primary" type="submit" disabled={loading} className="w-100">{loading ? 'Verifying...' : 'Login'}</Button>
+                    </Form>
+                </Modal.Body>
+            </Modal>
+        );
+    }
+
+    if (!currentData) return <div>Loading...</div>;
+
+    const activeData = getActiveData();
+
+    // Calculate button count for cyclic colors
+    let globalButtonCount = 0;
+
+    return (
+        <div className="admin-dashboard">
+            {/* Sidebar */}
+            <div className="admin-sidebar">
+                <div className="sidebar-header">
+                    <h3>Arhat Anzan</h3>
+                    <span className="badge bg-primary">Admin</span>
+                </div>
+                
+                <div className="sidebar-menu">
+                    <div className="menu-label">General</div>
+                    <button 
+                        className={`menu-item ${activeView === 'global' ? 'active' : ''}`}
+                        onClick={() => setActiveView('global')}
+                    >
+                        <i className="fas fa-globe"></i> Global Settings
+                    </button>
+
+                    <div className="menu-label mt-4">Pages</div>
+                    <button 
+                        className={`menu-item ${activeView === 'home' ? 'active' : ''}`}
+                        onClick={() => setActiveView('home')}
+                    >
+                        <i className="fas fa-home"></i> Home Page
+                    </button>
+                    
+                    {Object.keys(currentData.pages || {}).map(pageId => (
+                        <button 
+                            key={pageId}
+                            className={`menu-item ${activeView === pageId ? 'active' : ''}`}
+                            onClick={() => setActiveView(pageId)}
+                        >
+                            <i className="fas fa-file-alt"></i> {pageId}
+                        </button>
+                    ))}
+
+                    <button className="menu-item add-page-btn" onClick={() => setShowAddPageModal(true)}>
+                        <i className="fas fa-plus"></i> Add New Page
+                    </button>
+
+                    <div className="menu-label mt-4">System</div>
+                    <button 
+                        className={`menu-item ${activeView === 'changelog' ? 'active' : ''}`}
+                        onClick={() => setActiveView('changelog')}
+                    >
+                        <i className="fas fa-history"></i> Changelog
+                    </button>
+                </div>
+
+                <div className="sidebar-footer">
+                    <button className="btn-logout" onClick={handleLogout}>
+                        <i className="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="admin-content">
+                {/* Top Bar */}
+                <div className="top-bar">
+                    <div className="breadcrumb">
+                        <span className="text-muted">Dashboard</span>
+                        <i className="fas fa-chevron-right mx-2 text-muted" style={{fontSize: '0.8em'}}></i>
+                        <span className="fw-bold text-dark">
+                            {activeView === 'global' ? 'Global Settings' : (activeView === 'home' ? 'Home Page' : activeView)}
+                        </span>
+                    </div>
+                    <div className="actions d-flex gap-2">
+                        {activeView !== 'home' && activeView !== 'global' && activeView !== 'changelog' && (
+                            <Button 
+                                variant="outline-danger" 
+                                size="sm"
+                                onClick={handleDeletePage}
+                                className="d-flex align-items-center me-2"
+                            >
+                                <i className="fas fa-trash-alt me-1"></i> Delete Page
+                            </Button>
+                        )}
+                        <a href="/" target="_blank" className="btn btn-outline-secondary btn-sm d-flex align-items-center">
+                            <i className="fas fa-external-link-alt me-1"></i> View Site
+                        </a>
+                        {hasChanges && (
+                            <Button 
+                                variant="outline-danger" 
+                                size="sm"
+                                onClick={handleDiscard}
+                                className="d-flex align-items-center"
+                            >
+                                <i className="fas fa-undo me-1"></i> Discard
+                            </Button>
+                        )}
+                        <Button 
+                            variant={hasChanges ? "primary" : "secondary"} 
+                            size="sm"
+                            onClick={handleSave} 
+                            disabled={!hasChanges}
+                            className="save-btn d-flex align-items-center"
+                        >
+                            {hasChanges ? 'Save Changes' : 'Saved'}
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Editor Area */}
+                <div className="editor-area">
+                    {activeView === 'changelog' ? (
+                        <div className="section-list">
+                            <div className="bg-white p-5 rounded-4 shadow-sm border">
+                                <h2 className="fw-bold text-dark mb-4">System Changelog</h2>
+                                <div className="changelog-entry mb-4">
+                                    <h5 className="fw-bold">v2.1.0 - UI Overhaul & Features</h5>
+                                    <ul className="text-muted">
+                                        <li>Implemented "Vibrant & Compact" Dashboard Theme.</li>
+                                        <li>Added Dark Sidebar and Gradient Buttons.</li>
+                                        <li>Added "Collapse All" / "Expand All" functionality.</li>
+                                        <li>Added Cyclic Color Preview for buttons.</li>
+                                        <li>Added Page Deletion capability.</li>
+                                        <li>Fixed navigation delays and scrolling issues.</li>
+                                    </ul>
+                                </div>
+                                <div className="changelog-entry mb-4">
+                                    <h5 className="fw-bold">v2.0.0 - Dashboard Architecture</h5>
+                                    <ul className="text-muted">
+                                        <li>Refactored Admin Panel into Dashboard layout.</li>
+                                        <li>Implemented View-based rendering for performance.</li>
+                                        <li>Added Global vs Page-Specific configuration.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    ) : activeView === 'global' ? (
+                        <div className="section-list">
+                            <div className="bg-white p-4 rounded-4 shadow-sm mb-4 border">
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h2 className="fw-bold text-dark mb-1">Global Configuration</h2>
+                                        <p className="text-muted mb-0">Manage themes and shared sections.</p>
+                                    </div>
+                                    <div className="d-flex gap-2">
+                                        <Button variant="light" className="border" onClick={() => setExpandAll(!expandAll)}>
+                                            <i className={`fas fa-${expandAll ? 'compress' : 'expand'} me-2`}></i>
+                                            {expandAll ? 'Collapse All' : 'Expand All'}
+                                        </Button>
+                                        <Button variant="primary" onClick={() => handleAddSection(true)} className="shadow-sm">
+                                            <i className="fas fa-plus me-2"></i> Add Global Section
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {(currentData.globalSections || []).map((key, index) => {
+                                // Calculate start index for colors
+                                const currentStartIndex = globalButtonCount;
+                                const sectionData = currentData[key];
+                                const items = sectionData?.links || sectionData || [];
+                                if (Array.isArray(items)) {
+                                    globalButtonCount += items.length;
+                                }
+
+                                return (
+                                    <SectionEditor 
+                                        key={key}
+                                        sectionKey={key}
+                                        index={index}
+                                        data={{...currentData, openAllSections: expandAll}}
+                                        isGlobalList={true}
+                                        activePageId={null}
+                                        availablePages={['home', ...Object.keys(currentData.pages || {})]}
+                                        onUpdate={(k, d) => handleUpdateSection(k, d)}
+                                        onMove={(i, d) => handleMoveSection(i, d, true)}
+                                        onMoveToLocal={handleMoveToLocal}
+                                        onToggleDivider={handleToggleDivider}
+                                        startColorIndex={currentStartIndex}
+                                        theme={currentData.theme}
+                                    />
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div className="section-list">
+                            {/* Welcome / Stats Banner */}
+                            <div className="bg-white p-4 rounded-4 shadow-sm mb-5 border">
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h2 className="fw-bold text-dark mb-1">
+                                            {activeView === 'home' ? 'Home Page' : activeView}
+                                        </h2>
+                                        <p className="text-muted mb-0">
+                                            {activeData.sectionOrder?.length || 0} active sections
+                                        </p>
+                                    </div>
+                                    <div className="d-flex gap-2">
+                                        <Button variant="light" className="border" onClick={() => setExpandAll(!expandAll)}>
+                                            <i className={`fas fa-${expandAll ? 'compress' : 'expand'} me-2`}></i>
+                                            {expandAll ? 'Collapse All' : 'Expand All'}
+                                        </Button>
+                                        <Button variant="primary" onClick={() => handleAddSection(false)} className="shadow-sm">
+                                            <i className="fas fa-plus me-2"></i> Add Section
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {(activeData.sectionOrder || []).map((key, index) => {
+                                // Skip if in global sections (applies to home and all subpages)
+                                if (currentData.globalSections && currentData.globalSections.includes(key)) return null;
+                                // Skip connectLinks as it is now part of footer
+                                if (key === 'connectLinks') return null;
+                                
+                                // Calculate start index for colors
+                                const currentStartIndex = globalButtonCount;
+                                const sectionData = activeData[key];
+                                const items = sectionData?.links || sectionData || [];
+                                if (Array.isArray(items)) {
+                                    globalButtonCount += items.length;
+                                }
+
+                                return (
+                                    <SectionEditor 
+                                        key={key}
+                                        sectionKey={key}
+                                        index={index}
+                                        data={{...activeData, openAllSections: expandAll}}
+                                        isGlobalList={false}
+                                        activePageId={activeView === 'home' ? null : activeView}
+                                        availablePages={['home', ...Object.keys(currentData.pages || {})]}
+                                        onUpdate={handleUpdateSection}
+                                        onMove={(i, d) => handleMoveSection(i, d, false)}
+                                        onMoveToGlobal={handleMoveToGlobal}
+                                        onDelete={handleDeleteSection}
+                                        onToggleDivider={handleToggleDivider}
+                                        startColorIndex={currentStartIndex}
+                                        theme={activeData.theme}
+                                    />
+                                );
+                            })}
+                            
+                            {(!activeData.sectionOrder || activeData.sectionOrder.length === 0) && (
+                                <div className="text-center py-5">
+                                    <div className="bg-white p-5 rounded-4 border border-dashed d-inline-block">
+                                        <i className="fas fa-layer-group fa-3x mb-3 text-primary opacity-50"></i>
+                                        <h4 className="fw-bold text-dark">Start Building</h4>
+                                        <p className="text-muted mb-4">This page is currently empty.</p>
+                                        <Button variant="primary" size="lg" onClick={() => handleAddSection(false)}>
+                                            Add Your First Section
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Add Page Modal */}
+            <Modal show={showAddPageModal} onHide={() => setShowAddPageModal(false)} centered contentClassName="border-0 shadow-lg">
+                <Modal.Header closeButton className="border-0 pb-0">
+                    <Modal.Title className="fs-5 fw-bold">Add New Page</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group>
+                        <Form.Label className="text-uppercase text-muted small fw-bold">Page ID (URL Slug)</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            placeholder="e.g. my-new-page" 
+                            value={newPageId} 
+                            onChange={(e) => setNewPageId(e.target.value)} 
+                            autoFocus
+                            className="form-control-lg"
+                        />
+                        <Form.Text className="text-muted">
+                            This will create a new page at /?page={newPageId || '...'}
+                        </Form.Text>
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer className="border-0 pt-0">
+                    <Button variant="light" onClick={() => setShowAddPageModal(false)}>Cancel</Button>
+                    <Button variant="primary" onClick={handleCreatePage} disabled={!newPageId}>Create Page</Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Add Section Modal */}
+            <Modal show={showAddSectionModal} onHide={() => setShowAddSectionModal(false)} centered contentClassName="border-0 shadow-lg">
+                <Modal.Header closeButton className="border-0 pb-0">
+                    <Modal.Title className="fs-5 fw-bold">
+                        {isAddingGlobalSection ? 'Add Global Section' : 'Add Page Section'}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group>
+                        <Form.Label className="text-uppercase text-muted small fw-bold">Section Name</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            placeholder="e.g. My New Section" 
+                            value={newSectionName} 
+                            onChange={(e) => setNewSectionName(e.target.value)} 
+                            autoFocus
+                            className="form-control-lg"
+                        />
+                        <Form.Text className="text-muted">
+                            This will be the internal ID and default title.
+                        </Form.Text>
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer className="border-0 pt-0">
+                    <Button variant="light" onClick={() => setShowAddSectionModal(false)}>Cancel</Button>
+                    <Button variant="primary" onClick={handleConfirmAddSection} disabled={!newSectionName}>Add Section</Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Save Confirmation Modal */}
+            <Modal show={showSaveModal} onHide={() => setShowSaveModal(false)} centered contentClassName="border-0 shadow-lg">
+                <Modal.Header closeButton className="border-0 pb-0">
+                    <Modal.Title className="fs-5 fw-bold">Save Changes</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Alert variant="info" className="mb-3 border-0 bg-info bg-opacity-10 text-info">
+                        <i className="fas fa-info-circle me-2"></i>
+                        This will update the live site immediately.
+                    </Alert>
+                    <Form.Group>
+                        <Form.Label className="text-uppercase text-muted small fw-bold">Commit Message</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            value={commitMessage} 
+                            onChange={(e) => setCommitMessage(e.target.value)} 
+                            className="form-control-lg"
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer className="border-0 pt-0">
+                    <Button variant="light" onClick={() => setShowSaveModal(false)}>Cancel</Button>
+                    <Button variant="primary" onClick={handleConfirmSave} disabled={loading}>
+                        {loading ? 'Saving...' : 'Confirm Save'}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </div>
+    );
+};
+
+export default AdminPanel;

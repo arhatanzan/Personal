@@ -1,7 +1,7 @@
 /* --- Font Setup --- */
 @font-face {
     font-family: 'Daniel';
-    src: url('./assets/fonts/danielbk.ttf') format('truetype');
+    src: url('../../assets/fonts/danielbk.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
