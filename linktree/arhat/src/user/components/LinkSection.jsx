@@ -42,8 +42,9 @@ const LinkSection = ({ title, items, isConnect = false, theme, id }) => {
                                 const btnClass = customColor ? 'link-btn custom-color' : 'link-btn';
 
                                 if (icon) {
+                                    const iconStyle = customColor ? { color: customColor } : {};
                                     return (
-                                        <a key={index} href={url} target="_blank" rel="noopener noreferrer">
+                                        <a key={index} href={url} target="_blank" rel="noopener noreferrer" style={iconStyle}>
                                             <i className={icon}></i>
                                         </a>
                                     );

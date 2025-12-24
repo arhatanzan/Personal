@@ -198,18 +198,37 @@ const SectionEditor = ({
                                         className="form-control-color w-100"
                                         title="Pick a custom color"
                                     />
-                                    <div 
-                                        title={`Default Cyclic Color: ${buttonColors[(startColorIndex + idx) % buttonColors.length]}`}
-                                        style={{
-                                            width: '38px', 
-                                            height: '38px', 
-                                            backgroundColor: buttonColors[(startColorIndex + idx) % buttonColors.length], 
-                                            borderRadius: '4px',
-                                            border: '1px solid #ced4da',
-                                            cursor: 'help',
-                                            flexShrink: 0
-                                        }}
-                                    ></div>
+                                    
+                                    {!isConnect && (
+                                        <div 
+                                            title={`Default Cyclic Color: ${buttonColors[(startColorIndex + idx) % buttonColors.length]}`}
+                                            style={{
+                                                width: '38px', 
+                                                height: '38px', 
+                                                backgroundColor: buttonColors[(startColorIndex + idx) % buttonColors.length], 
+                                                borderRadius: '4px',
+                                                border: '1px solid #ced4da',
+                                                cursor: 'help',
+                                                flexShrink: 0
+                                            }}
+                                        ></div>
+                                    )}
+
+                                    {isConnect && (
+                                        <div 
+                                            title="Icon Preview"
+                                            className="d-flex align-items-center justify-content-center border rounded bg-light"
+                                            style={{
+                                                width: '38px', 
+                                                height: '38px', 
+                                                color: item.customColor || '#023e62',
+                                                fontSize: '1.2rem'
+                                            }}
+                                        >
+                                            <i className={item.icon || 'fas fa-question'}></i>
+                                        </div>
+                                    )}
+
                                     {item.customColor && (
                                         <Button 
                                             variant="outline-secondary" 
@@ -226,9 +245,11 @@ const SectionEditor = ({
                                         </Button>
                                     )}
                                 </div>
-                                <Form.Text className="text-muted" style={{fontSize: '0.75rem'}}>
-                                    Right box shows the default cyclic color.
-                                </Form.Text>
+                                {!isConnect && (
+                                    <Form.Text className="text-muted" style={{fontSize: '0.75rem'}}>
+                                        Right box shows the default cyclic color.
+                                    </Form.Text>
+                                )}
                             </div>
                         </div>
                     </div>
