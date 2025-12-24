@@ -1,12 +1,8 @@
-exports.handler = async function(event, context) {
-    const timeout = process.env.SESSION_TIMEOUT || '30';
-    
+export const handler = async (event, context) => {
     return {
         statusCode: 200,
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify({ sessionTimeout: parseInt(timeout) })
+        body: JSON.stringify({
+            sessionTimeout: 30 // minutes
+        })
     };
 };

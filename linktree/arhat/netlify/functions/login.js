@@ -1,34 +1,27 @@
-exports.handler = async function(event, context) {
-    if (event.httpMethod !== "POST") {
-        return { statusCode: 405, body: "Method Not Allowed" };
+export const handler = async (event, context) => {
+    if (event.httpMethod !== 'POST') {
+        return { statusCode: 405, body: 'Method Not Allowed' };
     }
 
     try {
-        const { ADMIN_PASSWORD } = process.env;
         const { password } = JSON.parse(event.body);
+        const correctPassword = process.env.ADMIN_PASSWORD;
 
-        if (!ADMIN_PASSWORD) {
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ error: "ADMIN_PASSWORD not set in environment variables" })
-            };
-        }
-
-        if (password === ADMIN_PASSWORD) {
+        if (password === correctPassword) {
             return {
                 statusCode: 200,
-                body: JSON.stringify({ success: true, message: "Authenticated" })
+                body: JSON.stringify({ success: true })
             };
         } else {
             return {
                 statusCode: 401,
-                body: JSON.stringify({ error: "Invalid password" })
+                body: JSON.stringify({ success: false, message: 'Invalid password' })
             };
         }
     } catch (error) {
         return {
-            statusCode: 500,
-            body: JSON.stringify({ error: "Server Error" })
+            statusCode: 400,
+            body: JSON.stringify({ success: false, message: 'Invalid request' })
         };
     }
 };

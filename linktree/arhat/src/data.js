@@ -1,8 +1,10 @@
-var siteData = {
+import arhatImage from './assets/images/arhat.png';
+
+export const siteData = {
     "profile": {
         "name": "Arhat Anzan",
         "subtitle": "",
-        "image": "/assets/images/arhat.png"
+        "image": arhatImage
     },
     "socialLinks": [
         {

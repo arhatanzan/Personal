@@ -1,8 +1,7 @@
 /* --- Font Setup --- */
-/* If you have the Daniel.ttf file, place it in the same folder */
 @font-face {
     font-family: 'Daniel';
-    src: url('../fonts/danielbk.ttf') format('truetype');
+    src: url('./assets/fonts/danielbk.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -36,12 +35,17 @@ body {
     
     margin: 0;
     padding: 90px 0 0 0; /* Added top padding for fixed header */
-    text-align: center;
+    text-align: center !important; /* Force center alignment */
     background-color: var(--bg-color);
     background-image: var(--bg-image);
     background-size: cover;
     background-attachment: fixed;
     min-height: 100vh;
+}
+
+/* Ensure headings are centered */
+h1, h2, h3, h4, h5, h6 {
+    text-align: center !important;
 }
 
 /* --- Header & Profile --- */
@@ -95,6 +99,7 @@ header {
     font-weight: 800;
     margin: var(--section-spacing) 0 20px;
     color: var(--text-color);
+    text-align: center; /* Ensure section titles are centered */
 }
 
 /* --- The Specific Button Styles --- */
@@ -125,6 +130,7 @@ header {
 
 .link-btn:hover {
     background-color: #fff;
+    color: var(--text-color); /* Ensure text color stays consistent on hover */
 }
 
 /* Legacy classes kept for reference but not used by JS anymore */
@@ -157,6 +163,7 @@ header {
     line-height: 1.5;
     font-weight: 600; /* Montserrat makes it look slightly thinner, so 600 helps legibility */
     color: #023e62; /* Updated Color */
+    text-align: center; /* Ensure text content is centered */
 }
 
 .hindi-text {
