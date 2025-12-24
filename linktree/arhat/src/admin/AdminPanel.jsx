@@ -130,8 +130,6 @@ const AdminPanel = () => {
         if (activeView === 'home') return currentData;
         return currentData.pages[activeView] || currentData;
     };
-        return currentData.pages[activeView];
-    };
 
     const handleUpdateSection = (key, newData) => {
         const newCurrentData = { ...currentData };
