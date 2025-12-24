@@ -19,16 +19,20 @@ export const handler = async (event, context) => {
 
         const commitMessage = message || "Update site data via Admin Panel";
 
+        // Resolve GitHub variables (support both naming conventions)
+        const owner = process.env.GITHUB_OWNER || process.env.REPO_OWNER;
+        const repo = process.env.GITHUB_NAME || process.env.REPO_NAME;
+
         // Check if running in production with GitHub credentials
-        if (process.env.GITHUB_TOKEN && process.env.GITHUB_OWNER && process.env.GITHUB_NAME) {
-            return await saveToGitHub(data, commitMessage);
+        if (process.env.GITHUB_TOKEN && owner && repo) {
+            return await saveToGitHub(data, commitMessage, owner, repo);
         } else {
             // If on Netlify (production) but missing credentials, warn the user
             if (process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME) {
                  const missing = [];
                  if (!process.env.GITHUB_TOKEN) missing.push('GITHUB_TOKEN');
-                 if (!process.env.GITHUB_OWNER) missing.push('GITHUB_OWNER');
-                 if (!process.env.GITHUB_NAME) missing.push('GITHUB_NAME');
+                 if (!owner) missing.push('REPO_OWNER');
+                 if (!repo) missing.push('REPO_NAME');
                  
                  return {
                     statusCode: 500,
@@ -66,10 +70,8 @@ function saveLocally(data) {
     }
 }
 
-async function saveToGitHub(data, commitMessage) {
+async function saveToGitHub(data, commitMessage, owner, repo) {
     const token = process.env.GITHUB_TOKEN;
-    const owner = process.env.GITHUB_OWNER;
-    const repo = process.env.GITHUB_NAME;
     const branch = 'main';
 
     // File paths relative to repo root
