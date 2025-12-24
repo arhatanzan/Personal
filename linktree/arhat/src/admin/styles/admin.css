@@ -533,4 +533,31 @@ body.admin-body {
     .actions .btn i {
         margin-right: 0 !important;
     }
+
+    /* Content Responsiveness */
+    .section-header {
+        padding: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .section-header h2 {
+        font-size: 1rem;
+    }
+
+    .section-content {
+        padding: 1rem;
+    }
+
+    .item-card {
+        padding: 1rem;
+    }
+
+    .d-flex.gap-4 {
+        gap: 1rem !important;
+    }
+    
+    /* Adjust form controls for better touch targets */
+    .form-control, .form-select, .btn {
+        font-size: 16px; /* Prevents iOS zoom */
+    }
 }

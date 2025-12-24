@@ -69,7 +69,7 @@ const SectionEditor = ({
             <div>
                 {items.map((item, idx) => (
                     <div key={idx} className="item-card">
-                        <div className="d-flex justify-content-between align-items-center mb-3">
+                        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                             <span className="badge bg-light text-dark border">Item #{idx + 1}</span>
                             <Button variant="outline-danger" size="sm" className="btn-icon border-0" onClick={() => {
                                 const newItems = [...items];
@@ -187,7 +187,7 @@ const SectionEditor = ({
 
                             <div className="col-md-6">
                                 <Form.Label>Custom Color</Form.Label>
-                                <div className="d-flex gap-2 align-items-center">
+                                <div className="d-flex gap-2 align-items-center flex-wrap">
                                     <Form.Control 
                                         type="color"
                                         value={item.customColor || '#000000'} 
@@ -360,8 +360,8 @@ const SectionEditor = ({
     return (
         <div className="section-card" id={`section-${sectionKey}`}>
             <div className={`section-header ${isOpen ? 'active' : ''}`} onClick={() => setIsOpen(!isOpen)}>
-                <div className="d-flex align-items-center gap-3 flex-grow-1">
-                    <h2 className="m-0 fs-5">
+                <div className="d-flex align-items-center gap-3 flex-grow-1 flex-wrap">
+                    <h2 className="m-0 fs-5 text-break">
                         {title} 
                         <span className="badge bg-secondary ms-2" style={{fontSize: '0.6em'}}>
                             {isGlobalList ? 'Global' : (type === 'custom' ? (isInherited ? 'Global' : 'Custom') : 'Static')}
@@ -389,7 +389,7 @@ const SectionEditor = ({
                             This is a global section. You can reorder it here, but content must be edited in <strong>Global Settings</strong>.
                         </div>
                     )}
-                    <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                    <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3 flex-wrap gap-3">
                         <div className="d-flex gap-4">
                             <Form.Check 
                                 type="switch"
