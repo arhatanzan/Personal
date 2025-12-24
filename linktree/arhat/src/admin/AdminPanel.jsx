@@ -30,14 +30,53 @@ const AdminPanel = () => {
         // Add admin-body class to body for styling
         document.body.classList.add('admin-body');
         
-        const storedAuth = localStorage.getItem('adminPassword');
-        if (storedAuth) {
-            setIsAuthenticated(true);
-            initData();
-        }
+        const verifySession = async () => {
+            const storedAuth = localStorage.getItem('adminPassword');
+            if (storedAuth) {
+                try {
+                    const endpoint = window.location.port === '8000' ? '/.netlify/functions/login' : '/.netlify/functions/login';
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: storedAuth })
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.success) {
+                        setIsAuthenticated(true);
+                        initData();
+                    } else {
+                        // Invalid session
+                        localStorage.removeItem('adminPassword');
+                        setIsAuthenticated(false);
+                    }
+                } catch (e) {
+                    console.error("Session verification failed", e);
+                    setIsAuthenticated(false);
+                }
+            }
+        };
+
+        verifySession();
+
+        // Handle cross-tab login/logout
+        const handleStorageChange = (e) => {
+            if (e.key === 'adminPassword') {
+                if (e.newValue) {
+                    // Logged in elsewhere
+                    verifySession(); 
+                } else {
+                    // Logged out elsewhere
+                    setIsAuthenticated(false);
+                    setCurrentData(null);
+                }
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
 
         return () => {
             document.body.classList.remove('admin-body');
+            window.removeEventListener('storage', handleStorageChange);
         };
     }, []);
 
