@@ -73,7 +73,12 @@ export const siteData = {
             "url": "#"
         }
     ],
-    "footer": "Learn about updates @ /changelog",
+    "footer": "",
+    "globalSections": [
+        "theme",
+        "profile",
+        "footer"
+    ],
     "sectionOrder": [
         "profile",
         "socialLinks",
