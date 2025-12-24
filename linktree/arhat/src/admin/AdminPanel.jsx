@@ -241,7 +241,7 @@ const AdminPanel = () => {
             return;
         }
         const newData = {...currentData};
-        newData.pages[sanitized] = { sectionOrder: ['profile', 'footer'] };
+        newData.pages[sanitized] = { sectionOrder: ['profile'] };
         setCurrentData(newData);
         setActiveView(sanitized);
         setHasChanges(true);
@@ -397,7 +397,7 @@ const AdminPanel = () => {
         }
 
         // Prevent adding reserved global sections to pages
-        if (!isAddingGlobalSection && (key === 'profile' || key === 'footer' || key === 'theme')) {
+        if (!isAddingGlobalSection && (key === 'profile' || key === 'footer' || key === 'theme' || key === 'connectLinks')) {
             alert("This section name is reserved for global settings.");
             return;
         }

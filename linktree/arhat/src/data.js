@@ -77,7 +77,7 @@ export const siteData = {
     "globalSections": [
         "theme",
         "profile",
-        "footer"
+        "connectLinks"
     ],
     "sectionOrder": [
         "profile",

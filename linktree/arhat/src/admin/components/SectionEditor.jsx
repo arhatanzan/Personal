@@ -79,58 +79,82 @@ const SectionEditor = ({
                             </Button>
                         </div>
                         <div className="row g-3">
-                            <div className="col-md-6">
-                                <Form.Label>Title</Form.Label>
-                                <Form.Control 
-                                    value={item.title || ''} 
-                                    placeholder="Item Title"
-                                    onChange={(e) => {
-                                        const newItems = [...items];
-                                        newItems[idx] = { ...item, title: e.target.value };
-                                        onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
-                                    }}
-                                />
-                            </div>
-                            <div className="col-md-6">
-                                <Form.Label>Sub-Title</Form.Label>
-                                <Form.Control 
-                                    value={item.subtitle || ''} 
-                                    placeholder="Item Sub-Title"
-                                    onChange={(e) => {
-                                        const newItems = [...items];
-                                        newItems[idx] = { ...item, subtitle: e.target.value };
-                                        onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
-                                    }}
-                                />
-                            </div>
-                            <div className="col-12">
-                                <Form.Label>Description</Form.Label>
-                                <Form.Control 
-                                    as="textarea" 
-                                    rows={2}
-                                    value={item.description || ''} 
-                                    placeholder="Description text..."
-                                    onChange={(e) => {
-                                        const newItems = [...items];
-                                        newItems[idx] = { ...item, description: e.target.value };
-                                        onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
-                                    }}
-                                />
-                            </div>
-                            <div className="col-md-6">
-                                <Form.Label>Button Text</Form.Label>
-                                <Form.Control 
-                                    value={item.text || ''} 
-                                    placeholder="Click Here"
-                                    onChange={(e) => {
-                                        const newItems = [...items];
-                                        newItems[idx] = { ...item, text: e.target.value };
-                                        onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
-                                    }}
-                                />
-                            </div>
-                            <div className="col-md-6">
-                                <Form.Label>Button URL</Form.Label>
+                            {isConnect ? (
+                                <div className="col-12">
+                                    <Form.Label>Icon Class</Form.Label>
+                                    <InputGroup>
+                                        <InputGroup.Text><i className={item.icon || 'fas fa-question'}></i></InputGroup.Text>
+                                        <Form.Control 
+                                            value={item.icon || ''} 
+                                            placeholder="fab fa-instagram"
+                                            onChange={(e) => {
+                                                const newItems = [...items];
+                                                newItems[idx] = { ...item, icon: e.target.value };
+                                                onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
+                                            }}
+                                        />
+                                    </InputGroup>
+                                    <Form.Text className="text-muted">
+                                        FontAwesome class (e.g. <code>fab fa-instagram</code>)
+                                    </Form.Text>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="col-md-6">
+                                        <Form.Label>Title</Form.Label>
+                                        <Form.Control 
+                                            value={item.title || ''} 
+                                            placeholder="Item Title"
+                                            onChange={(e) => {
+                                                const newItems = [...items];
+                                                newItems[idx] = { ...item, title: e.target.value };
+                                                onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <Form.Label>Sub-Title</Form.Label>
+                                        <Form.Control 
+                                            value={item.subtitle || ''} 
+                                            placeholder="Item Sub-Title"
+                                            onChange={(e) => {
+                                                const newItems = [...items];
+                                                newItems[idx] = { ...item, subtitle: e.target.value };
+                                                onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="col-12">
+                                        <Form.Label>Description</Form.Label>
+                                        <Form.Control 
+                                            as="textarea" 
+                                            rows={2}
+                                            value={item.description || ''} 
+                                            placeholder="Description text..."
+                                            onChange={(e) => {
+                                                const newItems = [...items];
+                                                newItems[idx] = { ...item, description: e.target.value };
+                                                onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <Form.Label>Button Text</Form.Label>
+                                        <Form.Control 
+                                            value={item.text || ''} 
+                                            placeholder="Click Here"
+                                            onChange={(e) => {
+                                                const newItems = [...items];
+                                                newItems[idx] = { ...item, text: e.target.value };
+                                                onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
+                                            }}
+                                        />
+                                    </div>
+                                </>
+                            )}
+
+                            <div className={isConnect ? "col-md-12" : "col-md-6"}>
+                                <Form.Label>URL</Form.Label>
                                 <InputGroup>
                                     <Form.Control 
                                         value={item.url || ''} 
@@ -159,20 +183,7 @@ const SectionEditor = ({
                                     </Form.Select>
                                 </InputGroup>
                             </div>
-                            {isConnect && (
-                                <div className="col-md-6">
-                                    <Form.Label>Icon Class (e.g. fab fa-instagram)</Form.Label>
-                                    <Form.Control 
-                                        value={item.icon || ''} 
-                                        placeholder="fab fa-..."
-                                        onChange={(e) => {
-                                            const newItems = [...items];
-                                            newItems[idx] = { ...item, icon: e.target.value };
-                                            onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
-                                        }}
-                                    />
-                                </div>
-                            )}
+
                             <div className="col-md-6">
                                 <Form.Label>Custom Color</Form.Label>
                                 <div className="d-flex gap-2 align-items-center">
@@ -223,7 +234,12 @@ const SectionEditor = ({
                     </div>
                 ))}
                 <Button variant="outline-primary" className="w-100 py-2 border-dashed" onClick={() => {
-                    const newItems = [...items, { title: 'New Item', url: '#' }];
+                    const newItems = [...items];
+                    if (isConnect) {
+                        newItems.push({ icon: 'fab fa-instagram', url: '#' });
+                    } else {
+                        newItems.push({ title: 'New Item', url: '#' });
+                    }
                     onUpdate(key, Array.isArray(data[key]) ? newItems : { ...data[key], links: newItems });
                 }}>
                     <i className="fas fa-plus me-2"></i> Add Item
