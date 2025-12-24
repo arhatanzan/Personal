@@ -29,8 +29,9 @@ const ListEditor = ({ title, items, onChange, themeColors, itemTemplate, ...prop
 
     return (
         <SectionEditor title={title} {...props}>
+            {props.children}
             <div className="d-flex flex-column gap-3">
-                {items.map((item, index) => (
+                {Array.isArray(items) && items.map((item, index) => (
                     <ItemEditor 
                         key={index} 
                         index={index} 

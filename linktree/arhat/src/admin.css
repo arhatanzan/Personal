@@ -52,7 +52,6 @@
 }
 .section-content {
     padding: 20px;
-    display: none;
 }
 .section-content.active {
     display: block;

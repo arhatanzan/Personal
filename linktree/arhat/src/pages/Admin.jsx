@@ -21,8 +21,15 @@ const Admin = ({ initialData }) => {
   const [toastMessage, setToastMessage] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [showAddPage, setShowAddPage] = useState(false);
-  const [newPageId, setNewPageId] = useState('');
-  const [addPageError, setAddPageError] = useState('');
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [commitMessage, setCommitMessage] = useState('Update site data');
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+      if (initialData) {
+          setSiteData(initialData);
+      }
+  }, [initialData]);
 
   useEffect(() => {
     const token = localStorage.getItem('adminPassword');
@@ -101,7 +108,13 @@ const Admin = ({ initialData }) => {
       updateSiteData(newData);
   };
 
-  const handleSave = async () => {
+  const handleSaveClick = () => {
+      setCommitMessage('Update site data');
+      setShowSaveModal(true);
+  };
+
+  const handleConfirmSave = async () => {
+      setShowSaveModal(false);
       setSaving(true);
       try {
         let endpoint = '/.netlify/functions/save-data';
@@ -114,7 +127,8 @@ const Admin = ({ initialData }) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 password: localStorage.getItem('adminPassword'),
-                data: siteData 
+                data: siteData,
+                message: commitMessage
             })
         });
         
@@ -158,6 +172,13 @@ const Admin = ({ initialData }) => {
           setAddPageError('Page ID is required');
           return;
       }
+      
+      const slugRegex = /^[a-z0-9-]+$/;
+      if (!slugRegex.test(newPageId)) {
+          setAddPageError('Page ID can only contain lowercase letters, numbers, and hyphens (no spaces).');
+          return;
+      }
+
       if (siteData.pages && siteData.pages[newPageId]) {
           setAddPageError('Page ID already exists');
           return;
@@ -233,6 +254,45 @@ const Admin = ({ initialData }) => {
       setShowToast(true);
   };
 
+  const handleAddCustomSection = () => {
+      const id = `custom_${Date.now()}`;
+      const newSection = { title: "New Section", links: [] };
+      const currentData = getCurrentPageData();
+      const newOrder = [...(currentData.sectionOrder || [])];
+      
+      // Insert before footer if possible
+      const footerIndex = newOrder.indexOf('footer');
+      if (footerIndex !== -1) {
+          newOrder.splice(footerIndex, 0, id);
+      } else {
+          newOrder.push(id);
+      }
+
+      const newData = {
+          ...currentData,
+          [id]: newSection,
+          sectionOrder: newOrder
+      };
+      
+      updateSiteData(newData);
+      setExpandedSections(prev => ({ ...prev, [id]: true }));
+      setToastMessage('New custom section added.');
+      setShowToast(true);
+  };
+
+  const handleDeleteSection = (sectionKey) => {
+      if (!window.confirm('Are you sure you want to delete this section?')) return;
+      
+      const currentData = getCurrentPageData();
+      const newOrder = currentData.sectionOrder.filter(k => k !== sectionKey);
+      const newData = { ...currentData, sectionOrder: newOrder };
+      delete newData[sectionKey];
+      
+      updateSiteData(newData);
+      setToastMessage('Section deleted.');
+      setShowToast(true);
+  };
+
   const handleInheritanceChange = (type, isInheriting) => {
       const currentPage = { ...siteData.pages[activePageId] };
       
@@ -264,12 +324,17 @@ const Admin = ({ initialData }) => {
                   <Form onSubmit={handleLogin}>
                       <Form.Group className="mb-3">
                           <Form.Label>Password</Form.Label>
-                          <Form.Control 
-                              type="password" 
-                              value={password} 
-                              onChange={(e) => setPassword(e.target.value)} 
-                              required 
-                          />
+                          <InputGroup>
+                              <Form.Control 
+                                  type={showPassword ? "text" : "password"} 
+                                  value={password} 
+                                  onChange={(e) => setPassword(e.target.value)} 
+                                  required 
+                              />
+                              <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>
+                                  <i className={`fas fa-eye${showPassword ? '-slash' : ''}`}></i>
+                              </Button>
+                          </InputGroup>
                       </Form.Group>
                       <Button variant="primary" type="submit" className="w-100" disabled={loading}>
                           {loading ? 'Verifying...' : 'Login'}
@@ -440,6 +505,7 @@ const Admin = ({ initialData }) => {
                       // List Editors
                       let title = sectionKey;
                       let itemTemplate = {};
+                      let isCustom = false;
                       
                       if (sectionKey === 'socialLinks') {
                           title = 'Social Links';
@@ -453,28 +519,67 @@ const Admin = ({ initialData }) => {
                       } else if (sectionKey === 'connectLinks') {
                           title = 'Connect Icons';
                           itemTemplate = { icon: 'fab fa-link', url: '#' };
+                      } else if (currentData[sectionKey]) {
+                          // Custom Section
+                          title = currentData[sectionKey].title || 'Custom Section';
+                          itemTemplate = { text: 'New Item', url: '#' };
+                          isCustom = true;
+                      } else {
+                          // Unknown section or static section handled elsewhere
+                          return null;
                       }
 
                       return (
                           <div key={sectionKey} className="mb-3">
+                              {isCustom && (
+                                  <div className="mb-2 text-end">
+                                      <Button variant="danger" size="sm" onClick={() => handleDeleteSection(sectionKey)}>
+                                          <i className="fas fa-trash me-1"></i> Delete Section
+                                      </Button>
+                                  </div>
+                              )}
                               <ListEditor 
                                   title={title}
-                                  items={currentData[sectionKey] || []}
-                                  onChange={(newItems) => handleSectionChange(sectionKey, newItems)}
+                                  items={isCustom ? (currentData[sectionKey]?.links || []) : (Array.isArray(currentData[sectionKey]) ? currentData[sectionKey] : [])}
+                                  onChange={(newItems) => {
+                                      if (isCustom) {
+                                          handleSectionChange(sectionKey, { ...currentData[sectionKey], links: newItems });
+                                      } else {
+                                          handleSectionChange(sectionKey, newItems);
+                                      }
+                                  }}
                                   themeColors={themeColors}
                                   itemTemplate={itemTemplate}
+                                  isCustom={isCustom}
                                   {...commonProps}
-                              />
+                              >
+                                  {isCustom && (
+                                      <Form.Group className="mb-3">
+                                          <Form.Label>Section Title</Form.Label>
+                                          <Form.Control 
+                                              type="text" 
+                                              value={title} 
+                                              onChange={(e) => handleSectionChange(sectionKey, { ...currentData[sectionKey], title: e.target.value })} 
+                                          />
+                                      </Form.Group>
+                                  )}
+                              </ListEditor>
                           </div>
                       );
                   })}
+
+                  <div className="text-center my-4">
+                      <Button variant="primary" size="lg" onClick={handleAddCustomSection}>
+                          <i className="fas fa-plus-circle me-2"></i>Add New Custom Section
+                      </Button>
+                  </div>
 
               </div>
           </Container>
 
           {/* Floating Save Button */}
           <div className="position-fixed bottom-0 end-0 p-4" style={{zIndex: 1000}}>
-              <Button variant={hasChanges ? "success" : "secondary"} size="lg" className="shadow rounded-pill px-4" onClick={handleSave} disabled={saving || !hasChanges}>
+              <Button variant={hasChanges ? "success" : "secondary"} size="lg" className="shadow rounded-pill px-4" onClick={handleSaveClick} disabled={saving || !hasChanges}>
                   {saving ? (
                       <>
                           <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -487,6 +592,30 @@ const Admin = ({ initialData }) => {
                   )}
               </Button>
           </div>
+
+          <Modal show={showSaveModal} onHide={() => setShowSaveModal(false)}>
+              <Modal.Header closeButton>
+                  <Modal.Title>Confirm Save</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                  <Form.Group>
+                      <Form.Label>Commit Message</Form.Label>
+                      <Form.Control 
+                          type="text" 
+                          value={commitMessage} 
+                          onChange={(e) => setCommitMessage(e.target.value)} 
+                          placeholder="Describe your changes..."
+                      />
+                      <Form.Text className="text-muted">
+                          This message will be recorded in the changelog.
+                      </Form.Text>
+                  </Form.Group>
+              </Modal.Body>
+              <Modal.Footer>
+                  <Button variant="secondary" onClick={() => setShowSaveModal(false)}>Cancel</Button>
+                  <Button variant="success" onClick={handleConfirmSave}>Confirm Save</Button>
+              </Modal.Footer>
+          </Modal>
 
           <ToastContainer position="bottom-start" className="p-3">
               <Toast onClose={() => setShowToast(false)} show={showToast} delay={3000} autohide bg="success">

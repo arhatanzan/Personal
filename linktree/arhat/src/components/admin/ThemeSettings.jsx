@@ -115,5 +115,4 @@ const ThemeSettings = ({ theme, onChange, isOpen, onToggle }) => {
     );
 };
 
-import { Collapse } from 'react-bootstrap';
 export default ThemeSettings;
